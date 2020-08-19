@@ -11,6 +11,7 @@ import (
 	"go-admin/tools/config"
 	"net/http"
 	"text/template"
+	"time"
 )
 
 func Preview(c *gin.Context) {
@@ -133,7 +134,7 @@ func GenCode(c *gin.Context) {
 func GenMenuAndApi(c *gin.Context) {
 
 	table := tools.SysTables{}
-	timeNow := tools2.GetCurrentTime()
+	timeNow := time.Now()
 	id, err := tools2.StringToInt(c.Param("tableId"))
 	tools2.HasError(err, "", -1)
 	table.TableId = id
@@ -153,8 +154,8 @@ func GenMenuAndApi(c *gin.Context) {
 	Mmenu.IsFrame = "0"
 	Mmenu.CreateBy = "1"
 	Mmenu.UpdateBy = "1"
-	Mmenu.CreatedAt = timeNow
-	Mmenu.UpdatedAt = timeNow
+	Mmenu.CreatedAt = time.Now()
+	Mmenu.UpdatedAt = time.Now()
 	Mmenu.MenuId, err = Mmenu.Create()
 
 	Cmenu := models.Menu{}
@@ -173,8 +174,8 @@ func GenMenuAndApi(c *gin.Context) {
 	Cmenu.IsFrame = "0"
 	Cmenu.CreateBy = "1"
 	Cmenu.UpdateBy = "1"
-	Cmenu.CreatedAt = timeNow
-	Cmenu.UpdatedAt = timeNow
+	Cmenu.CreatedAt = time.Now()
+	Cmenu.UpdatedAt = time.Now()
 	Cmenu.MenuId, err = Cmenu.Create()
 
 	MList := models.Menu{}
@@ -192,8 +193,8 @@ func GenMenuAndApi(c *gin.Context) {
 	MList.IsFrame = "0"
 	MList.CreateBy = "1"
 	MList.UpdateBy = "1"
-	MList.CreatedAt = timeNow
-	MList.UpdatedAt = timeNow
+	MList.CreatedAt = time.Now()
+	MList.UpdatedAt = time.Now()
 	MList.MenuId, err = MList.Create()
 
 	MCreate := models.Menu{}
@@ -211,8 +212,8 @@ func GenMenuAndApi(c *gin.Context) {
 	MCreate.IsFrame = "0"
 	MCreate.CreateBy = "1"
 	MCreate.UpdateBy = "1"
-	MCreate.CreatedAt = timeNow
-	MCreate.UpdatedAt = timeNow
+	MCreate.CreatedAt = time.Now()
+	MCreate.UpdatedAt = time.Now()
 	MCreate.MenuId, err = MCreate.Create()
 
 	MUpdate := models.Menu{}
@@ -230,8 +231,8 @@ func GenMenuAndApi(c *gin.Context) {
 	MUpdate.IsFrame = "0"
 	MUpdate.CreateBy = "1"
 	MUpdate.UpdateBy = "1"
-	MUpdate.CreatedAt = timeNow
-	MUpdate.UpdatedAt = timeNow
+	MUpdate.CreatedAt = time.Now()
+	MUpdate.UpdatedAt = time.Now()
 	MUpdate.MenuId, err = MUpdate.Create()
 
 	MDelete := models.Menu{}
@@ -249,8 +250,8 @@ func GenMenuAndApi(c *gin.Context) {
 	MDelete.IsFrame = "0"
 	MDelete.CreateBy = "1"
 	MDelete.UpdateBy = "1"
-	MDelete.CreatedAt = timeNow
-	MDelete.UpdatedAt = timeNow
+	MDelete.CreatedAt = time.Now()
+	MDelete.UpdatedAt = time.Now()
 	MDelete.MenuId, err = MDelete.Create()
 
 	var InterfaceId = 63
@@ -268,7 +269,7 @@ func GenMenuAndApi(c *gin.Context) {
 	Amenu.IsFrame = "0"
 	Amenu.CreateBy = "1"
 	Amenu.UpdateBy = "1"
-	Amenu.CreatedAt = timeNow
+	Amenu.CreatedAt = time.Now()
 	Amenu.UpdatedAt = timeNow
 	Amenu.MenuId, err = Amenu.Create()
 

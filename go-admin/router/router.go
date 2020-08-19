@@ -39,7 +39,10 @@ func examplesCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMiddle
 	// 空接口防止v1定义无使用报错
 	v1.GET("/checkrole", nil)
 
-	// {{认证路由自动补充在此处请勿删除}}
+	// {{认证路由自动补充在此处请勿删除}} 
+ registerScbDeptRouter(v1,authMiddleware) 
+ registerSchSitesRouter(v1,authMiddleware) 
+ registerScbLinesRouter(v1,authMiddleware)
 	 registerScbStudentsRouter(v1,authMiddleware)
 	 registerScbTeachersRouter(v1,authMiddleware)
 	 registerScbCarsRouter(v1,authMiddleware)

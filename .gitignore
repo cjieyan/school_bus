@@ -21,5 +21,14 @@ selenium-debug.log
 
 package-lock.json
 yarn.lock
-node_modules
-tests
+static/uploadfile
+main.exe
+go-admin
+temp/
+!temp
+vendor
+config/settings.dev.yml
+go-admin
+middleware/demo.go
+config/settings.dev.b.yml
+temp/logs

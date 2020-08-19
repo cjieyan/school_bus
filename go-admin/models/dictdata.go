@@ -116,7 +116,7 @@ func (e *DictData) GetPage(pageSize int, pageIndex int) ([]DictData, int, error)
 	if err := table.Order("dict_sort").Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&doc).Error; err != nil {
 		return nil, 0, err
 	}
-	table.Where("`deleted_at` IS NULL").Count(&count)
+	table.Where("`deleted_at` is NULL ").Count(&count)
 	return doc, count, nil
 }
 

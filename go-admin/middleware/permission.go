@@ -18,6 +18,8 @@ func AuthCheckRole() gin.HandlerFunc {
 		e, err := mycasbin.Casbin()
 		tools.HasError(err, "", 500)
 		//检查权限
+		fmt.Println("v[\"rolekey\"], c.Request.URL.Path, c.Request.Method", v["rolekey"],
+			c.Request.URL.Path, c.Request.Method)
 		res, err := e.Enforce(v["rolekey"], c.Request.URL.Path, c.Request.Method)
 		tools.HasError(err, "", 500)
 

@@ -7,7 +7,6 @@ import (
 	"go-admin/tools"
 	"go-admin/tools/app"
 	"go-admin/tools/app/msg"
-	"time"
 )
 
 func GetAkCarsList(c *gin.Context) {
@@ -42,7 +41,6 @@ func GetAkCars(c *gin.Context) {
 func InsertAkCars(c *gin.Context) {
 	var data models.Cars
 	err := c.ShouldBindJSON(&data)
-	data.CreatedAt = int(time.Now().Unix())
 	tools.HasError(err, "", 500)
 	result, err := data.Create()
 	tools.HasError(err, "", -1)
@@ -53,7 +51,6 @@ func UpdateAkCars(c *gin.Context) {
 	var data models.Cars
 	err := c.BindWith(&data, binding.JSON)
 	tools.HasError(err, "数据解析失败", -1)
-	data.UpdatedAt = int(time.Now().Unix())
 	result, err := data.Update(data.Id)
 	tools.HasError(err, "", -1)
 
@@ -62,7 +59,6 @@ func UpdateAkCars(c *gin.Context) {
 
 func DeleteAkCars(c *gin.Context) {
 	var data models.Cars
-	data.UpdatedAt = int(time.Now().Unix())
 
 	IDS := tools.IdsStrToIdsIntGroup("id", c)
 	_, err := data.BatchDelete(IDS)

@@ -25,8 +25,8 @@ type Cars struct {
         CarnoMd5 string `json:"carnoMd5" gorm:"type:varchar(32);"` // 车牌号md5
         RenewAt string `json:"renewAt" gorm:"type:int(11);"` // 最后一次更新时间
         SuccMonth string `json:"succMonth" gorm:"type:int(11);"` // 查询成功的年月
-        CreatedAt int `json:"created_at" gorm:"created_at:int(11);"` // 最后一次更新时间
-        UpdatedAt int `json:"updated_at" gorm:"updated_at:int(11);"` // 最后一次更新时间
+        //CreatedAt int `json:"created_at" gorm:"created_at:int(11);"` // 最后一次更新时间
+        //UpdatedAt int `json:"updated_at" gorm:"updated_at:int(11);"` // 最后一次更新时间
 
         IllegalStatus int `json:"illegalStatus" gorm:"type:tinyint(4);"` // 0 无违章 1有违章
         DataScope   string `json:"dataScope" gorm:"-"`
@@ -84,7 +84,7 @@ func (e *Cars) GetPage(pageSize int, pageIndex int) ([]Cars, int, error) {
         if err := table.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&doc).Error; err != nil {
         return nil, 0, err
         }
-        table.Where("`deleted_at` IS NULL").Count(&count)
+        table.Where("`deleted_at` is NULL ").Count(&count)
         return doc, count, nil
         }
 

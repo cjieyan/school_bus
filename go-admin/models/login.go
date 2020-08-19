@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	orm "go-admin/global"
 	"go-admin/tools"
 )
@@ -13,8 +14,9 @@ type Login struct {
 }
 
 func (u *Login) GetUser() (user SysUser, role SysRole, e error) {
-
 	e = orm.Eloquent.Table("sys_user").Where("username = ? ", u.Username).Find(&user).Error
+
+	fmt.Println("username....", u.Username, e)
 	if e != nil {
 		return
 	}
