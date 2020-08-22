@@ -27,8 +27,7 @@ func AuthCheckRole() gin.HandlerFunc {
 			tools.GetCurrentTimeStr(),
 			c.Request.Method,
 			c.Request.URL.Path,
-			v["rolekey"],
-		)
+			v["rolekey"])
 
 		if res {
 			c.Next()
