@@ -1,10 +1,10 @@
 package router
 
 import (
-"github.com/gin-gonic/gin"
-"go-admin/middleware"
-"go-admin/apis/akcars"
-jwt "go-admin/pkg/jwtauth"
+	"github.com/gin-gonic/gin"
+	"go-admin/apis/akcars"
+	"go-admin/middleware"
+	jwt "go-admin/pkg/jwtauth"
 )
 
 // 需认证的路由代码
@@ -20,7 +20,7 @@ func registerCarsRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddlewar
 
 	l := v1.Group("").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
-		l.GET("/akcarsList",akcars.GetAkCarsList)
+		l.GET("/akcarsList", akcars.GetAkCarsList)
 	}
 
 }

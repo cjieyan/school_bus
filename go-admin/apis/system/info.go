@@ -56,7 +56,7 @@ func GetInfo(c *gin.Context) {
 
 	app.OK(c, mp, "")
 }
-func GetPreView(c *gin.Context){
+func GetPreView(c *gin.Context) {
 
 	sysuser := models.SysUser{}
 	sysuser.UserId = tools.GetUserId(c)
@@ -76,7 +76,7 @@ func GetPreView(c *gin.Context){
 	data, err := userAccount.Get()
 	if nil == err && data.Id > 0 {
 		mp["times"] = data.CarTimes
-	}else{
+	} else {
 		mp["times"] = 0
 	}
 
@@ -87,7 +87,6 @@ func GetPreView(c *gin.Context){
 	//违章车辆
 	illegalCount := cars.GetIllegalCount()
 	mp["illegalCount"] = illegalCount
-
 
 	app.OK(c, mp, "")
 }

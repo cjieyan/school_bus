@@ -241,11 +241,11 @@ export default {
         this.deptOptions = []
 
         if (e === 'update') {
-          const dept = { deptId: 0, deptName: '主类目', children: [], isDisabled: true }
+          const dept = { deptId: 0, deptName: '请选择', children: [] }
           dept.children = response.data
           this.deptOptions.push(dept)
         } else {
-          const dept = { deptId: 0, deptName: '主类目', children: [] }
+          const dept = { deptId: 0, deptName: '请选择', children: [] }
           dept.children = response.data
           this.deptOptions.push(dept)
         }

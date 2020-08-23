@@ -2,8 +2,8 @@ package cronjob
 
 import (
 	"github.com/robfig/cron/v3"
-	"log"
 	tools2 "go-admin/tools"
+	"log"
 )
 
 func TestJob(c *cron.Cron) {

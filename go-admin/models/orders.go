@@ -1,14 +1,14 @@
 package models
 
 import (
-        orm "go-admin/global"
+	orm "go-admin/global"
 )
 
 type Orders struct {
 	Id             int    `json:"id" gorm:"type:int(11);primary_key"`           //
 	OrderNo        string `json:"orderNo" gorm:"type:varchar(100);"`            // 订单号
 	TradeNo        string `json:"tradeNo" gorm:"type:varchar(100);"`            // 第三方流水号
-	UserId         int `json:"userId" gorm:"type:int(11);"`                  // 用户id
+	UserId         int    `json:"userId" gorm:"type:int(11);"`                  // 用户id
 	GoodsId        string `json:"goodsId" gorm:"type:int(11);"`                 // 商品id
 	CarTimes       string `json:"carTimes" gorm:"type:int(11);"`                // 查询次数
 	OrderAmount    string `json:"orderAmount" gorm:"type:int(11) unsigned;"`    // 订单金额
@@ -57,7 +57,7 @@ func (e *Orders) Get() (Orders, error) {
 }
 
 //待支付订单数量
-func (e *Orders)WaitPayCount()int{
+func (e *Orders) WaitPayCount() int {
 	table := orm.Eloquent.Table(e.TableName())
 	filter := make(map[string]interface{})
 	filter["user_id"] = e.UserId

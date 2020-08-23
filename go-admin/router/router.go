@@ -26,8 +26,8 @@ func examplesNoCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMidd
 	v1.GET("/nilcheckrole", nil)
 
 	// {{无需认证路由自动补充在此处请勿删除}}
-	 //registerOrdersRouter(v1)
-	 //registerUserAccountRouter(v1)
+	//registerOrdersRouter(v1)
+	//registerUserAccountRouter(v1)
 	// registerCarsRecordRouter(v1, authMiddleware)
 	// registerCarsRouter(v1,authMiddleware)
 }
@@ -39,13 +39,14 @@ func examplesCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMiddle
 	// 空接口防止v1定义无使用报错
 	v1.GET("/checkrole", nil)
 
-	// {{认证路由自动补充在此处请勿删除}} 
- registerScbDeptRouter(v1,authMiddleware) 
- registerSchSitesRouter(v1,authMiddleware) 
- registerScbLinesRouter(v1,authMiddleware)
-	 registerScbStudentsRouter(v1,authMiddleware)
-	 registerScbTeachersRouter(v1,authMiddleware)
-	 registerScbCarsRouter(v1,authMiddleware)
-	 registerCarsRecordRouter(v1,authMiddleware)
-	 registerCarsRouter(v1,authMiddleware)
+	// {{认证路由自动补充在此处请勿删除}}
+	registerScbPostRouter(v1, authMiddleware)
+	registerScbDeptRouter(v1, authMiddleware)
+	registerSchSitesRouter(v1, authMiddleware)
+	registerScbLinesRouter(v1, authMiddleware)
+	registerScbStudentsRouter(v1, authMiddleware)
+	registerScbTeachersRouter(v1, authMiddleware)
+	registerScbCarsRouter(v1, authMiddleware)
+	registerCarsRecordRouter(v1, authMiddleware)
+	registerCarsRouter(v1, authMiddleware)
 }

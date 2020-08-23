@@ -1,8 +1,8 @@
 package router
 
 import (
-"github.com/gin-gonic/gin"
-"go-admin/apis/orders"
+	"github.com/gin-gonic/gin"
+	"go-admin/apis/orders"
 )
 
 // 无需认证的路由代码

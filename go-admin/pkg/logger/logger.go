@@ -30,7 +30,6 @@ func Setup() {
 	RequestLogger.SetFile("access-{Ymd}.log")
 	_ = RequestLogger.SetLevelStr(config.LoggerConfig.Level)
 
-
 	Logger.Info(tools.Green("Logger init success!"))
 
 	global.Logger = Logger.Line()

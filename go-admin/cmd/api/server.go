@@ -36,11 +36,10 @@ var (
 			return run()
 		},
 	}
-
-
 )
 
 var echoTimes int
+
 func init() {
 	StartCmd.PersistentFlags().StringVarP(&configYml, "config", "c", "config/settings.yml", "Start server with provided configuration file")
 	StartCmd.PersistentFlags().StringVarP(&port, "port", "p", "8000", "Tcp port server listening on")
