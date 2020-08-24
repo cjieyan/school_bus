@@ -25,8 +25,8 @@ func GetScbTeachersList(c *gin.Context) {
 	data.Id, _ = tools.StringToInt(c.Request.FormValue("id"))
 	data.Name = c.Request.FormValue("name")
 	data.Phone = c.Request.FormValue("phone")
-	data.ClassId = c.Request.FormValue("classId")
-	data.PostId = c.Request.FormValue("postId")
+	data.ClassId, _ = tools.StringToInt(c.Request.FormValue("classId"))
+	data.PostId, _ = tools.StringToInt(c.Request.FormValue("postId"))
 	data.IsDeleted = c.Request.FormValue("isDeleted")
 
 	data.DataScope = tools.GetUserIdStr(c)
@@ -35,14 +35,26 @@ func GetScbTeachersList(c *gin.Context) {
 
 	app.PageOK(c, result, count, pageIndex, pageSize, "")
 }
-
+//获取教师信息
 func GetScbTeachers(c *gin.Context) {
 	var data models.ScbTeachers
 	data.Id, _ = tools.StringToInt(c.Param("id"))
 	result, err := data.Get()
 	tools.HasError(err, "抱歉未找到相关信息", -1)
 
-	app.OK(c, result, "")
+	scbpost := models.ScbPost{}
+	posts, err := scbpost.GetList()
+
+	postIds := make([]int, 0)
+	intPostId := result.PostId
+	postIds = append(postIds, intPostId)
+
+	app.Custum(c, gin.H{
+		"code":    200,
+		"data":    result,
+		"postIds": postIds,
+		"posts":   posts,
+	})
 }
 
 func InsertScbTeachers(c *gin.Context) {

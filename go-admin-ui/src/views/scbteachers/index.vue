@@ -29,23 +29,17 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="岗位id" prop="postId">
-        <el-input
-          v-model="queryParams.postId"
-          placeholder="请输入岗位id"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="0未删除 1已删除" prop="isDeleted">
-        <el-input
-          v-model="queryParams.isDeleted"
-          placeholder="请输入0未删除 1已删除"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+
+      <el-form-item label="岗位">
+        <el-select v-model="form.postId" placeholder="请选择" @change="$forceUpdate()">
+          <el-option
+            v-for="item in postOptions"
+            :key="item.postId"
+            :label="item.postName"
+            :value="item.postId"
+            :disabled="item.status == 1"
+          />
+        </el-select>
       </el-form-item>
 
       <el-form-item>
@@ -126,11 +120,6 @@
         align="center"
         prop="updatedAt"
         :show-overflow-tooltip="true"
-      /><el-table-column
-        label="0未删除 1已删除"
-        align="center"
-        prop="isDeleted"
-        :show-overflow-tooltip="true"
       />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -188,22 +177,22 @@
             :is-disabled="isEdit"
           />
         </el-form-item>
-        <el-form-item label="岗位id" prop="postId">
-          <el-input
-            v-model="form.postId"
-            placeholder="岗位id"
-          />
+
+        <el-form-item label="岗位">
+          <el-select v-model="form.postId" placeholder="请选择" @change="$forceUpdate()">
+            <el-option
+              v-for="item in postOptions"
+              :key="item.postId"
+              :label="item.postName"
+              :value="item.postId"
+              :disabled="item.status == 1"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input
             v-model="form.remark"
             placeholder="备注"
-          />
-        </el-form-item>
-        <el-form-item label="0未删除 1已删除" prop="isDeleted">
-          <el-input
-            v-model="form.isDeleted"
-            placeholder="0未删除 1已删除"
           />
         </el-form-item>
       </el-form>
@@ -218,6 +207,7 @@
 <script>
 import { addScbTeachers, delScbTeachers, getScbTeachers, listScbTeachers, updateScbTeachers } from '@/api/scbteachers'
 import { getDeptList } from '@/api/scbdept'
+import { getScbpostAll } from '@/api/scbpost'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
@@ -245,6 +235,9 @@ export default {
       // 类型数据字典
       typeOptions: [],
       scbteachersList: [],
+      // 岗位选项
+      postOptions: [],
+      postIds: undefined,
 
       // 查询参数
       queryParams: {
@@ -287,10 +280,6 @@ export default {
       postId:
                 [
                   { required: true, message: '岗位id不能为空', trigger: 'blur' }
-                ],
-      isDeleted:
-                [
-                  { required: true, message: '0未删除 1已删除不能为空', trigger: 'blur' }
                 ]
       }
     }
@@ -374,6 +363,9 @@ export default {
       this.open = true
       this.title = '添加教职员工表'
       this.isEdit = false
+      getScbpostAll().then(response => {
+        this.postOptions = response.data
+      })
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -392,6 +384,10 @@ export default {
         this.open = true
         this.title = '修改教职员工表'
         this.isEdit = true
+        getScbpostAll().then(res => {
+          this.postOptions = res.data
+          // this.postId = response.data.postId
+        })
       })
     },
     /** 提交按钮 */

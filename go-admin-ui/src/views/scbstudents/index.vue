@@ -21,12 +21,13 @@
         />
       </el-form-item>
       <el-form-item label="班级id" prop="classId">
-        <el-input
-          v-model="queryParams.classId"
-          placeholder="请输入班级id"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
+        <treeselect
+          v-model="form.classId"
+          :options="deptOptions"
+          :normalizer="normalizer"
+          :show-count="true"
+          placeholder="选择班级"
+          :is-disabled="isEdit"
         />
       </el-form-item>
       <el-form-item label="线路id" prop="lineId">
@@ -470,7 +471,7 @@ export default {
         this.deptOptions = []
 
         if (e === 'update') {
-          const dept = { deptId: 0, deptName: '请选择', children: [], isDisabled: true }
+          const dept = { deptId: 0, deptName: '请选择', children: [] }
           dept.children = response.data
           this.deptOptions.push(dept)
         } else {

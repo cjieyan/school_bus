@@ -3,14 +3,15 @@ package models
 import (
 	orm "go-admin/global"
 	"go-admin/tools"
+	"time"
 )
 
 type ScbTeachers struct {
 	Id        int    `json:"id" gorm:"type:int(10) unsigned;primary_key"` //
 	Name      string `json:"name" gorm:"type:varchar(100);"`              // 名称
 	Phone     string `json:"phone" gorm:"type:varchar(50);"`              // 手机号
-	ClassId   string `json:"classId" gorm:"type:int(11);"`                // 班级id
-	PostId    string `json:"postId" gorm:"type:int(11);"`                 // 岗位id
+	ClassId   int 	 `json:"classId" gorm:"type:int(11);"`                // 班级id
+	PostId    int `json:"postId" gorm:"type:int(11);"`                 // 岗位id
 	Remark    string `json:"remark" gorm:"type:varchar(200);"`            // 备注
 	IsDeleted string `json:"isDeleted" gorm:"type:tinyint(4);"`           // 0未删除 1已删除
 	DataScope string `json:"dataScope" gorm:"-"`
@@ -25,6 +26,7 @@ func (ScbTeachers) TableName() string {
 // 创建ScbTeachers
 func (e *ScbTeachers) Create() (ScbTeachers, error) {
 	var doc ScbTeachers
+	e.CreatedAt = time.Now()
 	result := orm.Eloquent.Table(e.TableName()).Create(&e)
 	if result.Error != nil {
 		err := result.Error
@@ -51,11 +53,11 @@ func (e *ScbTeachers) Get() (ScbTeachers, error) {
 		table = table.Where("phone = ?", e.Phone)
 	}
 
-	if e.ClassId != "" {
+	if e.ClassId != 0 {
 		table = table.Where("class_id = ?", e.ClassId)
 	}
 
-	if e.PostId != "" {
+	if e.PostId !=0 {
 		table = table.Where("post_id = ?", e.PostId)
 	}
 
@@ -87,11 +89,11 @@ func (e *ScbTeachers) GetPage(pageSize int, pageIndex int) ([]ScbTeachers, int, 
 		table = table.Where("phone = ?", e.Phone)
 	}
 
-	if e.ClassId != "" {
+	if e.ClassId != 0 {
 		table = table.Where("class_id = ?", e.ClassId)
 	}
 
-	if e.PostId != "" {
+	if e.PostId !=0 {
 		table = table.Where("post_id = ?", e.PostId)
 	}
 
