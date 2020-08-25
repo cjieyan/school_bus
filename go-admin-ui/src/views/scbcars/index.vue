@@ -155,13 +155,6 @@
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-
-        <el-form-item label="" prop="id">
-          <el-input
-            v-model="form.id"
-            placeholder=""
-          />
-        </el-form-item>
         <el-form-item label="车牌编号" prop="carNumber">
           <el-input
             v-model="form.carNumber"
@@ -181,10 +174,15 @@
           />
         </el-form-item>
         <el-form-item label="跟车员" prop="attendantId">
-          <el-input
+          <treeselect
             v-model="form.attendantId"
-            placeholder="跟车员"
+            :options="attendantsOptions"
+            :normalizer="normalizer"
+            :show-count="true"
+            placeholder="选择班级"
+            :is-disabled="isEdit"
           />
+
         </el-form-item>
         <el-form-item label="司机" prop="driver">
           <el-input
@@ -204,12 +202,6 @@
             placeholder="所属部门"
           />
         </el-form-item>
-        <el-form-item label="0正常 1已删除" prop="isDelete">
-          <el-input
-            v-model="form.isDelete"
-            placeholder="0正常 1已删除"
-          />
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -221,11 +213,15 @@
 
 <script>
 import { addScbCars, delScbCars, getScbCars, listScbCars, updateScbCars } from '@/api/scbcars'
-
+import { getAttendants } from '@/api/scbteachers'
+import Treeselect from '@riophae/vue-treeselect'
+import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
-  name: 'Config',
+  name: 'Scbcars',
+  components: { Treeselect },
   data() {
     return {
+      attendantsOptions: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -286,6 +282,16 @@ export default {
     this.getList()
   },
   methods: {
+    normalizer(node) {
+      if (node.children && !node.children.length) {
+        delete node.children
+      }
+      return {
+        id: node.deptId,
+        label: node.deptName,
+        children: node.children
+      }
+    },
     /** 查询参数列表 */
     getList() {
       this.loading = true
@@ -295,6 +301,15 @@ export default {
         this.loading = false
       }
       )
+    },
+    /** 查询班级下拉树结构 */
+    getTreeselect(e) {
+      getAttendants().then(response => {
+        this.attendantsOptions = []
+        const attendants = { deptId: 0, deptName: '请选择', children: [] }
+        attendants.children = response.data
+        this.attendantsOptions.push(attendants)
+      })
     },
     // 取消按钮
     cancel() {
@@ -333,7 +348,7 @@ export default {
     handleAdd() {
       this.reset()
       this.open = true
-      this.title = '添加ScbCars'
+      this.title = '添加车辆'
       this.isEdit = false
     },
     // 多选框选中数据

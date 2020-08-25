@@ -42,4 +42,10 @@ export function delScbTeachers(id) {
     method: 'delete'
   })
 }
+export function getAttendants() {
+  return request({
+    url: '/api/v1/getAttendants',
+    method: 'get'
+  })
+}
 

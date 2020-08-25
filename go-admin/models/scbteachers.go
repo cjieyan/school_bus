@@ -133,7 +133,9 @@ func (e *ScbTeachers) Update(id int) (update ScbTeachers, err error) {
 
 // 删除ScbTeachers
 func (e *ScbTeachers) Delete(id int) (success bool, err error) {
-	if err = orm.Eloquent.Table(e.TableName()).Where("id = ?", id).Delete(&ScbTeachers{}).Error; err != nil {
+	if err = orm.Eloquent.Table(e.TableName()).
+		Where("id = ?", id).
+		Delete(&ScbTeachers{}).Error; err != nil {
 		success = false
 		return
 	}
@@ -148,4 +150,15 @@ func (e *ScbTeachers) BatchDelete(id []int) (Result bool, err error) {
 	}
 	Result = true
 	return
+}
+func (e *ScbTeachers) GetAttendants() ([]ScbTeachers, error){
+	var doc []ScbTeachers
+
+	table := orm.Eloquent.Select("*").
+		Where("post_id = ?", 1).
+		Table(e.TableName())
+	if err := table.Find(&doc).Error; err != nil {
+		return doc, err
+	}
+	return doc, nil
 }

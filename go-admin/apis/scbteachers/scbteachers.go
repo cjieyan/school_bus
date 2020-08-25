@@ -84,3 +84,10 @@ func DeleteScbTeachers(c *gin.Context) {
 	tools.HasError(err, msg.DeletedFail, 500)
 	app.OK(c, nil, msg.DeletedSuccess)
 }
+func GetAttendants(c *gin.Context){
+
+	data := models.ScbTeachers{}
+	attendants, err := data.GetAttendants()
+	tools.HasError(err, "", -1)
+	app.OK(c, attendants, "")
+}

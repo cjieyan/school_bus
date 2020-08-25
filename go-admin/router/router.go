@@ -47,6 +47,4 @@ func examplesCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMiddle
 	registerScbStudentsRouter(v1, authMiddleware)
 	registerScbTeachersRouter(v1, authMiddleware)
 	registerScbCarsRouter(v1, authMiddleware)
-	registerCarsRecordRouter(v1, authMiddleware)
-	registerCarsRouter(v1, authMiddleware)
 }

@@ -21,6 +21,7 @@ func registerScbTeachersRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMi
 	l := v1.Group("").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
 		l.GET("/scbteachersList", scbteachers.GetScbTeachersList)
+		l.GET("/getAttendants", scbteachers.GetAttendants)
 	}
 
 }

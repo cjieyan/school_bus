@@ -48,11 +48,8 @@ func GetInfo(c *gin.Context) {
 	mp["deptId"] = user.DeptId
 	mp["name"] = user.NickName
 
-	cars := models.Cars{
-		UserId: user.UserId,
-	}
-	count := cars.GetCount()
-	mp["carsCount"] = count
+
+	mp["carsCount"] = 0
 
 	app.OK(c, mp, "")
 }
@@ -62,10 +59,7 @@ func GetPreView(c *gin.Context) {
 	sysuser.UserId = tools.GetUserId(c)
 	var mp = make(map[string]interface{})
 
-	cars := models.Cars{
-		UserId: sysuser.UserId,
-	}
-	count := cars.GetCount()
+	count := 0
 	//车辆数
 	mp["carsCount"] = count
 
@@ -85,7 +79,7 @@ func GetPreView(c *gin.Context) {
 	//待支付订单
 	mp["waitPayCount"] = waitPayCount
 	//违章车辆
-	illegalCount := cars.GetIllegalCount()
+	illegalCount := 0
 	mp["illegalCount"] = illegalCount
 
 	app.OK(c, mp, "")

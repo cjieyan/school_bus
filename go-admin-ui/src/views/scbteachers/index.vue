@@ -303,16 +303,9 @@ export default {
     getTreeselect(e) {
       getDeptList().then(response => {
         this.deptOptions = []
-
-        if (e === 'update') {
-          const dept = { deptId: 0, deptName: '请选择', children: [], isDisabled: true }
-          dept.children = response.data
-          this.deptOptions.push(dept)
-        } else {
-          const dept = { deptId: 0, deptName: '请选择', children: [] }
-          dept.children = response.data
-          this.deptOptions.push(dept)
-        }
+        const dept = { deptId: 0, deptName: '请选择', children: []}
+        dept.children = response.data
+        this.deptOptions.push(dept)
       })
     },
     /** 查询参数列表 */
