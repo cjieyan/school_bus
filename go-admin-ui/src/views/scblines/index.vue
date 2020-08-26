@@ -21,30 +21,37 @@
         />
       </el-form-item>
       <el-form-item label="出发时间" prop="departed_at">
-        <el-input
+        <el-time-picker
           v-model="queryParams.departed_at"
-          placeholder="请输入出发时间"
+          format="HH:mm:ss"
+          value-format="HH:mm:ss"
+          :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+          :style="{width: '100%'}"
+          placeholder="请选择出发时间"
           clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+
       <el-form-item label="到达时间" prop="arrivedAt">
-        <el-input
+        <el-time-picker
           v-model="queryParams.arrivedAt"
-          placeholder="请输入到达时间"
+          format="HH:mm:ss"
+          value-format="HH:mm:ss"
+          :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+          :style="{width: '100%'}"
+          placeholder="请选择到达时间"
           clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
         />
       </el-form-item>
       <el-form-item label="换站截止时间" prop="changeExpiredAt">
-        <el-input
+        <el-time-picker
           v-model="queryParams.changeExpiredAt"
-          placeholder="请输入换站截止时间"
+          format="HH:mm:ss"
+          value-format="HH:mm:ss"
+          :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+          :style="{width: '100%'}"
+          placeholder="请选择换站截止时间"
           clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
         />
       </el-form-item>
       <el-form-item label="绑定的车辆" prop="carIds">
@@ -150,7 +157,8 @@
         align="center"
         prop="departed_at"
         :show-overflow-tooltip="true"
-      /><el-table-column
+      />
+      <el-table-column
         label="到达时间"
         align="center"
         prop="arrivedAt"
@@ -227,33 +235,44 @@
           />
         </el-form-item>
         <el-form-item label="出发时间" prop="departed_at">
-          <el-input
-            v-model="form.departed_at"
-            placeholder="出发时间"
+          <el-time-picker
+            v-model="queryParams.departed_at"
+            format="HH:mm:ss"
+            value-format="HH:mm:ss"
+            :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+            :style="{width: '100%'}"
+            placeholder="请选择出发时间"
+            clearable
           />
         </el-form-item>
         <el-form-item label="到达时间" prop="arrivedAt">
-          <el-input
-            v-model="form.arrivedAt"
-            placeholder="到达时间"
+          <el-time-picker
+            v-model="queryParams.arrivedAt"
+            format="HH:mm:ss"
+            value-format="HH:mm:ss"
+            :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+            :style="{width: '100%'}"
+            placeholder="请选择到达时间"
+            clearable
           />
         </el-form-item>
+
+
         <el-form-item label="换站截止时间" prop="changeExpiredAt">
-          <el-input
-            v-model="form.changeExpiredAt"
-            placeholder="换站截止时间"
+          <el-time-picker
+            v-model="queryParams.changeExpiredAt"
+            format="HH:mm:ss"
+            value-format="HH:mm:ss"
+            :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+            :style="{width: '100%'}"
+            placeholder="请选择换站截止时间"
+            clearable
           />
         </el-form-item>
         <el-form-item label="绑定的车辆" prop="carIds">
           <el-input
             v-model="form.carIds"
             placeholder="绑定的车辆"
-          />
-        </el-form-item>
-        <el-form-item label="0正常 1已删除" prop="isDelete">
-          <el-input
-            v-model="form.isDelete"
-            placeholder="0正常 1已删除"
           />
         </el-form-item>
       </el-form>
@@ -331,15 +350,15 @@ export default {
                 ],
       departed_at:
                 [
-                  { required: true, message: '出发时间不能为空', trigger: 'blur' }
+                  { required: true, message: '出发时间不能为空', trigger: 'change' }
                 ],
       arrivedAt:
                 [
-                  { required: true, message: '到达时间不能为空', trigger: 'blur' }
+                  { required: true, message: '到达时间不能为空', trigger: 'change' }
                 ],
       changeExpiredAt:
                 [
-                  { required: true, message: '换站截止时间不能为空', trigger: 'blur' }
+                  { required: true, message: '换站截止时间不能为空', trigger: 'change' }
                 ],
       carIds:
                 [
