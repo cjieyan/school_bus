@@ -19,7 +19,7 @@ func registerScbPostRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddle
 	}
 
 	l := v1.Group("").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
-	{ 
+	{
 		l.GET("/scbpostList", scbpost.GetScbPostList)
 		l.GET("/scbpostAll", scbpost.GetScbPostAll)
 	}

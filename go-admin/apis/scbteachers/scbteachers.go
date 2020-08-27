@@ -27,7 +27,7 @@ func GetScbTeachersList(c *gin.Context) {
 	data.Phone = c.Request.FormValue("phone")
 	data.ClassId, _ = tools.StringToInt(c.Request.FormValue("classId"))
 	data.PostId, _ = tools.StringToInt(c.Request.FormValue("postId"))
-	data.IsDeleted = c.Request.FormValue("isDeleted")
+	data.IsDeleted, _ = tools.StringToInt(c.Request.FormValue("isDeleted"))
 
 	data.DataScope = tools.GetUserIdStr(c)
 	result, count, err := data.GetPage(pageSize, pageIndex)

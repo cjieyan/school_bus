@@ -42,4 +42,9 @@ export function delScbCars() {
     method: 'delete'
   })
 }
-
+export function treeselect() {
+  return request({
+    url: '/api/v1/scbcarsAll',
+    method: 'get'
+  })
+}

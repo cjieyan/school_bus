@@ -54,10 +54,10 @@
           clearable
         />
       </el-form-item>
-      <el-form-item label="绑定的车辆" prop="carIds">
+      <el-form-item label="绑定车辆" prop="carIds">
         <el-input
           v-model="queryParams.carIds"
-          placeholder="请输入绑定的车辆"
+          placeholder="请选择车辆"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -269,10 +269,14 @@
             clearable
           />
         </el-form-item>
-        <el-form-item label="绑定的车辆" prop="carIds">
-          <el-input
-            v-model="form.carIds"
-            placeholder="绑定的车辆"
+        <el-form-item label="绑定的车辆">
+          <el-tree
+            ref="menu"
+            :data="carsOptions"
+            show-checkbox
+            node-key="id"
+            empty-text="加载中，请稍后"
+            :props="defaultProps"
           />
         </el-form-item>
       </el-form>
@@ -286,6 +290,7 @@
 
 <script>
 import { addScbLines, delScbLines, getScbLines, listScbLines, updateScbLines } from '@/api/scblines'
+import { treeselect as carsTreeselect } from '@/api/scbcars'
 
 export default {
   name: 'Config',
@@ -309,6 +314,8 @@ export default {
       // 类型数据字典
       typeOptions: [],
       scblinesList: [],
+      // 车辆列表
+      carsOptions: [],
 
       // 查询参数
       queryParams: {
@@ -339,6 +346,10 @@ export default {
       // 表单参数
       form: {
       },
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
       // 表单校验
       rules: { id:
                 [
@@ -350,15 +361,15 @@ export default {
                 ],
       departed_at:
                 [
-                  { required: true, message: '出发时间不能为空', trigger: 'change' }
+                  { required: false, message: '出发时间不能为空', trigger: 'change' }
                 ],
       arrivedAt:
                 [
-                  { required: true, message: '到达时间不能为空', trigger: 'change' }
+                  { required: false, message: '到达时间不能为空', trigger: 'change' }
                 ],
       changeExpiredAt:
                 [
-                  { required: true, message: '换站截止时间不能为空', trigger: 'change' }
+                  { required: false, message: '换站截止时间不能为空', trigger: 'change' }
                 ],
       carIds:
                 [
@@ -387,6 +398,12 @@ export default {
     this.getList()
   },
   methods: {
+    /** 查询菜单树结构 */
+    getCarsTreeselect() {
+      carsTreeselect().then(response => {
+        this.carsOptions = response.data
+      })
+    },
     /** 查询参数列表 */
     getList() {
       this.loading = true
@@ -434,6 +451,7 @@ export default {
       this.open = true
       this.title = '添加线路管理'
       this.isEdit = false
+      this.getCarsTreeselect()
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -444,14 +462,14 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset()
-      const id =
-                row.id || this.ids
+      const id = row.id || this.ids
       getScbLines(id).then(response => {
         this.form = response.data
         this.open = true
         this.title = '修改线路管理'
         this.isEdit = true
       })
+      this.getCarsTreeselect()
     },
     /** 提交按钮 */
     submitForm: function() {

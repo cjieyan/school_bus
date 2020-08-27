@@ -179,7 +179,7 @@
             :options="attendantsOptions"
             :normalizer="normalizer"
             :show-count="true"
-            placeholder="选择班级"
+            placeholder="选择跟车员"
             :is-disabled="isEdit"
           />
 
@@ -257,6 +257,8 @@ export default {
       },
       // 表单参数
       form: {
+        deptId: undefined,
+        deptName: undefined
       },
       // 表单校验
       rules: { carNumber:
@@ -287,8 +289,8 @@ export default {
         delete node.children
       }
       return {
-        id: node.deptId,
-        label: node.deptName,
+        id: node.id,
+        label: node.name,
         children: node.children
       }
     },
@@ -306,7 +308,7 @@ export default {
     getTreeselect(e) {
       getAttendants().then(response => {
         this.attendantsOptions = []
-        const attendants = { deptId: 0, deptName: '请选择', children: [] }
+        const attendants = { id: 0, name: '请选择', children: [] }
         attendants.children = response.data
         this.attendantsOptions.push(attendants)
       })
@@ -328,7 +330,9 @@ export default {
         driver: undefined,
         phone: undefined,
         dept: undefined,
-        isDelete: undefined
+        isDelete: undefined,
+        deptId: undefined,
+        deptName: undefined
       }
       this.resetForm('form')
     },
@@ -350,6 +354,8 @@ export default {
       this.open = true
       this.title = '添加车辆'
       this.isEdit = false
+
+      this.getTreeselect('add')
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -366,6 +372,7 @@ export default {
         this.title = '修改ScbCars'
         this.isEdit = true
       })
+      this.getTreeselect('update')
     },
     /** 提交按钮 */
     submitForm: function() {

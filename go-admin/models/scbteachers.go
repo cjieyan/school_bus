@@ -13,7 +13,7 @@ type ScbTeachers struct {
 	ClassId   int 	 `json:"classId" gorm:"type:int(11);"`                // 班级id
 	PostId    int `json:"postId" gorm:"type:int(11);"`                 // 岗位id
 	Remark    string `json:"remark" gorm:"type:varchar(200);"`            // 备注
-	IsDeleted string `json:"isDeleted" gorm:"type:tinyint(4);"`           // 0未删除 1已删除
+	IsDeleted int `json:"isDeleted" gorm:"type:tinyint(4);"`           // 0未删除 1已删除
 	DataScope string `json:"dataScope" gorm:"-"`
 	Params    string `json:"params"  gorm:"-"`
 	BaseModel
@@ -61,7 +61,7 @@ func (e *ScbTeachers) Get() (ScbTeachers, error) {
 		table = table.Where("post_id = ?", e.PostId)
 	}
 
-	if e.IsDeleted != "" {
+	if e.IsDeleted != 0 {
 		table = table.Where("is_deleted = ?", e.IsDeleted)
 	}
 
@@ -97,7 +97,7 @@ func (e *ScbTeachers) GetPage(pageSize int, pageIndex int) ([]ScbTeachers, int, 
 		table = table.Where("post_id = ?", e.PostId)
 	}
 
-	if e.IsDeleted != "" {
+	if e.IsDeleted != 0 {
 		table = table.Where("is_deleted = ?", e.IsDeleted)
 	}
 

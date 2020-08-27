@@ -21,6 +21,7 @@ func registerScbCarsRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddle
 	l := v1.Group("").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
 		l.GET("/scbcarsList", scbcars.GetScbCarsList)
+		l.GET("/scbcarsAll", scbcars.GetScbCarsAll)
 	}
 
 }

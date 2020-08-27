@@ -10,11 +10,11 @@ type ScbCars struct {
 	CarNumber   string `json:"carNumber" gorm:"type:varchar(100);"` // 车牌编号
 	CarNo       string `json:"carNo" gorm:"type:varchar(50);"`      // 车牌号
 	SeatsNum    string `json:"seatsNum" gorm:"type:int(11);"`       // 座位数
-	AttendantId string `json:"attendantId" gorm:"type:int(11);"`    // 跟车员
-	Driver      string `json:"driver" gorm:"type:int(11);"`         // 司机
+	AttendantId int `json:"attendantId" gorm:"type:int(11);"`    // 跟车员
+	Driver      string `json:"driver" gorm:"type:varchar(50);"`         // 司机
 	Phone       string `json:"phone" gorm:"type:varchar(50);"`      // 手机号
 	Dept        string `json:"dept" gorm:"type:int(11);"`           // 所属部门
-	IsDelete    string `json:"isDelete" gorm:"type:int(11);"`       // 0正常 1已删除
+	IsDelete    int `json:"isDelete" gorm:"type:int(11);"`       // 0正常 1已删除
 	DataScope   string `json:"dataScope" gorm:"-"`
 	Params      string `json:"params"  gorm:"-"`
 	BaseModel
@@ -140,4 +140,32 @@ func (e *ScbCars) BatchDelete(id []int) (Result bool, err error) {
 	}
 	Result = true
 	return
+}
+
+func (e *ScbCars) GetAll()([]MenuLable, error){
+	var doc []ScbCars
+	table := orm.Eloquent.Select("*").Table(e.TableName())
+
+	// 数据权限控制(如果不需要数据权限请将此处去掉)
+	dataPermission := new(DataPermission)
+	dataPermission.UserId, _ = tools.StringToInt(e.DataScope)
+	table, err := dataPermission.GetDataScope(e.TableName(), table)
+	if err != nil {
+		return nil, err
+	}
+	table = table.Where("`is_delete` = 0")
+
+	if err := table.Find(&doc).Error; err != nil {
+		return nil, err
+	}
+
+	m := make([]MenuLable, 0)
+	for i := 0; i < len(doc); i++ {
+		e := MenuLable{}
+		e.Id = doc[i].Id
+		e.Label = doc[i].CarNo
+		m = append(m, e)
+	}
+
+	return m, nil
 }

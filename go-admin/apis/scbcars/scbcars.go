@@ -28,6 +28,7 @@ func GetScbCarsList(c *gin.Context) {
 	data.CarNo = c.Request.FormValue("carNo")
 	data.Driver = c.Request.FormValue("driver")
 	data.Phone = c.Request.FormValue("phone")
+	data.AttendantId, _ = strconv.Atoi(c.Request.FormValue("attendantId"))
 
 	data.DataScope = tools.GetUserIdStr(c)
 	result, count, err := data.GetPage(pageSize, pageIndex)
@@ -72,4 +73,16 @@ func DeleteScbCars(c *gin.Context) {
 	_, err := data.BatchDelete(IDS)
 	tools.HasError(err, msg.DeletedFail, 500)
 	app.OK(c, nil, msg.DeletedSuccess)
+}
+//获取所有车辆
+func GetScbCarsAll(c *gin.Context) {
+	var data models.ScbCars
+	var err error
+
+	data.DataScope = tools.GetUserIdStr(c)
+	result, err := data.GetAll()
+
+	tools.HasError(err, "", -1)
+
+	app.OK(c, result, "")
 }
