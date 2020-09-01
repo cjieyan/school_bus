@@ -1,6 +1,7 @@
 package scbcars
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"go-admin/models"
@@ -39,7 +40,9 @@ func GetScbCarsList(c *gin.Context) {
 
 func GetScbCars(c *gin.Context) {
 	var data models.ScbCars
-	err := c.ShouldBindJSON(&data)
+	var err error
+	data.Id, err = tools.StringToInt(c.Param("id"))
+	fmt.Println("err....", err)
 	tools.HasError(err, "", 500)
 	result, err := data.Get()
 	tools.HasError(err, "抱歉未找到相关信息", -1)

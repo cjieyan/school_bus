@@ -54,9 +54,9 @@
           clearable
         />
       </el-form-item>
-      <el-form-item label="绑定车辆" prop="carIds">
+      <el-form-item label="绑定车辆" prop="carIdsSelected">
         <el-input
-          v-model="queryParams.carIds"
+          v-model="queryParams.carIdsSelected"
           placeholder="请选择车辆"
           clearable
           size="small"
@@ -169,9 +169,9 @@
         prop="changeExpiredAt"
         :show-overflow-tooltip="true"
       /><el-table-column
-        label="绑定的车辆"
+        label="绑定车辆"
         align="center"
-        prop="carIds"
+        prop="carIdsSelected"
         :show-overflow-tooltip="true"
       /><el-table-column
         label="创建时间"
@@ -236,7 +236,7 @@
         </el-form-item>
         <el-form-item label="出发时间" prop="departed_at">
           <el-time-picker
-            v-model="queryParams.departed_at"
+            v-model="form.departed_at"
             format="HH:mm:ss"
             value-format="HH:mm:ss"
             :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
@@ -247,7 +247,7 @@
         </el-form-item>
         <el-form-item label="到达时间" prop="arrivedAt">
           <el-time-picker
-            v-model="queryParams.arrivedAt"
+            v-model="form.arrivedAt"
             format="HH:mm:ss"
             value-format="HH:mm:ss"
             :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
@@ -256,11 +256,9 @@
             clearable
           />
         </el-form-item>
-
-
         <el-form-item label="换站截止时间" prop="changeExpiredAt">
           <el-time-picker
-            v-model="queryParams.changeExpiredAt"
+            v-model="form.changeExpiredAt"
             format="HH:mm:ss"
             value-format="HH:mm:ss"
             :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
@@ -269,9 +267,9 @@
             clearable
           />
         </el-form-item>
-        <el-form-item label="绑定的车辆">
+        <el-form-item label="绑定车辆">
           <el-tree
-            ref="menu"
+            ref="cars"
             :data="carsOptions"
             show-checkbox
             node-key="id"
@@ -289,8 +287,7 @@
 </template>
 
 <script>
-import { addScbLines, delScbLines, getScbLines, listScbLines, updateScbLines } from '@/api/scblines'
-import { treeselect as carsTreeselect } from '@/api/scbcars'
+import { addScbLines, delScbLines, getScbLines, listScbLines, updateScbLines, carsTreeselect } from '@/api/scblines'
 
 export default {
   name: 'Config',
@@ -316,6 +313,8 @@ export default {
       scblinesList: [],
       // 车辆列表
       carsOptions: [],
+      carIdsSelected: [],
+      // carIdsSubmit: [],
 
       // 查询参数
       queryParams: {
@@ -331,7 +330,7 @@ export default {
             undefined,
         changeExpiredAt:
             undefined,
-        carIds:
+        carIdsSelected:
             undefined,
         createdAt:
             undefined,
@@ -371,7 +370,7 @@ export default {
                 [
                   { required: false, message: '换站截止时间不能为空', trigger: 'change' }
                 ],
-      carIds:
+      carIdsSelected:
                 [
                   { required: true, message: '绑定的车辆不能为空', trigger: 'blur' }
                 ],
@@ -398,10 +397,23 @@ export default {
     this.getList()
   },
   methods: {
+
+    // 所有菜单节点数据
+    getCarsAllCheckedKeys() {
+      // 目前被选中的菜单节点
+      const checkedKeys = this.$refs.cars.getHalfCheckedKeys()
+      // 半选中的菜单节点
+      const halfCheckedKeys = this.$refs.cars.getCheckedKeys()
+      checkedKeys.unshift.apply(checkedKeys, halfCheckedKeys)
+      return checkedKeys
+    },
     /** 查询菜单树结构 */
-    getCarsTreeselect() {
-      carsTreeselect().then(response => {
-        this.carsOptions = response.data
+    getCarsTreeselect(lineId) {
+      carsTreeselect(lineId).then(response => {
+        this.carsOptions = response.cars
+        this.$nextTick(() => {
+          this.$refs.cars.setCheckedKeys(response.checkedKeys)
+        })
       })
     },
     /** 查询参数列表 */
@@ -428,7 +440,8 @@ export default {
         departed_at: undefined,
         arrivedAt: undefined,
         changeExpiredAt: undefined,
-        carIds: undefined,
+        carIdsSelected: undefined,
+        carIdsSubmit: undefined,
         isDelete: undefined
       }
       this.resetForm('form')
@@ -451,7 +464,7 @@ export default {
       this.open = true
       this.title = '添加线路管理'
       this.isEdit = false
-      this.getCarsTreeselect()
+      this.getCarsTreeselect(0)
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -469,12 +482,14 @@ export default {
         this.title = '修改线路管理'
         this.isEdit = true
       })
-      this.getCarsTreeselect()
+      this.getCarsTreeselect(id)
     },
     /** 提交按钮 */
     submitForm: function() {
       this.$refs['form'].validate(valid => {
         if (valid) {
+          this.form.carIdsSubmit = this.getCarsAllCheckedKeys()
+          console.log( this.form.carIdsSubmit)
           if (this.form.id !== undefined) {
             updateScbLines(this.form).then(response => {
               if (response.code === 200) {

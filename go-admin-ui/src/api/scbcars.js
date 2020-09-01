@@ -10,9 +10,9 @@ export function listScbCars(query) {
 }
 
 // 查询ScbCars详细
-export function getScbCars() {
+export function getScbCars(id) {
   return request({
-    url: '/api/v1/scbcars/',
+    url: '/api/v1/scbcars/' + id,
     method: 'get'
   })
 }

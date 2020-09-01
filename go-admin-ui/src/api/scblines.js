@@ -43,3 +43,16 @@ export function delScbLines(id) {
   })
 }
 
+export function carsTreeselect(lineId) {
+  return request({
+    url: '/api/v1/carsTreeselect/' + lineId,
+    method: 'get'
+  })
+}
+
+export function getAllLines() {
+  return request({
+    url: '/api/v1/getAllLines',
+    method: 'get'
+  })
+}

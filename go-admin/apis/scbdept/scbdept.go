@@ -1,7 +1,6 @@
 package scbdept
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"go-admin/models"
@@ -26,7 +25,6 @@ func GetDeptList(c *gin.Context) {
 	Dept.DeptId, _ = tools.StringToInt(c.Request.FormValue("deptId"))
 	Dept.DataScope = tools.GetUserIdStr(c)
 	result, err := Dept.SetDept(true)
-	fmt.Println("err....", err)
 	tools.HasError(err, "抱歉未找到相关信息", -1)
 	app.OK(c, result, "")
 }

@@ -366,10 +366,11 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset()
-      getScbCars().then(response => {
+      const id = row.id
+      getScbCars(id).then(response => {
         this.form = response.data
         this.open = true
-        this.title = '修改ScbCars'
+        this.title = '修改车辆'
         this.isEdit = true
       })
       this.getTreeselect('update')

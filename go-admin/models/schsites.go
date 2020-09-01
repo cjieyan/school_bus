@@ -16,6 +16,7 @@ type SchSites struct {
 	Remark    string `json:"remark" gorm:"type:varchar(200);"`    // 备注
 	Longitude string `json:"longitude" gorm:"type:varchar(100);"` // 经度
 	Latitude  string `json:"latitude" gorm:"type:varchar(100);"`  // 维度
+	Address   string `json:"address" gorm:"type:varchar(500);"`   //地址
 	Picture   string `json:"picture" gorm:"type:varchar(200);"`   // 图片
 	IsDelete  string `json:"isDelete" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
 	DataScope string `json:"dataScope" gorm:"-"`

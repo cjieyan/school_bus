@@ -7,6 +7,8 @@ import (
 	"go-admin/tools"
 	"go-admin/tools/app"
 	"go-admin/tools/app/msg"
+	"strconv"
+	"strings"
 )
 
 func GetScbLinesList(c *gin.Context) {
@@ -24,11 +26,10 @@ func GetScbLinesList(c *gin.Context) {
 
 	data.Id, _ = tools.StringToInt(c.Request.FormValue("id"))
 	data.Name = c.Request.FormValue("name")
-	data.DepartedAt = c.Request.FormValue("departed_at")
 	data.ArrivedAt = c.Request.FormValue("arrivedAt")
 	data.ChangeExpiredAt = c.Request.FormValue("changeExpiredAt")
 	data.CarIds = c.Request.FormValue("carIds")
-	data.IsDelete = c.Request.FormValue("isDelete")
+	data.IsDelete, _ = tools.StringToInt(c.Request.FormValue("isDelete"))
 
 	data.DataScope = tools.GetUserIdStr(c)
 	result, count, err := data.GetPage(pageSize, pageIndex)
@@ -72,4 +73,35 @@ func DeleteScbLines(c *gin.Context) {
 	_, err := data.BatchDelete(IDS)
 	tools.HasError(err, msg.DeletedFail, 500)
 	app.OK(c, nil, msg.DeletedSuccess)
+}
+func GetScbLinesTreeCarsselect(c *gin.Context) {
+	var data models.ScbLines
+	data.Id, _ = tools.StringToInt(c.Param("id"))
+	result, err := data.Get()
+	tools.HasError(err, "抱歉未找到相关信息", -1)
+
+
+	carIdsSelected := []int{}
+	if data.Id > 0 {
+		carIds := strings.Split(result.CarIds, ",")
+		for i := 0; i < len(carIds); i++ {
+			carId, _ := strconv.Atoi(carIds[i])
+			carIdsSelected = append(carIdsSelected, carId)
+		}
+	}
+	var carModel models.ScbCars
+	cars, err := carModel.GetAll()
+	app.Custum(c, gin.H{
+		"code":        200,
+		"cars":		   cars,
+		"checkedKeys": carIdsSelected,
+	})
+}
+
+func GetAllLines(c *gin.Context) {
+	var data models.ScbLines
+	data.DataScope = tools.GetUserIdStr(c)
+	result, err := data.GetAll()
+	tools.HasError(err, "", -1)
+	app.OK(c, result,"")
 }

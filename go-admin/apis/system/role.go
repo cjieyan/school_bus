@@ -60,7 +60,6 @@ func GetRole(c *gin.Context) {
 	tools.HasError(err, "抱歉未找到相关信息", -1)
 	result.MenuIds = menuIds
 	app.OK(c, result, "")
-
 }
 
 // @Summary 创建角色

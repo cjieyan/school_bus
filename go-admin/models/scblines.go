@@ -1,20 +1,25 @@
 package models
 
 import (
+	"fmt"
 	orm "go-admin/global"
 	"go-admin/tools"
+	"strconv"
+	"strings"
 )
 
 type ScbLines struct {
 	Id              int    `json:"id" gorm:"type:int(11);primary_key"`   //
 	Name            string `json:"name" gorm:"type:varchar(250);"`       // 线路名称
-	DepartedAt      string `json:"departed_at" gorm:"type:int(11);"`     // 出发时间
-	ArrivedAt       string `json:"arrivedAt" gorm:"type:int(11);"`       // 到达时间
-	ChangeExpiredAt string `json:"changeExpiredAt" gorm:"type:int(11);"` // 换站截止时间
+	DepartedAt      string `json:"departed_at" gorm:"type:varchar(100);"`     // 出发时间
+	ArrivedAt       string `json:"arrivedAt" gorm:"type:varchar(11);"`       // 到达时间
+	ChangeExpiredAt string `json:"changeExpiredAt" gorm:"type:varchar(100);"` // 换站截止时间
 	CarIds          string `json:"carIds" gorm:"type:varchar(200);"`     // 绑定的车辆
-	IsDelete        string `json:"isDelete" gorm:"type:tinyint(4);"`     // 0正常 1已删除
+	IsDelete        int   `json:"isDelete" gorm:"type:tinyint(4);"`     // 0正常 1已删除
 	DataScope       string `json:"dataScope" gorm:"-"`
 	Params          string `json:"params"  gorm:"-"`
+	CarIdsSelected  []int  `json:"carIdsSelected" gorm:"-"`
+	CarIdsSubmit    []int  `json:"carIdsSubmit" gorm:"-"`
 	BaseModel
 }
 
@@ -25,6 +30,18 @@ func (ScbLines) TableName() string {
 // 创建ScbLines
 func (e *ScbLines) Create() (ScbLines, error) {
 	var doc ScbLines
+	carIds := ""
+	for _, carId := range e.CarIdsSubmit{
+		if len(carIds) > 0{
+			carIds = carIds + "," + strconv.Itoa( carId )
+		}else{
+			carIds = strconv.Itoa( carId )
+		}
+	}
+	fmt.Println("doc.CarIdsSubmit...,  carIds", e.CarIdsSubmit, carIds)
+	e.CarIds = carIds
+
+	doc.CarIds = carIds
 	result := orm.Eloquent.Table(e.TableName()).Create(&e)
 	if result.Error != nil {
 		err := result.Error
@@ -63,13 +80,35 @@ func (e *ScbLines) Get() (ScbLines, error) {
 		table = table.Where("car_ids = ?", e.CarIds)
 	}
 
-	if e.IsDelete != "" {
-		table = table.Where("is_delete = ?", e.IsDelete)
+	if err := table.First(&doc).Error; err != nil {
+		return doc, err
 	}
+	carIds := doc.CarIds
+	carIdsSelected := strings.Split(carIds, ",")
+	for i:=0; i < len(carIdsSelected); i++ {
+		carId , _ := strconv.Atoi(carIdsSelected[i])
+		doc.CarIdsSelected = append(doc.CarIdsSelected, carId)
+	}
+
+	return doc, nil
+}
+
+// 获取ScbLines
+func (e *ScbLines) GetCarIds() (ScbLines, error) {
+
+	var doc ScbLines
+	table := orm.Eloquent.Table(e.TableName())
 
 	if err := table.First(&doc).Error; err != nil {
 		return doc, err
 	}
+	carIds := doc.CarIds
+	carIdsSelected := strings.Split(carIds, ",")
+	for i:=0; i < len(carIdsSelected); i++ {
+		carId , _ := strconv.Atoi(carIdsSelected[i])
+		doc.CarIdsSelected = append(doc.CarIdsSelected, carId)
+	}
+
 	return doc, nil
 }
 
@@ -103,10 +142,6 @@ func (e *ScbLines) GetPage(pageSize int, pageIndex int) ([]ScbLines, int, error)
 		table = table.Where("car_ids = ?", e.CarIds)
 	}
 
-	if e.IsDelete != "" {
-		table = table.Where("is_delete = ?", e.IsDelete)
-	}
-
 	// 数据权限控制(如果不需要数据权限请将此处去掉)
 	dataPermission := new(DataPermission)
 	dataPermission.UserId, _ = tools.StringToInt(e.DataScope)
@@ -130,6 +165,16 @@ func (e *ScbLines) Update(id int) (update ScbLines, err error) {
 	}
 
 	//参数1:是要修改的数据
+	carIds := ""
+	for _, carId := range e.CarIdsSubmit{
+		if len(carIds) > 0{
+			carIds = carIds + "," + strconv.Itoa( carId )
+		}else{
+			carIds = strconv.Itoa( carId )
+		}
+	}
+	fmt.Println("doc.CarIdsSubmit..Update..,  carIds", e.CarIdsSubmit, carIds)
+	e.CarIds = carIds
 	//参数2:是修改的数据
 	if err = orm.Eloquent.Table(e.TableName()).Model(&update).Updates(&e).Error; err != nil {
 		return
@@ -154,4 +199,25 @@ func (e *ScbLines) BatchDelete(id []int) (Result bool, err error) {
 	}
 	Result = true
 	return
+}
+//获取所有线路
+func (e *ScbLines) GetAll()([]ScbLines, error){
+	var doc []ScbLines
+	table := orm.Eloquent.Select("*").Table(e.TableName())
+
+	// 数据权限控制(如果不需要数据权限请将此处去掉)
+	dataPermission := new(DataPermission)
+	dataPermission.UserId, _ = tools.StringToInt(e.DataScope)
+	table, err := dataPermission.GetDataScope(e.TableName(), table)
+	if err != nil {
+		return nil, err
+	}
+	table = table.Where("`is_delete` = 0")
+
+	if err := table.Find(&doc).Error; err != nil {
+		return nil, err
+	}
+
+
+	return doc, nil
 }

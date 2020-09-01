@@ -74,24 +74,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="经度" prop="longitude">
-        <el-input
-          v-model="queryParams.longitude"
-          placeholder="请输入经度"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="维度" prop="latitude">
-        <el-input
-          v-model="queryParams.latitude"
-          placeholder="请输入维度"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="图片" prop="picture">
         <el-input
           v-model="queryParams.picture"
@@ -261,11 +243,14 @@
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-
-        <el-form-item label="线路id" prop="lineId">
-          <el-input
+        <el-form-item label="线路" prop="lineId">
+          <treeselect
             v-model="form.lineId"
-            placeholder="线路id"
+            :options="linesOptions"
+            :normalizer="normalizer"
+            :show-count="true"
+            placeholder="选择线路"
+            :is-disabled="isEdit"
           />
         </el-form-item>
         <el-form-item label="名称" prop="name">
@@ -287,15 +272,24 @@
           />
         </el-form-item>
         <el-form-item label="站点属性" prop="prop">
-          <el-input
+          <treeselect
             v-model="form.prop"
-            placeholder="站点属性"
+            :options="attrsOptions"
+            :normalizer="normalizer"
+            :show-count="true"
+            placeholder="选择站点属性"
+            :is-disabled="isEdit"
           />
         </el-form-item>
         <el-form-item label="到达时间" prop="arriveAt">
-          <el-input
-            v-model="form.arriveAt"
-            placeholder="到达时间"
+          <el-time-picker
+            v-model="form.arrivedAt"
+            format="HH:mm:ss"
+            value-format="HH:mm:ss"
+            :picker-options="{'selectableRange':'00:00:00-23:59:59'}"
+            :style="{width: '100%'}"
+            placeholder="请选择到达时间"
+            clearable
           />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
@@ -304,23 +298,43 @@
             placeholder="备注"
           />
         </el-form-item>
-        <el-form-item label="经度" prop="longitude">
-          <el-input
-            v-model="form.longitude"
-            placeholder="经度"
-          />
+        <el-form-item label="详细地址：" prop="address">
+          <el-autocomplete
+            v-model="form.address"
+            style="width:100%;"
+            popper-class="autoAddressClass"
+            :fetch-suggestions="querySearchAsync"
+            :trigger-on-focus="false"
+            placeholder="详细地址"
+            clearable
+            @select="handleSelect"
+          >
+            <template slot-scope="{ item }">
+              <i class="el-icon-search fl mgr10" />
+              <div style="overflow:hidden;">
+                <div class="title">{{ item.title }}</div>
+                <span class="address ellipsis">{{ item.address }}</span>
+              </div>
+            </template>
+          </el-autocomplete>
         </el-form-item>
-        <el-form-item label="维度" prop="latitude">
-          <el-input
-            v-model="form.latitude"
-            placeholder="维度"
-          />
+        <el-form-item label="地图定位：">
+          <div id="map-container" style="width:100%;height:500px;" />
         </el-form-item>
         <el-form-item label="图片" prop="picture">
-          <el-input
-            v-model="form.picture"
-            placeholder="图片"
-          />
+          <el-upload
+            ref="picture"
+            :file-list="picturefileList"
+            :action="pictureAction"
+            :auto-upload="false"
+            :before-upload="pictureBeforeUpload"
+            list-type="picture-card"
+            accept="image/*"
+            name="picture"
+          >
+            <i class="el-icon-plus" />
+            <div slot="tip" class="el-upload__tip">只能上传不超过 2MB 的图片文件</div>
+          </el-upload>
         </el-form-item>
         <el-form-item label="0未删除 1已删除" prop="isDelete">
           <el-input
@@ -338,12 +352,26 @@
 </template>
 
 <script>
+/* eslint-disable */
 import { addSchSites, delSchSites, getSchSites, listSchSites, updateSchSites } from '@/api/schsites'
-
+import Treeselect from '@riophae/vue-treeselect'
+import { getAllLines } from '@/api/scblines'
+import loadBMap from '@/utils/loadBMap'
+import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
-  name: 'Config',
+  name: 'Schsites',
+  components: { Treeselect },
   data() {
     return {
+      map: '', // 地图实例
+      mk: '', // Marker实例
+      locationPoint: null,
+      pictureAction: 'https://jsonplaceholder.typicode.com/posts/',
+      picturefileList: [],
+      // 线路列表
+      linesOptions: [],
+      // 站点属性列表
+      attrsOptions: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -457,7 +485,117 @@ export default {
   created() {
     this.getList()
   },
+  async mounted() {
+    await loadBMap('vTW8ITU3lpEfHCoZGV3StGLchcQwsjZA') // 加载引入BMap
+    this.initMap()
+  },
   methods: {
+    initMap() {
+      var that = this
+      // 1、挂载地图
+      this.map = new BMap.Map('map-container', { enableMapClick: false })
+      console.log('this.map...1..')
+      var point = new BMap.Point(113.3324436, 23.1315381)
+      this.map.centerAndZoom(point, 12);
+      // 3、设置图像标注并绑定拖拽标注结束后事件
+      this.mk = new BMap.Marker(point, { enableDragging: true })
+      this.map.addOverlay(this.mk)
+      this.mk.addEventListener('dragend', function(e) {
+        that.getAddrByPoint(e.point)
+      })
+      // 4、添加（右上角）平移缩放控件
+      this.map.addControl(new BMap.NavigationControl({ anchor: BMAP_ANCHOR_TOP_RIGHT, type: BMAP_NAVIGATION_CONTROL_SMALL }))
+      // 5、添加（左下角）定位控件
+      var geolocationControl = new BMap.GeolocationControl({ anchor: BMAP_ANCHOR_BOTTOM_LEFT })
+      geolocationControl.addEventListener('locationSuccess', function(e) {
+        that.getAddrByPoint(e.point)
+      })
+      geolocationControl.addEventListener('locationError', function(e) {
+        alert(e.message)
+      })
+      this.map.addControl(geolocationControl)
+      // 6、浏览器定位
+      this.geolocation()
+      // 7、绑定点击地图任意点事件
+      this.map.addEventListener('click', function(e) {
+        that.getAddrByPoint(e.point)
+      })
+    },
+    // 获取两点间的距离
+    getDistancs(pointA, pointB) {
+      return this.map.getDistance(pointA, pointB).toFixed(2)
+    },
+    // 浏览器定位函数
+    geolocation() {
+      var that = this
+      var geolocation = new BMap.Geolocation()
+      geolocation.getCurrentPosition(function(res) {
+        if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+          that.getAddrByPoint(res.point)
+          that.locationPoint = res.point
+        } else {
+          alert('failed' + this.getStatus())
+          that.locationPoint = new BMap.Point(113.3324436, 23.1315381)
+        }
+      }, { enableHighAccuracy: true })
+    },// 2、逆地址解析函数
+    getAddrByPoint(point) {
+      var that = this
+      var geco = new BMap.Geocoder()
+      geco.getLocation(point, function(res) {
+        console.log(res)
+        that.mk.setPosition(point)
+        that.map.panTo(point)
+        that.form.address = res.address
+        that.form.addrPoint = point
+      })
+    },
+    // 8-1、地址搜索
+    querySearchAsync(str, cb) {
+      var options = {
+        onSearchComplete: function(res) {
+          var s = []
+          if (local.getStatus() == BMAP_STATUS_SUCCESS) {
+            for (var i = 0; i < res.getCurrentNumPois(); i++) {
+              s.push(res.getPoi(i))
+            }
+            cb(s)
+          } else {
+            cb(s)
+          }
+        }
+      }
+      var local = new BMap.LocalSearch(this.map, options)
+      local.search(str)
+    }, // 8-2、选择地址
+    handleSelect(item) {
+      this.form.address = item.address + item.title
+      this.form.longitude = item.point.lng
+      this.form.latitude = item.point.lat
+      this.map.clearOverlays()
+      this.mk = new BMap.Marker(item.point)
+      this.map.addOverlay(this.mk)
+      this.map.panTo(item.point)
+    },
+    // 以上baidu map
+
+    pictureBeforeUpload(file) {
+      const isRightSize = file.size / 1024 / 1024 < 2
+      if (!isRightSize) {
+        this.$message.error('文件大小超过 2MB')
+      }
+      return isRightSize
+    },
+    normalizer(node) {
+      if (node.children && !node.children.length) {
+        delete node.children
+      }
+      return {
+        id: node.id,
+        label: node.name,
+        children: node.children
+      }
+    },
     /** 查询参数列表 */
     getList() {
       this.loading = true
@@ -467,6 +605,21 @@ export default {
         this.loading = false
       }
       )
+    },
+    /** 查询班级下拉树结构 */
+    getTreeselect(e) {
+      getAllLines().then(response => {
+        this.linesOptions = []
+        const lines = { id: 0, name: '请选择', children: [] }
+        lines.children = response.data
+        this.linesOptions.push(lines)
+      })
+    },
+    getSitesAttrs(e) {
+      this.attrsOptions = []
+      const attrs = { id: 0, name: '请选择', children: [] }
+      attrs.children = [{ id: 1, name: '上车' }, { id: 2, name: '下车' }]
+      this.attrsOptions.push(attrs)
     },
     // 取消按钮
     cancel() {
@@ -510,6 +663,8 @@ export default {
       this.open = true
       this.title = '添加站点管理'
       this.isEdit = false
+      this.getTreeselect('add')
+      this.getSitesAttrs('add')
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -520,14 +675,15 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset()
-      const id =
-                row.id || this.ids
+      const id = row.id || this.ids
       getSchSites(id).then(response => {
         this.form = response.data
         this.open = true
         this.title = '修改站点管理'
         this.isEdit = true
       })
+      this.getTreeselect('update')
+      this.getSitesAttrs('update')
     },
     /** 提交按钮 */
     submitForm: function() {
@@ -575,3 +731,21 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.autoAddressClass{
+  li {
+    i.el-icon-search {margin-top:11px;}
+    .mgr10 {margin-right: 10px;}
+    .title {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .address {
+      line-height: 1;
+      font-size: 12px;
+      color: #b4b4b4;
+      margin-bottom: 5px;
+    }
+  }
+}
+</style>

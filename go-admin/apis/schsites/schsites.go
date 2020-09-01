@@ -32,6 +32,7 @@ func GetSchSitesList(c *gin.Context) {
 	data.Remark = c.Request.FormValue("remark")
 	data.Longitude = c.Request.FormValue("longitude")
 	data.Latitude = c.Request.FormValue("latitude")
+	data.Address = c.Request.FormValue("Address")
 	data.Picture = c.Request.FormValue("picture")
 
 	data.DataScope = tools.GetUserIdStr(c)
