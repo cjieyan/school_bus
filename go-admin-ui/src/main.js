@@ -30,6 +30,7 @@ import '@/icons'
 import * as filters from './filters' // global filters
 
 import Pagination from '@/components/Pagination'
+import BaiduMap from 'vue-baidu-map'
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -59,6 +60,10 @@ Vue.use(permission)
 
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium' // set element-ui default size
+})
+Vue.use(BaiduMap, {
+  /* 需要注册百度地图开发者来获取你的ak */
+  ak: 'oW2UEhdth2tRbEE4FUpF9E5YVDCIPYih'
 })
 
 // register global utility filters

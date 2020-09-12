@@ -241,7 +241,7 @@
     />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px">
+    <el-dialog :title="title" :visible.sync="open" width="800px" >
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="线路" prop="lineId">
           <treeselect
@@ -283,7 +283,7 @@
         </el-form-item>
         <el-form-item label="到达时间" prop="arriveAt">
           <el-time-picker
-            v-model="form.arrivedAt"
+            v-model="form.arriveAt"
             format="HH:mm:ss"
             value-format="HH:mm:ss"
             :picker-options="{'selectableRange':'00:00:00-23:59:59'}"
@@ -298,29 +298,7 @@
             placeholder="备注"
           />
         </el-form-item>
-        <el-form-item label="详细地址：" prop="address">
-          <el-autocomplete
-            v-model="form.address"
-            style="width:100%;"
-            popper-class="autoAddressClass"
-            :fetch-suggestions="querySearchAsync"
-            :trigger-on-focus="false"
-            placeholder="详细地址"
-            clearable
-            @select="handleSelect"
-          >
-            <template slot-scope="{ item }">
-              <i class="el-icon-search fl mgr10" />
-              <div style="overflow:hidden;">
-                <div class="title">{{ item.title }}</div>
-                <span class="address ellipsis">{{ item.address }}</span>
-              </div>
-            </template>
-          </el-autocomplete>
-        </el-form-item>
-        <el-form-item label="地图定位：">
-          <div id="map-container" style="width:100%;height:500px;" />
-        </el-form-item>
+
         <el-form-item label="图片" prop="picture">
           <el-upload
             ref="picture"
@@ -336,7 +314,58 @@
             <div slot="tip" class="el-upload__tip">只能上传不超过 2MB 的图片文件</div>
           </el-upload>
         </el-form-item>
-        <el-form-item label="0未删除 1已删除" prop="isDelete">
+        <el-form-item label="位置" prop="address">
+          <el-input
+            v-model="addressKeyword"
+            placeholder="搜索地址"
+            clearable>
+          </el-input>
+          <el-input
+          v-model="form.longitude"
+          placeholder="经度"
+          readonly
+          style="width: 100px"
+          ></el-input>
+          <el-input
+            v-model="form.latitude"
+            placeholder="经度"
+            readonly
+            style="width: 100px"
+          ></el-input>
+          <el-input
+            v-model="form.address"
+            placeholder="详细地址"
+            readonly
+            style="width: 300px"
+            ></el-input>
+          <div class="address">
+            <!-- 给地图加点击事件getLocationPoint，点击地图获取位置相关的信息，经纬度啥的 -->
+            <!-- scroll-wheel-zoom：是否可以用鼠标滚轮控制地图缩放，zoom是视图比例 -->
+            <baidu-map
+              class="bmView"
+              :scroll-wheel-zoom="true"
+              :center="location"
+              :zoom="zoom"
+              @click="getLocationPoint"
+            >
+              <bm-geolocation
+                anchor="BMAP_ANCHOR_BOTTOM_RIGHT"
+                :showAddressBar="true"
+                :autoLocation="true"
+              ></bm-geolocation>
+              <bm-view style="width: 100%; height:400px; flex: 1"></bm-view>
+              <bm-local-search
+                :keyword="addressKeyword"
+                :panel="true"
+                :pageCapacity=5
+                :selectFirstResult=true
+                :auto-viewport="true"></bm-local-search>
+              <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
+            </baidu-map>
+          </div>
+        </el-form-item>
+
+        <el-form-item label="0未删除 " prop="isDelete">
           <el-input
             v-model="form.isDelete"
             placeholder="0未删除 1已删除"
@@ -356,7 +385,6 @@
 import { addSchSites, delSchSites, getSchSites, listSchSites, updateSchSites } from '@/api/schsites'
 import Treeselect from '@riophae/vue-treeselect'
 import { getAllLines } from '@/api/scblines'
-import loadBMap from '@/utils/loadBMap'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
   name: 'Schsites',
@@ -364,8 +392,12 @@ export default {
   data() {
     return {
       map: '', // 地图实例
-      mk: '', // Marker实例
-      locationPoint: null,
+      location: {
+        lng: 116.404,
+        lat: 39.915
+      },
+      zoom: 12.8,
+      addressKeyword: "",
       pictureAction: 'https://jsonplaceholder.typicode.com/posts/',
       picturefileList: [],
       // 线路列表
@@ -485,99 +517,55 @@ export default {
   created() {
     this.getList()
   },
-  async mounted() {
-    await loadBMap('vTW8ITU3lpEfHCoZGV3StGLchcQwsjZA') // 加载引入BMap
-    this.initMap()
+  mounted() {
   },
   methods: {
-    initMap() {
-      var that = this
-      // 1、挂载地图
-      this.map = new BMap.Map('map-container', { enableMapClick: false })
-      console.log('this.map...1..')
-      var point = new BMap.Point(113.3324436, 23.1315381)
-      this.map.centerAndZoom(point, 12);
-      // 3、设置图像标注并绑定拖拽标注结束后事件
-      this.mk = new BMap.Marker(point, { enableDragging: true })
-      this.map.addOverlay(this.mk)
-      this.mk.addEventListener('dragend', function(e) {
-        that.getAddrByPoint(e.point)
-      })
-      // 4、添加（右上角）平移缩放控件
-      this.map.addControl(new BMap.NavigationControl({ anchor: BMAP_ANCHOR_TOP_RIGHT, type: BMAP_NAVIGATION_CONTROL_SMALL }))
-      // 5、添加（左下角）定位控件
-      var geolocationControl = new BMap.GeolocationControl({ anchor: BMAP_ANCHOR_BOTTOM_LEFT })
-      geolocationControl.addEventListener('locationSuccess', function(e) {
-        that.getAddrByPoint(e.point)
-      })
-      geolocationControl.addEventListener('locationError', function(e) {
-        alert(e.message)
-      })
-      this.map.addControl(geolocationControl)
-      // 6、浏览器定位
-      this.geolocation()
-      // 7、绑定点击地图任意点事件
-      this.map.addEventListener('click', function(e) {
-        that.getAddrByPoint(e.point)
-      })
-    },
-    // 获取两点间的距离
-    getDistancs(pointA, pointB) {
-      return this.map.getDistance(pointA, pointB).toFixed(2)
-    },
-    // 浏览器定位函数
-    geolocation() {
-      var that = this
-      var geolocation = new BMap.Geolocation()
-      geolocation.getCurrentPosition(function(res) {
-        if (this.getStatus() == BMAP_STATUS_SUCCESS) {
-          that.getAddrByPoint(res.point)
-          that.locationPoint = res.point
-        } else {
-          alert('failed' + this.getStatus())
-          that.locationPoint = new BMap.Point(113.3324436, 23.1315381)
-        }
-      }, { enableHighAccuracy: true })
-    },// 2、逆地址解析函数
-    getAddrByPoint(point) {
-      var that = this
-      var geco = new BMap.Geocoder()
-      geco.getLocation(point, function(res) {
+    getLocationPoint(e) {
+      this.lng = e.point.lng;
+      this.lat = e.point.lat;
+      /* 创建地址解析器的实例 */
+      let geoCoder = new BMap.Geocoder();
+      /* 获取位置对应的坐标 */
+      geoCoder.getPoint(this.addressKeyword, point => {
+        this.lng = point.lng;
+        this.lat = point.lat;
+      });
+      /* 利用坐标获取地址的详细信息 */
+      geoCoder.getLocation(e.point, res => {
+        console.log('getLocation....')
         console.log(res)
-        that.mk.setPosition(point)
-        that.map.panTo(point)
-        that.form.address = res.address
-        that.form.addrPoint = point
+        this.form.address = res.address
+        // that.addressKeyword = res.address
+        this.form.longitude = res.point.lng
+        this.form.latitude = res.point.lat
       })
+    },
+    handler ({BMap, map}) {
+      this.center.lng = 116.404
+      this.center.lat = 39.915
+      this.zoom = 15
     },
     // 8-1、地址搜索
     querySearchAsync(str, cb) {
-      var options = {
-        onSearchComplete: function(res) {
-          var s = []
-          if (local.getStatus() == BMAP_STATUS_SUCCESS) {
-            for (var i = 0; i < res.getCurrentNumPois(); i++) {
-              s.push(res.getPoi(i))
-            }
-            cb(s)
-          } else {
-            cb(s)
-          }
-        }
-      }
-      var local = new BMap.LocalSearch(this.map, options)
-      local.search(str)
-    }, // 8-2、选择地址
-    handleSelect(item) {
-      this.form.address = item.address + item.title
-      this.form.longitude = item.point.lng
-      this.form.latitude = item.point.lat
-      this.map.clearOverlays()
-      this.mk = new BMap.Marker(item.point)
-      this.map.addOverlay(this.mk)
-      this.map.panTo(item.point)
+      this.addressKeyword = str
+      // var options = {
+      //   onSearchComplete: function(res) {
+      //     var s = []
+      //     if (local.getStatus() == BMAP_STATUS_SUCCESS) {
+      //       for (var i = 0; i < res.getCurrentNumPois(); i++) {
+      //         s.push(res.getPoi(i))
+      //       }
+      //       cb(s)
+      //     } else {
+      //       cb(s)
+      //     }
+      //   }
+      // }
+      // var local = new BMap.LocalSearch(this.map, options)
+      // local.search(str)
     },
-    // 以上baidu map
+    /***百度地图***/
+
 
     pictureBeforeUpload(file) {
       const isRightSize = file.size / 1024 / 1024 < 2
@@ -629,7 +617,6 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-
         id: undefined,
         lineId: undefined,
         name: undefined,
@@ -727,7 +714,7 @@ export default {
         this.msgSuccess('删除成功')
       }).catch(function() {
       })
-    }
+    },
   }
 }
 </script>
@@ -745,6 +732,7 @@ export default {
       font-size: 12px;
       color: #b4b4b4;
       margin-bottom: 5px;
+      height: 200px;
     }
   }
 }
