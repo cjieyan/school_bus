@@ -102,15 +102,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="0未删除 1已删除" prop="isDeleted">
-        <el-input
-          v-model="queryParams.isDeleted"
-          placeholder="请输入0未删除 1已删除"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
 
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -214,11 +205,6 @@
         align="center"
         prop="updatedAt"
         :show-overflow-tooltip="true"
-      /><el-table-column
-        label="0未删除 1已删除"
-        align="center"
-        prop="isDeleted"
-        :show-overflow-tooltip="true"
       />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -310,12 +296,6 @@
           <el-input
             v-model="form.picture"
             placeholder="图片"
-          />
-        </el-form-item>
-        <el-form-item label="0未删除 1已删除" prop="isDeleted">
-          <el-input
-            v-model="form.isDeleted"
-            placeholder="0未删除 1已删除"
           />
         </el-form-item>
       </el-form>

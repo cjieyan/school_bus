@@ -27,7 +27,7 @@ func GetScbStudentsList(c *gin.Context) {
 	data.Name = c.Request.FormValue("name")
 	data.Number = c.Request.FormValue("number")
 	data.ClassId = c.Request.FormValue("classId")
-	data.LineId = c.Request.FormValue("lineId")
+	data.LineId, _ = tools.StringToInt(c.Request.FormValue("lineId"))
 	data.SiteName = c.Request.FormValue("siteName")
 	data.SiteId = c.Request.FormValue("siteId")
 	data.CarId = c.Request.FormValue("carId")

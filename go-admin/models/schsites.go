@@ -7,18 +7,18 @@ import (
 
 type SchSites struct {
 	Id        int    `json:"id" gorm:"type:int(11);primary_key"`  //
-	LineId    string `json:"lineId" gorm:"type:int(11);"`         // 线路id
+	LineId    int    `json:"lineId" gorm:"type:int(11);"`         // 线路id
 	Name      string `json:"name" gorm:"type:varchar(100);"`      // 名称
 	Purpose   string `json:"purpose" gorm:"type:int(11);"`        // 用途
 	Sort      string `json:"sort" gorm:"type:int(11);"`           // 排序
-	Prop      string `json:"prop" gorm:"type:varchar(100);"`      // 站点属性
+	Prop      int    `json:"prop" gorm:"type:int(11);"`      // 站点属性
 	ArriveAt  string `json:"arriveAt" gorm:"type:varchar(50);"`   // 到达时间
 	Remark    string `json:"remark" gorm:"type:varchar(200);"`    // 备注
-	Longitude string `json:"longitude" gorm:"type:varchar(100);"` // 经度
-	Latitude  string `json:"latitude" gorm:"type:varchar(100);"`  // 维度
+	Longitude float64 `json:"longitude" gorm:"type:varchar(100);"` // 经度
+	Latitude  float64 `json:"latitude" gorm:"type:varchar(100);"`  // 维度
 	Address   string `json:"address" gorm:"type:varchar(500);"`   //地址
 	Picture   string `json:"picture" gorm:"type:varchar(200);"`   // 图片
-	IsDelete  string `json:"isDelete" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
+	IsDelete  int `json:"isDelete" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
 	DataScope string `json:"dataScope" gorm:"-"`
 	Params    string `json:"params"  gorm:"-"`
 	BaseModel
@@ -49,7 +49,7 @@ func (e *SchSites) Get() (SchSites, error) {
 		table = table.Where("id = ?", e.Id)
 	}
 
-	if e.LineId != "" {
+	if e.LineId != 0 {
 		table = table.Where("line_id = ?", e.LineId)
 	}
 
@@ -65,7 +65,7 @@ func (e *SchSites) Get() (SchSites, error) {
 		table = table.Where("sort = ?", e.Sort)
 	}
 
-	if e.Prop != "" {
+	if e.Prop != 0 {
 		table = table.Where("prop = ?", e.Prop)
 	}
 
@@ -77,11 +77,11 @@ func (e *SchSites) Get() (SchSites, error) {
 		table = table.Where("remark = ?", e.Remark)
 	}
 
-	if e.Longitude != "" {
+	if e.Longitude != 0.0 {
 		table = table.Where("longitude = ?", e.Longitude)
 	}
 
-	if e.Latitude != "" {
+	if e.Latitude != 0.0 {
 		table = table.Where("latitude = ?", e.Latitude)
 	}
 
@@ -105,7 +105,7 @@ func (e *SchSites) GetPage(pageSize int, pageIndex int) ([]SchSites, int, error)
 		table = table.Where("id = ?", e.Id)
 	}
 
-	if e.LineId != "" {
+	if e.LineId != 0 {
 		table = table.Where("line_id = ?", e.LineId)
 	}
 
@@ -121,7 +121,7 @@ func (e *SchSites) GetPage(pageSize int, pageIndex int) ([]SchSites, int, error)
 		table = table.Where("sort = ?", e.Sort)
 	}
 
-	if e.Prop != "" {
+	if e.Prop != 0 {
 		table = table.Where("prop = ?", e.Prop)
 	}
 
@@ -133,11 +133,11 @@ func (e *SchSites) GetPage(pageSize int, pageIndex int) ([]SchSites, int, error)
 		table = table.Where("remark = ?", e.Remark)
 	}
 
-	if e.Longitude != "" {
+	if e.Longitude != 0.0 {
 		table = table.Where("longitude = ?", e.Longitude)
 	}
 
-	if e.Latitude != "" {
+	if e.Latitude != 0.0 {
 		table = table.Where("latitude = ?", e.Latitude)
 	}
 

@@ -7,6 +7,7 @@ import (
 	"go-admin/tools"
 	"go-admin/tools/app"
 	"go-admin/tools/app/msg"
+	"strconv"
 )
 
 func GetSchSitesList(c *gin.Context) {
@@ -23,15 +24,16 @@ func GetSchSitesList(c *gin.Context) {
 	}
 
 	data.Id, _ = tools.StringToInt(c.Request.FormValue("id"))
-	data.LineId = c.Request.FormValue("lineId")
+	data.LineId, _ = tools.StringToInt(c.Request.FormValue("lineId"))
 	data.Name = c.Request.FormValue("name")
 	data.Purpose = c.Request.FormValue("purpose")
 	data.Sort = c.Request.FormValue("sort")
-	data.Prop = c.Request.FormValue("prop")
+	data.Prop, _ = tools.StringToInt(c.Request.FormValue("prop"))
 	data.ArriveAt = c.Request.FormValue("arriveAt")
 	data.Remark = c.Request.FormValue("remark")
-	data.Longitude = c.Request.FormValue("longitude")
-	data.Latitude = c.Request.FormValue("latitude")
+
+	data.Longitude, _ = strconv.ParseFloat(c.Request.FormValue("longitude"), 32)
+	data.Latitude, _ = strconv.ParseFloat(c.Request.FormValue("latitude"), 32)
 	data.Address = c.Request.FormValue("Address")
 	data.Picture = c.Request.FormValue("picture")
 

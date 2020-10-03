@@ -11,7 +11,7 @@ type ScbStudents struct {
 	Name        string `json:"name" gorm:"type:varchar(100);"`       // 名称
 	Number      string `json:"number" gorm:"type:varchar(100);"`     // 学号
 	ClassId     string `json:"classId" gorm:"type:int(11);"`         // 班级id
-	LineId      string `json:"lineId" gorm:"type:int(11);"`          // 线路id
+	LineId      int    `json:"lineId" gorm:"type:int(11);"`          // 线路id
 	SiteName    string `json:"siteName" gorm:"type:varchar(200);"`   // 站点名称
 	SiteId      string `json:"siteId" gorm:"type:int(11);"`          // 站点id
 	CarId       string `json:"carId" gorm:"type:int(11);"`           // 车辆id
@@ -60,7 +60,7 @@ func (e *ScbStudents) Get() (ScbStudents, error) {
 		table = table.Where("class_id = ?", e.ClassId)
 	}
 
-	if e.LineId != "" {
+	if e.LineId != 0 {
 		table = table.Where("line_id = ?", e.LineId)
 	}
 
@@ -116,7 +116,7 @@ func (e *ScbStudents) GetPage(pageSize int, pageIndex int) ([]ScbStudents, int, 
 		table = table.Where("class_id = ?", e.ClassId)
 	}
 
-	if e.LineId != "" {
+	if e.LineId != 0 {
 		table = table.Where("line_id = ?", e.LineId)
 	}
 

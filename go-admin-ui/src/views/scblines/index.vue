@@ -25,7 +25,7 @@
           v-model="queryParams.departed_at"
           format="HH:mm:ss"
           value-format="HH:mm:ss"
-          :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+          :picker-options="{&quot;selectableRange&quot;:&quot;00:00:00-23:59:59&quot;}"
           :style="{width: '100%'}"
           placeholder="请选择出发时间"
           clearable
@@ -37,7 +37,7 @@
           v-model="queryParams.arrivedAt"
           format="HH:mm:ss"
           value-format="HH:mm:ss"
-          :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+          :picker-options="{&quot;selectableRange&quot;:&quot;00:00:00-23:59:59&quot;}"
           :style="{width: '100%'}"
           placeholder="请选择到达时间"
           clearable
@@ -48,7 +48,7 @@
           v-model="queryParams.changeExpiredAt"
           format="HH:mm:ss"
           value-format="HH:mm:ss"
-          :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+          :picker-options="{&quot;selectableRange&quot;:&quot;00:00:00-23:59:59&quot;}"
           :style="{width: '100%'}"
           placeholder="请选择换站截止时间"
           clearable
@@ -76,15 +76,6 @@
         <el-input
           v-model="queryParams.updatedAt"
           placeholder="请输入更新时间"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="0正常 1已删除" prop="isDelete">
-        <el-input
-          v-model="queryParams.isDelete"
-          placeholder="请输入0正常 1已删除"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -184,11 +175,6 @@
         prop="updatedAt"
         :show-overflow-tooltip="true"
       /><el-table-column
-        label="0正常 1已删除"
-        align="center"
-        prop="isDelete"
-        :show-overflow-tooltip="true"
-      /><el-table-column
         label=""
         align="center"
         prop="deletedAt"
@@ -239,7 +225,7 @@
             v-model="form.departed_at"
             format="HH:mm:ss"
             value-format="HH:mm:ss"
-            :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+            :picker-options="{&quot;selectableRange&quot;:&quot;00:00:00-23:59:59&quot;}"
             :style="{width: '100%'}"
             placeholder="请选择出发时间"
             clearable
@@ -250,7 +236,7 @@
             v-model="form.arrivedAt"
             format="HH:mm:ss"
             value-format="HH:mm:ss"
-            :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+            :picker-options="{&quot;selectableRange&quot;:&quot;00:00:00-23:59:59&quot;}"
             :style="{width: '100%'}"
             placeholder="请选择到达时间"
             clearable
@@ -261,7 +247,7 @@
             v-model="form.changeExpiredAt"
             format="HH:mm:ss"
             value-format="HH:mm:ss"
-            :picker-options='{"selectableRange":"00:00:00-23:59:59"}'
+            :picker-options="{&quot;selectableRange&quot;:&quot;00:00:00-23:59:59&quot;}"
             :style="{width: '100%'}"
             placeholder="请选择换站截止时间"
             clearable
@@ -489,7 +475,7 @@ export default {
       this.$refs['form'].validate(valid => {
         if (valid) {
           this.form.carIdsSubmit = this.getCarsAllCheckedKeys()
-          console.log( this.form.carIdsSubmit)
+          console.log(this.form.carIdsSubmit)
           if (this.form.id !== undefined) {
             updateScbLines(this.form).then(response => {
               if (response.code === 200) {

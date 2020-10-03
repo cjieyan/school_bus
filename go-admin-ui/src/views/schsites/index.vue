@@ -241,7 +241,7 @@
     />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="800px" >
+    <el-dialog :title="title" :visible.sync="open" width="800px">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="线路" prop="lineId">
           <treeselect
@@ -318,26 +318,26 @@
           <el-input
             v-model="addressKeyword"
             placeholder="搜索地址"
-            clearable>
-          </el-input>
+            clearable
+          />
           <el-input
-          v-model="form.longitude"
-          placeholder="经度"
-          readonly
-          style="width: 100px"
-          ></el-input>
+            v-model="form.longitude"
+            placeholder="经度"
+            readonly
+            style="width: 100px"
+          />
           <el-input
             v-model="form.latitude"
             placeholder="经度"
             readonly
             style="width: 100px"
-          ></el-input>
+          />
           <el-input
             v-model="form.address"
             placeholder="详细地址"
             readonly
             style="width: 300px"
-            ></el-input>
+          />
           <div class="address">
             <!-- 给地图加点击事件getLocationPoint，点击地图获取位置相关的信息，经纬度啥的 -->
             <!-- scroll-wheel-zoom：是否可以用鼠标滚轮控制地图缩放，zoom是视图比例 -->
@@ -350,27 +350,22 @@
             >
               <bm-geolocation
                 anchor="BMAP_ANCHOR_BOTTOM_RIGHT"
-                :showAddressBar="true"
-                :autoLocation="true"
-              ></bm-geolocation>
-              <bm-view style="width: 100%; height:400px; flex: 1"></bm-view>
+                :show-address-bar="true"
+                :auto-location="true"
+              />
+              <bm-view style="width: 100%; height:400px; flex: 1" />
               <bm-local-search
                 :keyword="addressKeyword"
                 :panel="true"
-                :pageCapacity=5
-                :selectFirstResult=true
-                :auto-viewport="true"></bm-local-search>
-              <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
+                :page-capacity="5"
+                :select-first-result="true"
+                :auto-viewport="true"
+              />
+              <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT" />
             </baidu-map>
           </div>
         </el-form-item>
 
-        <el-form-item label="0未删除 " prop="isDelete">
-          <el-input
-            v-model="form.isDelete"
-            placeholder="0未删除 1已删除"
-          />
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -501,7 +496,7 @@ export default {
                 ],
       picture:
                 [
-                  { required: true, message: '图片不能为空', trigger: 'blur' }
+                  { required: false, message: '图片不能为空', trigger: 'blur' }
                 ],
       createdAt:
                 [
