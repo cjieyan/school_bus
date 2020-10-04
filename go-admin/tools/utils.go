@@ -1,7 +1,10 @@
 package tools
 
 import (
+	"bytes"
+	"crypto/rand"
 	"golang.org/x/crypto/bcrypt"
+	"math/big"
 	"strconv"
 )
 
@@ -15,12 +18,8 @@ func StrToInt(err error, index string) int {
 	return result
 }
 
-func CompareHashAndPassword(e string, p string) (bool, error) {
-	err := bcrypt.CompareHashAndPassword([]byte(e), []byte(p))
-	if err != nil {
-		return false, err
-	}
-	return true, nil
+func CompareHashAndPassword(e string, p string) error {
+	return bcrypt.CompareHashAndPassword([]byte(e), []byte(p))
 }
 
 // Assert 条件断言
@@ -51,4 +50,25 @@ func HasError(err error, msg string, code ...int) {
 		}
 		panic("CustomError#" + strconv.Itoa(statusCode) + "#" + msg)
 	}
+}
+func PasswordHash(password string)(string, error){
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 13)
+	return string(bytes), err
+}
+func PasswordVerify(password, hash string) bool{
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return nil == err
+}
+
+func GenRandomString(len int) string  {
+	var container string
+	var str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+	b := bytes.NewBufferString(str)
+	length := b.Len()
+	bigInt := big.NewInt(int64(length))
+	for i := 0;i < len ;i++  {
+		randomInt,_ := rand.Int(rand.Reader,bigInt)
+		container += string(str[randomInt.Int64()])
+	}
+	return container
 }

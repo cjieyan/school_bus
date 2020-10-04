@@ -167,6 +167,9 @@
             placeholder="手机号"
           />
         </el-form-item>
+        <el-form-item label="小程序登录密码" prop="password">
+          <el-input v-model="form.password" placeholder="请输入密码" type="password" />
+        </el-form-item>
         <el-form-item label="班级" prop="classId">
           <treeselect
             v-model="form.classId"
@@ -303,7 +306,7 @@ export default {
     getTreeselect(e) {
       getDeptList().then(response => {
         this.deptOptions = []
-        const dept = { deptId: 0, deptName: '请选择', children: []}
+        const dept = { deptId: 0, deptName: '请选择', children: [] }
         dept.children = response.data
         this.deptOptions.push(dept)
       })

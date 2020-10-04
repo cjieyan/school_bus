@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	orm "go-admin/global"
 	"go-admin/tools"
 	"time"
@@ -10,6 +11,7 @@ type ScbTeachers struct {
 	Id        int    `json:"id" gorm:"type:int(10) unsigned;primary_key"` //
 	Name      string `json:"name" gorm:"type:varchar(100);"`              // 名称
 	Phone     string `json:"phone" gorm:"type:varchar(50);"`              // 手机号
+	Password  string  `json:"password" gorm:"type:varchar(50);"`              //密码
 	ClassId   int 	 `json:"classId" gorm:"type:int(11);"`                // 班级id
 	PostId    int `json:"postId" gorm:"type:int(11);"`                 // 岗位id
 	Remark    string `json:"remark" gorm:"type:varchar(200);"`            // 备注
@@ -27,6 +29,11 @@ func (ScbTeachers) TableName() string {
 func (e *ScbTeachers) Create() (ScbTeachers, error) {
 	var doc ScbTeachers
 	e.CreatedAt = time.Now()
+	pLen := len(e.Password)
+	if pLen > 0 && pLen < 6{
+		return doc, errors.New("密码大于等于6个字符")
+	}
+	e.Password, _ = tools.PasswordHash(e.Password)
 	result := orm.Eloquent.Table(e.TableName()).Create(&e)
 	if result.Error != nil {
 		err := result.Error
@@ -119,6 +126,13 @@ func (e *ScbTeachers) GetPage(pageSize int, pageIndex int) ([]ScbTeachers, int, 
 
 // 更新ScbTeachers
 func (e *ScbTeachers) Update(id int) (update ScbTeachers, err error) {
+
+	pLen := len(e.Password)
+	if pLen > 0 && pLen < 6{
+		err = errors.New("密码大于等于6个字符")
+		return
+	}
+	e.Password, _ = tools.PasswordHash(e.Password)
 	if err = orm.Eloquent.Table(e.TableName()).Where("id = ?", id).First(&update).Error; err != nil {
 		return
 	}

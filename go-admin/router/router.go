@@ -14,6 +14,8 @@ func InitExamplesRouter(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) *gi
 	examplesNoCheckRoleRouter(r, authMiddleware)
 	// 需要认证的路由
 	examplesCheckRoleRouter(r, authMiddleware)
+	// 小程序接口
+	xcxCheckRouter(r)
 
 	return r
 }
@@ -47,4 +49,9 @@ func examplesCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMiddle
 	registerScbStudentsRouter(v1, authMiddleware)
 	registerScbTeachersRouter(v1, authMiddleware)
 	registerScbCarsRouter(v1, authMiddleware)
+}
+
+func xcxCheckRouter(r *gin.Engine){
+	v1 := r.Group("/xcx/")
+	registerXcxRouter(v1)
 }

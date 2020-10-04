@@ -27,6 +27,8 @@ var cfgSsl *viper.Viper
 // 代码生成配置项 非必须
 var cfgGen *viper.Viper
 
+var cfgRedis *viper.Viper
+
 //载入配置文件
 func Setup(path string) {
 	viper.SetConfigFile(path)
@@ -80,6 +82,13 @@ func Setup(path string) {
 		panic("No found settings.gen")
 	}
 	GenConfig = InitGen(cfgGen)
+
+	cfgRedis = viper.Sub("settings.redis")
+	if nil == cfgRedis{
+		panic("No Found settings,redis")
+	}
+	RedisConfig = InitRedis(cfgRedis)
+
 }
 
 func SetConfig(configPath string, key string, value interface{}) {

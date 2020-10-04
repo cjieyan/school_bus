@@ -3,9 +3,8 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"go-admin/tools/config"
-
 	"github.com/spf13/cobra"
+	"go-admin/tools/config"
 )
 
 var (

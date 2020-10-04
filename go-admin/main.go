@@ -7,6 +7,7 @@ import (
 	orm "go-admin/global"
 	mycasbin "go-admin/pkg/casbin"
 	"go-admin/pkg/logger"
+	"go-admin/tools"
 
 	//"go-admin/models"
 	//"go-admin/models/gorm"
@@ -40,6 +41,8 @@ func main() {
 	database.Setup(config.DatabaseConfig.Driver)
 	//4. 接口访问控制加载
 	mycasbin.Setup()
+	//5. 初始化redis
+	tools.Redisinit()
 
 	gin.SetMode(gin.DebugMode)
 	//
