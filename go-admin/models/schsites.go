@@ -95,6 +95,43 @@ func (e *SchSites) Get() (SchSites, error) {
 	return doc, nil
 }
 
+
+// 获取SchSites
+func (e *SchSites) GetAll() ([]SchSites, error) {
+	var doc []SchSites
+	table := orm.Eloquent.Table(e.TableName())
+
+	if e.Id != 0 {
+		table = table.Where("id = ?", e.Id)
+	}
+
+	if e.LineId != 0 {
+		table = table.Where("line_id = ?", e.LineId)
+	}
+
+	if e.Name != "" {
+		table = table.Where("name = ?", e.Name)
+	}
+
+	if e.Purpose != "" {
+		table = table.Where("purpose = ?", e.Purpose)
+	}
+
+	if e.Sort != "" {
+		table = table.Where("sort = ?", e.Sort)
+	}
+
+	if e.Prop != 0 {
+		table = table.Where("prop = ?", e.Prop)
+	}
+	table = table.Order("sort ASC")
+
+	if err := table.Find(&doc).Error; err != nil {
+		return doc, err
+	}
+	return doc, nil
+}
+
 // 获取SchSites带分页
 func (e *SchSites) GetPage(pageSize int, pageIndex int) ([]SchSites, int, error) {
 	var doc []SchSites

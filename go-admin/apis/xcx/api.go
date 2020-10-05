@@ -26,11 +26,14 @@ func (a Api)Login(c *gin.Context){
 	_, err = tools.CompareHashAndPassword( teacher.Password, objParams.Password)
 	tools.HasError(err, "账号或密码错误.", -1)
 
-	idStr := fmt.Sprint("%i", model.Id)
+	fmt.Println("model.id....", teacher.Id)
+
+	idStr := fmt.Sprintf("%d", teacher.Id)
 	token := tools.GenRandomString(36) + idStr
 	key := tools.Keys{}.ApiToken(token)
 
 	tools.RdbSet(key, idStr)
+	tools.RdbSetKeyExp(key, 3600 * 2)
 	rsp := models.XcxLoginRsp{}
 	rsp.Token = token
 
@@ -39,15 +42,37 @@ func (a Api)Login(c *gin.Context){
 
 func (a Api)Info(c *gin.Context){
 	token := c.GetHeader("token")
-	uidStr, err := tools.RdbGet(token)
+	key := tools.Keys{}.ApiToken(token)
+	uidStr, err := tools.RdbGet(key)
+
 	tools.HasError(err, "会话过期,请重新登录", -1)
 	uid, _ := strconv.Atoi(uidStr)
 
-	model := models.ScbTeachers{}
-	model.Id = uid
-	info, err := model.Get()
+	teacherModel := models.ScbTeachers{}
+	teacherModel.Id = uid
+	info, err := teacherModel.Get()
 	tools.HasError(err, "账号异常,请联系管理员", -1)
 
-	app.OK(c, info, "")
+	carModel := models.ScbCars{}
+	carModel.AttendantId = teacherModel.Id
+	car, err := carModel.Get()
+	tools.HasError(err, "尚未分配跟随车辆", -1)
+
+	lineModel := models.ScbLines{}
+	lineModel.CarId = car.Id
+	line, err := lineModel.Get()
+	tools.HasError(err, "该车辆尚未分配线路", -1)
+
+	siteModel := models.SchSites{}
+	siteModel.LineId = line.Id
+	sites, err := siteModel.GetAll()
+	tools.HasError(err, "该车辆尚未分配站点", -1)
+
+	rsp := make( map[string]interface{})
+	rsp["info"] = info //跟车员信息
+	rsp["car"] = car   //车辆信息
+	rsp["line"] = line  //线路信息
+	rsp["sites"] = sites //站点信息
+	app.OK(c, rsp, "")
 
 }

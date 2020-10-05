@@ -20,6 +20,7 @@ type ScbLines struct {
 	Params          string `json:"params"  gorm:"-"`
 	CarIdsSelected  []int  `json:"carIdsSelected" gorm:"-"`
 	CarIdsSubmit    []int  `json:"carIdsSubmit" gorm:"-"`
+	CarId  			int  `json:"carId" gorm:"-"`			// find_in_set 查询
 	BaseModel
 }
 
@@ -79,6 +80,9 @@ func (e *ScbLines) Get() (ScbLines, error) {
 	if e.CarIds != "" {
 		table = table.Where("car_ids = ?", e.CarIds)
 	}
+	if e.CarId != 0{
+		table = table.Where("find_in_set( ?, car_ids )", e.CarId)
+	}
 
 	if err := table.First(&doc).Error; err != nil {
 		return doc, err
@@ -89,7 +93,6 @@ func (e *ScbLines) Get() (ScbLines, error) {
 		carId , _ := strconv.Atoi(carIdsSelected[i])
 		doc.CarIdsSelected = append(doc.CarIdsSelected, carId)
 	}
-
 	return doc, nil
 }
 
