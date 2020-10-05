@@ -24,7 +24,7 @@ func (a Api)Login(c *gin.Context){
 	teacher, err := model.Get()
 	tools.HasError(err, "账号或密码错误", -1)
 
-	err = tools.CompareHashAndPassword(objParams.Password, teacher.Password)
+	_, err = tools.CompareHashAndPassword(objParams.Password, teacher.Password)
 	tools.HasError(err, "账号或密码错误.", -1)
 
 	idStr := fmt.Sprint("%i", model.Id)

@@ -18,8 +18,12 @@ func StrToInt(err error, index string) int {
 	return result
 }
 
-func CompareHashAndPassword(e string, p string) error {
-	return bcrypt.CompareHashAndPassword([]byte(e), []byte(p))
+func CompareHashAndPassword(e string, p string) (bool, error) {
+	err := bcrypt.CompareHashAndPassword([]byte(e), []byte(p))
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // Assert 条件断言
