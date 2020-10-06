@@ -27,7 +27,8 @@ func examplesNoCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMidd
 	// 空接口防止v1定义无使用报错
 	v1.GET("/nilcheckrole", nil)
 
-	// {{无需认证路由自动补充在此处请勿删除}}
+	// {{无需认证路由自动补充在此处请勿删除}} 
+ registerScbCarRecordRouter(v1)
 	//registerOrdersRouter(v1)
 	//registerUserAccountRouter(v1)
 	// registerCarsRecordRouter(v1, authMiddleware)

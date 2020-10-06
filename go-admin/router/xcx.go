@@ -9,4 +9,5 @@ import (
 func registerXcxRouter(v1 *gin.RouterGroup) {
 	v1.POST("/login", xcx.Api{}.Login)
 	v1.GET("/info", xcx.Api{}.Info)
+	v1.POST("record", xcx.Api{}.Record)
 }
