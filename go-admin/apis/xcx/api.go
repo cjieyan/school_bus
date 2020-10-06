@@ -88,3 +88,12 @@ func (a Api) Record(c *gin.Context) {
 	tools.HasError(err, "", -1)
 	app.OK(c, result, "")
 }
+
+//人脸token获取用户信息
+func (a Api) StudentFaceInfo(c *gin.Context) {
+	var data models.ScbStudents
+	err := c.ShouldBindJSON(&data)
+	tools.HasError(err, "", 500)
+	info, err := data.Get()
+	app.OK(c, info, "")
+}
