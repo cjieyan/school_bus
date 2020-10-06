@@ -30,3 +30,5 @@ config/settings.dev.yml
 middleware/demo.go
 config/settings.dev.b.yml
 temp/logs
+go-admin/config/settings.yml
+go-admin/go.sum

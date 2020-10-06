@@ -20,6 +20,8 @@ type ScbStudents struct {
 	IsDeleted   string `json:"isDeleted" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
 	DataScope   string `json:"dataScope" gorm:"-"`
 	Params      string `json:"params"  gorm:"-"`
+	FaceToken   string `json:"faceToken" gorm:"type:varchar(50);"`
+	LogId       string `json:"logId" gorm:"type:varchar(50);"`
 	BaseModel
 }
 
@@ -88,6 +90,14 @@ func (e *ScbStudents) Get() (ScbStudents, error) {
 		table = table.Where("is_deleted = ?", e.IsDeleted)
 	}
 
+	if e.FaceToken != "" {
+		table = table.Where("face_token = ?", e.FaceToken)
+	}
+
+	if e.LogId != "" {
+		table = table.Where("log_id = ?", e.LogId)
+	}
+
 	if err := table.First(&doc).Error; err != nil {
 		return doc, err
 	}
@@ -144,23 +154,23 @@ func (e *ScbStudents) GetPage(pageSize int, pageIndex int) ([]ScbStudents, int, 
 		table = table.Where("is_deleted = ?", e.IsDeleted)
 	}
 
-	fmt.Println("aaaa2...");
+	fmt.Println("aaaa2...")
 	// 数据权限控制(如果不需要数据权限请将此处去掉)
 	dataPermission := new(DataPermission)
 	dataPermission.UserId, _ = tools.StringToInt(e.DataScope)
 	table, err := dataPermission.GetDataScope(e.TableName(), table)
-	fmt.Println("aaaa2...");
+	fmt.Println("aaaa2...")
 	if err != nil {
 		return nil, 0, err
 	}
 	var count int
 
-	fmt.Println("aaaa3...");
+	fmt.Println("aaaa3...")
 	if err := table.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&doc).Error; err != nil {
 		return nil, 0, err
 	}
 	table.Where("`is_delete` = 0").Count(&count)
-	fmt.Println("aaaa4...");
+	fmt.Println("aaaa4...")
 	return doc, count, nil
 }
 
