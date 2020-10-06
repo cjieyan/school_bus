@@ -68,7 +68,7 @@ func GetDept(c *gin.Context) {
 // @Security Bearer
 func InsertDept(c *gin.Context) {
 	var data models.ScbDept
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	tools.HasError(err, "", 500)
 	data.CreateBy = tools.GetUserIdStr(c)
 	result, err := data.Create()

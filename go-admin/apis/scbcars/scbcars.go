@@ -61,7 +61,7 @@ func InsertScbCars(c *gin.Context) {
 
 func UpdateScbCars(c *gin.Context) {
 	var data models.ScbCars
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	tools.HasError(err, "数据解析失败", -1)
 	result, err := data.Update(data.Id)
 	tools.HasError(err, "", -1)

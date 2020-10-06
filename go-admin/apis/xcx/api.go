@@ -66,6 +66,7 @@ func (a Api)Info(c *gin.Context){
 	siteModel := models.SchSites{}
 	siteModel.LineId = line.Id
 	sites, err := siteModel.GetAll()
+	fmt.Println("err....", err)
 	tools.HasError(err, "该车辆尚未分配站点", -1)
 
 	rsp := make( map[string]interface{})

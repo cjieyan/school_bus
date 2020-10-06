@@ -16,6 +16,10 @@ func registerScbLinesRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddl
 		r.POST("", scblines.InsertScbLines)
 		r.PUT("", scblines.UpdateScbLines)
 		r.DELETE("/:id", scblines.DeleteScbLines)
+
+		//r.GET("/list", scblines.GetScbLinesList)
+		//r.GET("/treeselect/:id", scblines.GetScbLinesTreeCarsselect)
+		//r.GET("/all-lines", scblines.GetAllLines)
 	}
 
 	l := v1.Group("").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())

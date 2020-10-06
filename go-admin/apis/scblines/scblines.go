@@ -2,7 +2,6 @@ package scblines
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 	"go-admin/models"
 	"go-admin/tools"
 	"go-admin/tools/app"
@@ -58,7 +57,7 @@ func InsertScbLines(c *gin.Context) {
 
 func UpdateScbLines(c *gin.Context) {
 	var data models.ScbLines
-	err := c.BindWith(&data, binding.JSON)
+	err := c.ShouldBindJSON(&data)
 	tools.HasError(err, "数据解析失败", -1)
 	result, err := data.Update(data.Id)
 	tools.HasError(err, "", -1)

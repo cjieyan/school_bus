@@ -83,7 +83,7 @@ func GetOperLog(c *gin.Context) {
 // @Security Bearer
 func InsertOperLog(c *gin.Context) {
 	var data models.SysOperLog
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	tools.HasError(err, "", 500)
 	result, err := data.Create()
 	tools.HasError(err, "", -1)

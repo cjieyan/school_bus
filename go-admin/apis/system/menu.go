@@ -97,7 +97,7 @@ func GetMenuTreeelect(c *gin.Context) {
 // @Security Bearer
 func InsertMenu(c *gin.Context) {
 	var data models.Menu
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	tools.HasError(err, "抱歉未找到相关信息", -1)
 	data.CreateBy = tools.GetUserIdStr(c)
 	result, err := data.Create()
@@ -118,7 +118,7 @@ func InsertMenu(c *gin.Context) {
 // @Security Bearer
 func UpdateMenu(c *gin.Context) {
 	var data models.Menu
-	err2 := c.BindWith(&data, binding.JSON)
+	err2 := c.MustBindWith(&data, binding.JSON)
 	data.UpdateBy = tools.GetUserIdStr(c)
 	tools.HasError(err2, "修改失败", -1)
 	_, err := data.Update(data.MenuId)

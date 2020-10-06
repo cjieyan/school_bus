@@ -83,7 +83,7 @@ func GetLoginLog(c *gin.Context) {
 // @Security Bearer
 func InsertLoginLog(c *gin.Context) {
 	var data models.LoginLog
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	tools.HasError(err, "", 500)
 	result, err := data.Create()
 	tools.HasError(err, "", -1)
@@ -104,7 +104,7 @@ func InsertLoginLog(c *gin.Context) {
 // @Security Bearer
 func UpdateLoginLog(c *gin.Context) {
 	var data models.LoginLog
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	tools.HasError(err, "", -1)
 	result, err := data.Update(data.InfoId)
 	tools.HasError(err, "", -1)

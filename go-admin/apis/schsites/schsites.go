@@ -1,6 +1,7 @@
 package schsites
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"go-admin/models"
@@ -57,15 +58,31 @@ func InsertSchSites(c *gin.Context) {
 	var data models.SchSites
 	err := c.ShouldBindJSON(&data)
 	tools.HasError(err, "", 500)
+
+	qqLng, qqLat, qqErr := data.MapBd2qq(data.Longitude, data.Latitude)
+	if nil == qqErr{
+		data.Latitude = qqLat
+		data.Longitude = qqLng
+	}
+
 	result, err := data.Create()
+
 	tools.HasError(err, "", -1)
 	app.OK(c, result, "")
 }
 
 func UpdateSchSites(c *gin.Context) {
 	var data models.SchSites
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	tools.HasError(err, "数据解析失败", -1)
+
+	qqLng, qqLat, qqErr := data.MapBd2qq(data.Longitude, data.Latitude)
+	if nil == qqErr{
+		data.Latitude = qqLat
+		data.Longitude = qqLng
+	}
+	fmt.Println("Latitude.....", data.Latitude, data.Longitude, err)
+
 	result, err := data.Update(data.Id)
 	tools.HasError(err, "", -1)
 

@@ -1,27 +1,43 @@
 package models
 
 import (
+	"encoding/json"
+	"fmt"
 	orm "go-admin/global"
 	"go-admin/tools"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 type SchSites struct {
-	Id        int    `json:"id" gorm:"type:int(11);primary_key"`  //
-	LineId    int    `json:"lineId" gorm:"type:int(11);"`         // 线路id
-	Name      string `json:"name" gorm:"type:varchar(100);"`      // 名称
-	Purpose   string `json:"purpose" gorm:"type:int(11);"`        // 用途
-	Sort      string `json:"sort" gorm:"type:int(11);"`           // 排序
-	Prop      int    `json:"prop" gorm:"type:int(11);"`      // 站点属性
-	ArriveAt  string `json:"arriveAt" gorm:"type:varchar(50);"`   // 到达时间
-	Remark    string `json:"remark" gorm:"type:varchar(200);"`    // 备注
+	Id        int     `json:"id" gorm:"type:int(11);primary_key"`  //
+	LineId    int     `json:"lineId" gorm:"type:int(11);"`         // 线路id
+	Name      string  `json:"name" gorm:"type:varchar(100);"`      // 名称
+	Purpose   string  `json:"purpose" gorm:"type:int(11);"`        // 用途
+	Sort      string  `json:"sort" gorm:"type:int(11);"`           // 排序
+	Prop      int     `json:"prop" gorm:"type:int(11);"`           // 站点属性
+	ArriveAt  string  `json:"arriveAt" gorm:"type:varchar(50);"`   // 到达时间
+	Remark    string  `json:"remark" gorm:"type:varchar(200);"`    // 备注
 	Longitude float64 `json:"longitude" gorm:"type:varchar(100);"` // 经度
 	Latitude  float64 `json:"latitude" gorm:"type:varchar(100);"`  // 维度
-	Address   string `json:"address" gorm:"type:varchar(500);"`   //地址
-	Picture   string `json:"picture" gorm:"type:varchar(200);"`   // 图片
-	IsDelete  int `json:"isDelete" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
-	DataScope string `json:"dataScope" gorm:"-"`
-	Params    string `json:"params"  gorm:"-"`
+	QqLng     float64 `json:"qq_lng" gorm:"type:varchar(100)"`     // qq经度
+	QqLat     float64 `json:"qq_lat" gorm:"type:varchar(100)"`     // qq纬度
+	Address   string  `json:"address" gorm:"type:varchar(500);"`   //地址
+	Picture   string  `json:"picture" gorm:"type:varchar(200);"`   // 图片
+	IsDelete  int     `json:"isDelete" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
+	DataScope string  `json:"dataScope" gorm:"-"`
+	Params    string  `json:"params" gorm:"-"`
 	BaseModel
+}
+type SchSitesQqMapData struct {
+	Status    int                         `json:"status"`
+	Message   string                      `json:"message"`
+	Locations []SchSitesQqMapDataLocation `json:"locations"`
+}
+type SchSitesQqMapDataLocation struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
 }
 
 func (SchSites) TableName() string {
@@ -94,7 +110,6 @@ func (e *SchSites) Get() (SchSites, error) {
 	}
 	return doc, nil
 }
-
 
 // 获取SchSites
 func (e *SchSites) GetAll() ([]SchSites, error) {
@@ -228,5 +243,37 @@ func (e *SchSites) BatchDelete(id []int) (Result bool, err error) {
 		return
 	}
 	Result = true
+	return
+}
+
+func (e SchSites)MapBd2qq(lon, lat float64)(qqLng , qqLat float64, err error){
+	locations := fmt.Sprintf("%v,%v", lat, lon)
+	key := "URRBZ-64IW3-JYN3S-YNY5B-AYBKS-STBZH"
+	url := "https://apis.map.qq.com/ws/coord/v1/translate?locations=" + locations + "&type=3&key=" + key + "&output=json"
+
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Println("Get failed:", err)
+		return
+	}
+
+	defer resp.Body.Close()
+
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Read failed:", err)
+		return
+	}
+	fmt.Println("locations url.....:", url)
+
+	var qqLngLat SchSitesQqMapData
+
+	err = json.Unmarshal(content, &qqLngLat)
+	if nil == err && 0 == qqLngLat.Status && len(qqLngLat.Locations) > 0 {
+		ret := qqLngLat.Locations[0]
+		qqLat = ret.Lat
+		qqLng = ret.Lng
+	}
+	fmt.Println("qqLngLat......", qqLat, qqLng)
 	return
 }

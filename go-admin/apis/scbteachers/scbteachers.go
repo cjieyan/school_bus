@@ -47,6 +47,7 @@ func GetScbTeachers(c *gin.Context) {
 
 	postIds := make([]int, 0)
 	intPostId := result.PostId
+	result.Password = ""
 	postIds = append(postIds, intPostId)
 
 	app.Custum(c, gin.H{
@@ -68,7 +69,7 @@ func InsertScbTeachers(c *gin.Context) {
 
 func UpdateScbTeachers(c *gin.Context) {
 	var data models.ScbTeachers
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	tools.HasError(err, "数据解析失败", -1)
 	result, err := data.Update(data.Id)
 	tools.HasError(err, "", -1)

@@ -101,7 +101,7 @@ func GetConfigByConfigKey(c *gin.Context) {
 // @Security Bearer
 func InsertConfig(c *gin.Context) {
 	var data models.SysConfig
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	data.CreateBy = tools.GetUserIdStr(c)
 	tools.HasError(err, "", 500)
 	result, err := data.Create()
@@ -122,7 +122,7 @@ func InsertConfig(c *gin.Context) {
 // @Security Bearer
 func UpdateConfig(c *gin.Context) {
 	var data models.SysConfig
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	tools.HasError(err, "数据解析失败", -1)
 	data.UpdateBy = tools.GetUserIdStr(c)
 	result, err := data.Update(data.ConfigId)

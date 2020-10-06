@@ -94,7 +94,7 @@ func GetDictTypeOptionSelect(c *gin.Context) {
 // @Security Bearer
 func InsertDictType(c *gin.Context) {
 	var data models.DictType
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	data.CreateBy = tools.GetUserIdStr(c)
 	tools.HasError(err, "", 500)
 	result, err := data.Create()
@@ -116,7 +116,7 @@ func InsertDictType(c *gin.Context) {
 // @Security Bearer
 func UpdateDictType(c *gin.Context) {
 	var data models.DictType
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	data.UpdateBy = tools.GetUserIdStr(c)
 	tools.HasError(err, "", -1)
 	result, err := data.Update(data.DictId)

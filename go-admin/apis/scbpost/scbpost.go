@@ -54,7 +54,7 @@ func InsertScbPost(c *gin.Context) {
 
 func UpdateScbPost(c *gin.Context) {
 	var data models.ScbPost
-	err := c.BindWith(&data, binding.JSON)
+	err := c.MustBindWith(&data, binding.JSON)
 	tools.HasError(err, "数据解析失败", -1)
 	data.UpdateBy = tools.GetUserIdStr(c)
 	result, err := data.Update(data.PostId)
