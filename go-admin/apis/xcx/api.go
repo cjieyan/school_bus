@@ -2,12 +2,10 @@ package xcx
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"go-admin/models"
 	"go-admin/tools"
 	"go-admin/tools/app"
-	"strconv"
-
-	"github.com/gin-gonic/gin"
 )
 
 type Api struct {
@@ -42,15 +40,12 @@ func (a Api) Login(c *gin.Context) {
 }
 
 func (a Api) Info(c *gin.Context) {
-	token := c.GetHeader("token")
-	key := tools.Keys{}.ApiToken(token)
-	uidStr, err := tools.RdbGet(key)
 
-	tools.HasError(err, "会话过期,请重新登录", -1)
-	uid, _ := strconv.Atoi(uidStr)
+	userId := c.GetInt(models.UserId)
 
+	fmt.Println("userId````...", userId)
 	teacherModel := models.ScbTeachers{}
-	teacherModel.Id = uid
+	teacherModel.Id = userId
 	info, err := teacherModel.Get()
 	tools.HasError(err, "账号异常,请联系管理员", -1)
 

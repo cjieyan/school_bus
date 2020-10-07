@@ -10,6 +10,7 @@ import (
 	"go-admin/tools"
 	"go-admin/tools/config"
 	"net/http"
+	"strconv"
 )
 
 var store = base64Captcha.DefaultMemStore
@@ -168,4 +169,27 @@ func Unauthorized(c *gin.Context, code int, message string) {
 		"code": code,
 		"msg":  message,
 	})
+}
+
+func XcxCheckToken(c *gin.Context){
+	token := c.GetHeader("token")
+	if "" == token{
+		Unauthorized(c, 401, "Unauthorized")
+		c.Abort()
+		return
+	}
+
+	key := tools.Keys{}.ApiToken(token)
+	userIdStr, err := tools.RdbGet(key)
+	if nil != err || "" == userIdStr {
+		Unauthorized(c, 401, "Unauthorized.")
+		c.Abort()
+		return
+	}
+	//刷新token有效期
+	tools.RdbSetKeyExp(key, 3600*2)
+	userId, _ := strconv.Atoi(userIdStr)
+
+	c.Set(models.UserId, userId)
+	c.Next()
 }
