@@ -20,8 +20,8 @@ type ScbStudents struct {
 	IsDeleted   string `json:"isDeleted" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
 	DataScope   string `json:"dataScope" gorm:"-"`
 	Params      string `json:"params"  gorm:"-"`
-	FaceToken   string `json:"faceToken" gorm:"type:varchar(50);"`
-	LogId       string `json:"logId" gorm:"type:varchar(50);"`
+	FaceToken   string `json:"faceToken" gorm:"type:varchar(255);"`
+	LogId       string `json:"logId" gorm:"type:varchar(255);"`
 	BaseModel
 }
 
