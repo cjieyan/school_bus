@@ -114,7 +114,7 @@ func (e *ScbCars) GetPage(pageSize int, pageIndex int) ([]ScbCars, int, error) {
 
 // 更新ScbCars
 func (e *ScbCars) Update(id int) (update ScbCars, err error) {
-	if err = orm.Eloquent.Table(e.TableName()).Where(" = ?", id).First(&update).Error; err != nil {
+	if err = orm.Eloquent.Table(e.TableName()).Where(" id = ?", id).First(&update).Error; err != nil {
 		return
 	}
 
@@ -128,7 +128,7 @@ func (e *ScbCars) Update(id int) (update ScbCars, err error) {
 
 // 删除ScbCars
 func (e *ScbCars) Delete(id int) (success bool, err error) {
-	if err = orm.Eloquent.Table(e.TableName()).Where(" = ?", id).Delete(&ScbCars{}).Error; err != nil {
+	if err = orm.Eloquent.Table(e.TableName()).Where(" id = ?", id).Delete(&ScbCars{}).Error; err != nil {
 		success = false
 		return
 	}
@@ -138,7 +138,7 @@ func (e *ScbCars) Delete(id int) (success bool, err error) {
 
 //批量删除
 func (e *ScbCars) BatchDelete(id []int) (Result bool, err error) {
-	if err = orm.Eloquent.Table(e.TableName()).Where(" in (?)", id).Delete(&ScbCars{}).Error; err != nil {
+	if err = orm.Eloquent.Table(e.TableName()).Where(" id in (?)", id).Delete(&ScbCars{}).Error; err != nil {
 		return
 	}
 	Result = true

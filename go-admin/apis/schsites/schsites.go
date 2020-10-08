@@ -61,8 +61,8 @@ func InsertSchSites(c *gin.Context) {
 
 	qqLng, qqLat, qqErr := data.MapBd2qq(data.Longitude, data.Latitude)
 	if nil == qqErr{
-		data.Latitude = qqLat
-		data.Longitude = qqLng
+		data.QqLat = qqLat
+		data.QqLng = qqLng
 	}
 
 	result, err := data.Create()

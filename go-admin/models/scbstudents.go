@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	orm "go-admin/global"
 	"go-admin/tools"
 )
@@ -170,23 +169,19 @@ func (e *ScbStudents) GetPage(pageSize int, pageIndex int) ([]ScbStudents, int, 
 		table = table.Where("is_deleted = ?", e.IsDeleted)
 	}
 
-	fmt.Println("aaaa2...")
 	// 数据权限控制(如果不需要数据权限请将此处去掉)
 	dataPermission := new(DataPermission)
 	dataPermission.UserId, _ = tools.StringToInt(e.DataScope)
 	table, err := dataPermission.GetDataScope(e.TableName(), table)
-	fmt.Println("aaaa2...")
 	if err != nil {
 		return nil, 0, err
 	}
 	var count int
 
-	fmt.Println("aaaa3...")
 	if err := table.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&doc).Error; err != nil {
 		return nil, 0, err
 	}
 	table.Where("`is_delete` = 0").Count(&count)
-	fmt.Println("aaaa4...")
 	return doc, count, nil
 }
 
