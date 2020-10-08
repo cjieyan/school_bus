@@ -98,3 +98,10 @@ func (a Api) StudentFaceInfo(c *gin.Context) {
 	info, err := data.Get()
 	app.OK(c, info, "")
 }
+
+func (a Api) Sites(c *gin.Context) {
+	sitemodel := models.SchSites{}
+	info, _, err := sitemodel.GetPage(100, 0)
+	tools.HasError(err, "账号异常,请联系管理员", -1)
+	app.OK(c, info, "")
+}

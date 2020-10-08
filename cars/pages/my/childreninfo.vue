@@ -33,9 +33,11 @@
 			this.getData();
 		},
 		methods: {
-			back: function(){
-				uni.redirectTo({
-					url:"./user"
+			back() {
+				uni.navigateBack({
+					success:function(){
+						beforePage.onLoad();
+					}
 				})
 			},
 			getData() {

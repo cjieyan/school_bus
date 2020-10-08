@@ -47,6 +47,13 @@
 			};
 		},
 		methods: {
+			back() {
+				uni.navigateBack({
+					success:function(){
+						beforePage.onLoad();
+					}
+				})
+			},
 			gotocars() {
 				uni.showLoading({
 					

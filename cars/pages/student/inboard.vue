@@ -27,7 +27,7 @@
 						<view class="carno">车牌号码:粤B1234</view>
 						<view class="is">是否接送:否</view>
 					</view>
-					
+
 				</view>
 				<view style="clear:both;height:0"></view>
 			</view>
@@ -50,7 +50,13 @@
 			}
 		},
 		methods: {
-
+			back() {
+				uni.navigateBack({
+					success: function() {
+						beforePage.onLoad();
+					}
+				})
+			},
 		}
 	}
 </script>
@@ -64,6 +70,7 @@
 		margin-top: 10px;
 		padding: 0 10%;
 	}
+
 	.student-img {
 		width: 40px;
 		height: 40px;
@@ -72,22 +79,27 @@
 		position: relative;
 		float: left;
 	}
-	.student-info{
+
+	.student-info {
 		float: left;
 		margin-left: 20px;
 		line-height: 25px;
 		font-size: 12px;
 	}
-	.info-bottom{
+
+	.info-bottom {
 		margin-top: 20px;
 	}
+
 	.student-top {
 		border-bottom: 1px solid rgb(238 238 238);
 		padding-bottom: 10px;
 	}
-	.student-data{
+
+	.student-data {
 		margin-top: 20px;
 	}
+
 	.location-info {
 		margin-left: 15px;
 		color: rgb(89 89 89);

@@ -67,9 +67,10 @@
 				console.log(this.show)
 			},
 			back() {
-				console.log("abccc")
-				uni.redirectTo({
-					url:"./user"
+				uni.navigateBack({
+					success:function(){
+						beforePage.onLoad();
+					}
 				})
 			},
 		}

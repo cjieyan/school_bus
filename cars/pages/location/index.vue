@@ -13,7 +13,7 @@
 				</view>
 			</view>
 			<view class="content-info">
-				<view class="carinfo">1号车粤12345</view>
+				<view class="carinfo">1号车粤12345（已上车15人/共20人）</view>
 				<view class="carinfo">张师傅12345678911</view>
 			</view>
 			<view class="content-hr"></view>
@@ -23,11 +23,13 @@
 						<image src="../../static/location.png" class="location-image"></image>
 					</span>
 					<span class="location-info">
-						梧桐小学--六约新村{{address}}
+						梧桐小学--六约新村
 					</span>
 				</view>
 				<view class="location-d">
-					<u-steps :list="numList" active-color="rgb(255 114 58)" mode="dot" direction="column"></u-steps>
+					<u-steps :list="numList" active-color="rgb(255 114 58)" mode="dot" direction="column">
+						
+					</u-steps>
 				</view>
 			</view>
 			<view class="comfirm">
@@ -39,41 +41,32 @@
 </template>
 
 <script>
-	var bmap = require('../../libs/bmap-wx.min.js');
-	var wxMarkerData = [];
+	import utils from '../../common/utils.js'
 	export default {
 		components: {},
 		data() {
 			return {
+				ifOnShow: false,
 				ak: 'tjSZDrqGonHtUiDfmKpa8WbdEoOtSIcH',
-				markers: [],
 				latitude: '',
 				longitude: '',
-				placeData: {},
+				blat: "",
+				blng: "",
 				background: {
 					backgroundColor: '#12c497',
 				},
-				numList: [{
-					name: '六约新村'
-				}, {
-					name: '六约新村'
-				}, {
-					name: '六约新村'
-				}, {
-					name: '六约新村'
-				}, ],
-				latitudeL: "",
-				address: '', //地址  
-				cityInfo: {} //城市信息 
+				numList: [],
+				pk: 180 / 3.14169
 			};
 		},
-		makertap: function(e) {
-			var that = this;
-			var id = e.markerId;
-			that.showSearchInfo(wxMarkerData, id);
-			that.changeMarkerColor(wxMarkerData, id);
-		},
 		methods: {
+			back() {
+				uni.navigateBack({
+					success: function() {
+						beforePage.onLoad();
+					}
+				})
+			},
 			gotoLunBo() {
 				uni.showLoading({
 					title: '加载中'
@@ -89,49 +82,143 @@
 				uni.hideLoading();
 			}
 		},
-		onLoad() {
-			var that = this;
-			/* 获取定位地理位置 */
+		onHide() {
+			console.log('this.ifOnShow=true')
+			this.ifOnShow = true
+		},
 
+		onShow() {
+			if (this.ifOnShow) {
+				uni.showLoading({
+					title: "正在定位"
+				})
+				var that = this;
+				/* 获取定位地理位置 */
+				uni.getLocation({
+					type: 'wgs84',
+					success: function(res) {
+						console.log('当前位置的经度：' + res.longitude);
+						console.log('当前位置的纬度：' + res.latitude);
+						uni.request({
+							url: "http://api.map.baidu.com/reverse_geocoding/v3/?ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7&output=json&coordtype=wgs84ll&location=" +
+								res.latitude + "," + res.longitude,
+							data: {},
+							success: (res) => {
+								// console.log(res)
+								// uni.showModal({
+								// 	title: res.data.result.formatted_address
+								// })
+								//获取最近的站点
+
+							},
+							fail: (err) => {
+								console.log(err)
+							}
+						})
+						console.log("eeeeeeeeeeeeeeeeeee")
+						uni.request({
+							url: "http://localhost:8000/xcx/sites",
+							method: "POST",
+							data: {},
+							success: (res) => {
+								console.log("------计算最近站点-------")
+								console.log(res.data.data.length)
+								var t = 0
+								for (var i = 0; i < res.data.data.length; i++) {
+
+								}
+							},
+							fail: (err) => {
+								console.log("------计算最近站点err-------")
+								console.log(err)
+							}
+						})
+						console.log("fffffffffffffffffffffffffff")
+					},
+					fail: (err) => {
+						console.log(err)
+						uni.showModal({
+							title: "定位失败"
+						})
+					}
+				});
+				uni.hideLoading()
+			}
+		},
+		onLoad() {
 			uni.showLoading({
 				title: "正在获取定位"
 			})
+			var that = this;
+			/* 获取定位地理位置 */
+			
 			uni.getLocation({
-						type: 'wgs84',
-						success: function(res) {
-							console.log('当前位置的经度：' + res.longitude);
-							console.log('当前位置的纬度：' + res.latitude);
-							
-							//转换成百度坐标
+				// type: 'wgs84',
+				type:"wgs84",
+				success: function(res) {
+					console.log('当前位置的经度：' + res.longitude);
+					console.log('当前位置的纬度：' + res.latitude);
+					that.longitude = res.longitude
+					that.latitude = res.latitude
+					//转换成百度坐标系
+					uni.request({
+						url:"http://api.map.baidu.com/geoconv/v1/?coords=114.52152,22.741887&from=1&to=5&ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7",
+						method:"GET",
+						data:{},
+						success: (res) => {
+							console.log("---------百度坐标系--------")
+							console.log(res)
+							that.blat = res.data.result[0].y
+							that.blng = res.data.result[0].x
+						},
+						fail: (err) => {
+							console.log(err)
+						}
+					})
+					var a1 = that.latitude / that.pk
+					var a2 = that.longitude / that.pk
+					uni.request({
+						url: "http://api.map.baidu.com/reverse_geocoding/v3/?ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7&output=json&coordtype=wgs84ll&location=" +
+							res.latitude + "," + res.longitude,
+						data: {pois: 1,},
+						success: (res) => {
+							console.log("-----百度地图----")
+							console.log(res)
 							uni.request({
-								url:"http://api.map.baidu.com/geoconv/v1/?coords="+res.latitude+','+ res.longitude+"&from=3&to=5&ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7",
+								url: "http://localhost:8000/xcx/sites",
+								method: "POST",
+								data: {},
 								success: (res) => {
-									console.log("res:")
-									console.log(res)
+									console.log("------计算最近站点-------")
+									console.log("------计算最近站点-------")
+									console.log(res.data)
+									var t = 0
+									var siteList = []
+									//22.744943742471953,114.53285132220785,22.744943742471953
+									for (var i = 0; i < res.data.data.length; i++) {
+										var distict = utils.getGreatCircleDistance(that.blat,that.blng, res.data.data[i].latitude, res.data.data[i].longitude)
+										console.log("-------"+ res.data.data[i].name +"-----")
+										console.log(distict)
+										console.log("------------")
+										var resdata = {
+											"name": res.data.data[i].name+"("+Math.round(distict)+"米)",
+											"distict": Math.round(distict)
+										}
+										siteList.push(resdata)
+										that.numList = siteList
+									}
+									console.log(siteList)
 								},
 								fail: (err) => {
 									console.log(err)
 								}
 							})
-							//调用百度地图API
-							console.log("https://apis.map.qq.com/ws/geocoder/v1/?location="+res.latitude+","+res.longitude+"&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77&get_poi=1")
-							uni.request({
-								// url: 'http://api.map.baidu.com/reverse_geocoding/v3/?ak=tjSZDrqGonHtUiDfmKpa8WbdEoOtSIcH=json&coordtype=gcj02&location=' +res.latitude+','+ res.longitude,
-								// url:'http://api.map.baidu.com/pano/?x=120.320032&y=31.589666&lc=0&ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7&src=webapp.baidu.openAPIdemo',
-								// url:"http://api.map.baidu.com/reverse_geocoding/v3/?ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7&output=json&coordtype=wgs84ll&location="+(res.latitude+0.0060)+","+(res.longitude+0.0065),
-								// data: {},
-								//腾讯地图
-								url:"https://apis.map.qq.com/ws/geocoder/v1/?location="+res.latitude+","+res.longitude+"&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77&get_poi=1",
-								success: (res) => {
-									console.log(res)
-									uni.showModal({
-										title:res.data.result.formatted_address
-									})
-								},
-								fail: (err) => {
-									console.log(err)
-								}
-						})
+						},
+						fail: (err) => {
+							console.log(err)
+						}
+					})
+
 
 				},
 				fail: (err) => {
@@ -140,9 +227,9 @@
 						title: "定位失败"
 					})
 				}
-		});
-	uni.hideLoading()
-	}
+			});
+			uni.hideLoading()
+		}
 	}
 </script>
 

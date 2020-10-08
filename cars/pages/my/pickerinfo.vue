@@ -33,6 +33,13 @@
 			this.getData();
 		},
 		methods: {
+			back() {
+				uni.navigateBack({
+					success:function(){
+						beforePage.onLoad();
+					}
+				})
+			},
 			getData() {
 				this.siteList = [{
 						id: 1,

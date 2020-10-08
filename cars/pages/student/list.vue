@@ -94,7 +94,13 @@
 			}
 		},
 		methods: {
-
+			back() {
+				uni.navigateBack({
+					success: function() {
+						beforePage.onLoad();
+					}
+				})
+			},
 		}
 	}
 </script>
@@ -170,12 +176,13 @@
 		font-size: 12px;
 		text-align: center;
 	}
-	
-	.commnet{
+
+	.commnet {
 		font-size: 12px;
 		background-color: #f8f8f8;
 	}
-	.comment-list span{
+
+	.comment-list span {
 		border: 1px solid #f8f8f8;
 		border-radius: 5px;
 		padding: 5px 8px;

@@ -15,6 +15,13 @@
 			}
 		},
 		methods: {
+			back() {
+				uni.navigateBack({
+					success:function(){
+						beforePage.onLoad();
+					}
+				})
+			},
 			getuserinfo: function() {
 				uni.showLoading({
 					title:"正在登录",

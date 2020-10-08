@@ -29,7 +29,9 @@
 		methods: {
 			back() {
 				uni.navigateBack({
-
+					success:function(){
+						beforePage.onLoad();
+					}
 				})
 			},
 			takephone() {
@@ -83,6 +85,7 @@
 								console.log(err)
 							}
 						})
+						//本地记录token和url
 						uni.hideLoading()
 					}
 				})

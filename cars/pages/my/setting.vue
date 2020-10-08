@@ -12,7 +12,13 @@
 			}
 		},
 		methods: {
-			
+			back() {
+				uni.navigateBack({
+					success:function(){
+						beforePage.onLoad();
+					}
+				})
+			},
 		}
 	}
 </script>

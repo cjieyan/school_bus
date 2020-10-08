@@ -26,13 +26,17 @@
 				background: {
 					backgroundColor: '#12c497',
 				},
-				accesstoken: ""
+				accesstoken: "",
+				student: {},
+				facetoken: ""
 			}
 		},
 		methods: {
 			back() {
 				uni.navigateBack({
-
+					success: function() {
+						beforePage.onLoad();
+					}
 				})
 			},
 			takephone() {
@@ -54,7 +58,7 @@
 							title: "正在识别中"
 						})
 						//请求百度接口
-						console.log("https://aip.baidubce.com/rest/2.0/face/v3/search?access_token=" + this.accesstoken)
+
 						uni.request({
 							url: "https://aip.baidubce.com/rest/2.0/face/v3/search?access_token=" + this.accesstoken,
 							method: "POST",
@@ -70,16 +74,14 @@
 							},
 							success: (res) => {
 								console.log(res)
-								if(res.data.error_code == 0)
-								{
+								if (res.data.error_code == 0) {
 									uni.showModal({
-										title:"上车打卡成功"
+										title: "上车打卡成功"
 									})
-									//推送记录
-									
-								}else{
+									this.facetoken = res.data.face_token
+								} else {
 									uni.showModal({
-										title:"识别失败"
+										title: "识别失败"
 									})
 								}
 							},
@@ -87,6 +89,50 @@
 								console.log(err)
 							}
 						})
+						//获取学生信息
+
+						//记录日志
+						if (this.facetoken != "") {
+							//获取用户信息
+							uni.request({
+								url: "http://localhost:8000/xcx/faceinfo",
+								method: "POST",
+								data: {
+									"face_token": "a22bdde40e2f1d77b50acc1e55b6c0f2"
+								},
+								success: (res) => {
+									//
+									if (res.code == 200) {
+										this.student = res.data
+									}
+								}
+							})
+						}
+
+						//推送日志
+						if (this.student.id) {
+							console.log(this.student.id)
+							uni.request({
+								url: "http://localhost:8000/xcx/record",
+								method: "POST",
+								data: {
+									"studentId": "1",
+									"carId": "1",
+									"siteId": "1"
+								},
+								success: (res) => {
+									uni.showModal({
+										title:"打卡成功"
+									})
+								},
+								fail: (err) => {
+									uni.showModal({
+										title:"打卡失败"
+									})
+									console.log(err)
+								}
+							})
+						}
 						uni.hideLoading()
 					}
 				})

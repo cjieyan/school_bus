@@ -82,7 +82,13 @@
 			}
 		},
 		methods: {
-
+			back() {
+				uni.navigateBack({
+					success: function() {
+						beforePage.onLoad();
+					}
+				})
+			},
 		}
 	}
 </script>
@@ -142,13 +148,15 @@
 		top: 12px;
 		left: 3px;
 	}
-	.inboard-check{
+
+	.inboard-check {
 		position: absolute;
 		bottom: -6px;
 		left: 15px;
 		background-color: #4CD964;
 		border-radius: 6px;
 	}
+
 	.student-name {
 		margin-top: 8px;
 		font-size: 12px;

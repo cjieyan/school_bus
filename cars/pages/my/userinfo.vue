@@ -59,6 +59,13 @@
 			}
 		},
 		methods: {
+			back() {
+				uni.navigateBack({
+					success:function(){
+						beforePage.onLoad();
+					}
+				})
+			},
 			modeChange(index) {
 				this.mode = index == 0 ? 'circle' : 'square';
 			},
