@@ -58,8 +58,6 @@
 			
 								},
 								fail: (err) => {
-									console.log("eeee")
-									console.log(err)
 									uni.showToast({
 										title: "微信登录授权失败",
 										icon: "none"
