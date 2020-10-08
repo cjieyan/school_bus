@@ -245,7 +245,7 @@ func (e *SchSites) BatchDelete(id []int) (Result bool, err error) {
 	Result = true
 	return
 }
-
+// qq地图接口转换
 func (e SchSites)MapBd2qq(lon, lat float64)(qqLng , qqLat float64, err error){
 	locations := fmt.Sprintf("%v,%v", lat, lon)
 	key := "URRBZ-64IW3-JYN3S-YNY5B-AYBKS-STBZH"
