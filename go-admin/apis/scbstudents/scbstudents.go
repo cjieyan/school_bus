@@ -1,7 +1,6 @@
 package scbstudents
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"go-admin/models"
@@ -36,7 +35,6 @@ func GetScbStudentsList(c *gin.Context) {
 	data.IsDeleted = c.Request.FormValue("isDeleted")
 
 	data.DataScope = tools.GetUserIdStr(c)
-	fmt.Println("aaaa...");
 	result, count, err := data.GetPage(pageSize, pageIndex)
 	tools.HasError(err, "", -1)
 
