@@ -7,21 +7,24 @@ import (
 )
 
 type ScbStudents struct {
-	Id          int    `json:"id" gorm:"type:int(11);primary_key"`   //
-	Name        string `json:"name" gorm:"type:varchar(100);"`       // 名称
-	Number      string `json:"number" gorm:"type:varchar(100);"`     // 学号
-	ClassId     string `json:"classId" gorm:"type:int(11);"`         // 班级id
-	LineId      int    `json:"lineId" gorm:"type:int(11);"`          // 线路id
-	SiteName    string `json:"siteName" gorm:"type:varchar(200);"`   // 站点名称
-	SiteId      string `json:"siteId" gorm:"type:int(11);"`          // 站点id
-	CarId       string `json:"carId" gorm:"type:int(11);"`           // 车辆id
-	ParentPhone string `json:"parentPhone" gorm:"type:varchar(50);"` // 家长电话
-	Picture     string `json:"picture" gorm:"type:varchar(200);"`    // 图片
-	IsDeleted   string `json:"isDeleted" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
-	DataScope   string `json:"dataScope" gorm:"-"`
-	Params      string `json:"params"  gorm:"-"`
-	FaceToken   string `json:"faceToken" gorm:"type:varchar(255);"`
-	LogId       string `json:"logId" gorm:"type:varchar(255);"`
+	Id            int    `json:"id" gorm:"type:int(11);primary_key"`   //
+	Name          string `json:"name" gorm:"type:varchar(100);"`       // 名称
+	Number        string `json:"number" gorm:"type:varchar(100);"`     // 学号
+	ClassId       string `json:"classId" gorm:"type:int(11);"`         // 班级id
+	LineId        int    `json:"lineId" gorm:"type:int(11);"`          // 线路id
+	SiteName      string `json:"siteName" gorm:"type:varchar(200);"`   // 站点名称
+	SiteId        string `json:"siteId" gorm:"type:int(11);"`          // 站点id
+	CarId         string `json:"carId" gorm:"type:int(11);"`           // 车辆id
+	ParentPhone   string `json:"parentPhone" gorm:"type:varchar(50);"` // 家长电话
+	Picture       string `json:"picture" gorm:"type:varchar(200);"`    // 图片
+	IsDeleted     string `json:"isDeleted" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
+	DataScope     string `json:"dataScope" gorm:"-"`
+	Params        string `json:"params"  gorm:"-"`
+	FaceToken     string `json:"faceToken" gorm:"type:varchar(255);"`
+	LogId         string `json:"logId" gorm:"type:varchar(255);"`
+	BaiduGroupId  string `json:"baidu_group_id" gorm:"type:varchar(255);"`
+	BaiduUserId   string `json:"baidu_user_id" gorm:"type:varchar(255);"`
+	BaiduUserInfo string `json:"baidu_user_info" gorm:"type:varchar(255);"`
 	BaseModel
 }
 
@@ -98,6 +101,18 @@ func (e *ScbStudents) Get() (ScbStudents, error) {
 		table = table.Where("log_id = ?", e.LogId)
 	}
 
+	if e.BaiduGroupId != "" {
+		table = table.Where("baidu_group_id = ?", e.BaiduGroupId)
+	}
+
+	if e.BaiduUserId != "" {
+		table = table.Where("baidu_user_id = ?", e.BaiduUserId)
+	}
+
+	if e.BaiduUserInfo != "" {
+		table = table.Where("baidu_user_info = ?", e.BaiduUserInfo)
+	}
+
 	if err := table.First(&doc).Error; err != nil {
 		return doc, err
 	}
@@ -150,6 +165,7 @@ func (e *ScbStudents) GetPage(pageSize int, pageIndex int) ([]ScbStudents, int, 
 		table = table.Where("picture = ?", e.Picture)
 	}
 
+	// BaiduGroupId
 	if e.IsDeleted != "" {
 		table = table.Where("is_deleted = ?", e.IsDeleted)
 	}
