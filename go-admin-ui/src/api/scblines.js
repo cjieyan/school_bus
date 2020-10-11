@@ -49,10 +49,24 @@ export function carsTreeselect(lineId) {
     method: 'get'
   })
 }
-
+// 获取所有线路
 export function getAllLines() {
   return request({
     url: '/api/v1/getAllLines',
+    method: 'get'
+  })
+}
+// 获取线路的所有车辆
+export function getLineCars() {
+  return request({
+    url: '/api/v1/getLines/cars',
+    method: 'get'
+  })
+}
+// 获取线路的所有站点
+export function getLineSites() {
+  return request({
+    url: '/api/v1/getLines/sites',
     method: 'get'
   })
 }

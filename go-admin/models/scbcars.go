@@ -172,3 +172,16 @@ func (e *ScbCars) GetAll()([]MenuLable, error){
 
 	return m, nil
 }
+//多个id获取车辆列表
+func (e ScbCars) GetbyIds( ids []int) ([]ScbCars, error) {
+	var doc []ScbCars
+
+	table := orm.Eloquent.Select("*").Table(e.TableName())
+
+	err := table.
+		Where("id in ( ? )", ids).
+		Where("`is_delete` = 0").
+		Find(&doc).Error
+	return doc, err
+
+}

@@ -306,6 +306,7 @@
             :action="pictureAction"
             :auto-upload="false"
             :before-upload="pictureBeforeUpload"
+            :on-change="onUploadChange"
             list-type="picture-card"
             accept="image/*"
             name="picture"
@@ -496,7 +497,7 @@ export default {
                 ],
       picture:
                 [
-                  { required: false, message: '图片不能为空', trigger: 'blur' }
+                  //{ required: false, message: '图片不能为空', trigger: 'blur' }
                 ],
       createdAt:
                 [
@@ -559,9 +560,23 @@ export default {
       // var local = new BMap.LocalSearch(this.map, options)
       // local.search(str)
     },
-    /***百度地图***/
+    /***百度地图 end ***/
 
+    onUploadChange(file){
+        const isIMAGE = (file.raw.type === 'image/jpeg' || file.raw.type === 'image/png' || file.raw.type === 'image/gif');
+        // const isLt1M = file.size / 1024 / 1024 < 1;
 
+        if (!isIMAGE) {
+          this.$message.error('上传文件只能是图片格式!')
+          return false
+        }
+        var reader = new FileReader()
+        reader.readAsDataURL(file.raw)
+        reader.onload = function(e) {
+          console.log(this.result) // 图片的base64数据
+          this.form.picture =  this.result
+        }
+    },
     pictureBeforeUpload(file) {
       const isRightSize = file.size / 1024 / 1024 < 2
       if (!isRightSize) {
@@ -589,7 +604,7 @@ export default {
       }
       )
     },
-    /** 查询班级下拉树结构 */
+    /** 查询线路下拉树结构 */
     getTreeselect(e) {
       getAllLines().then(response => {
         this.linesOptions = []

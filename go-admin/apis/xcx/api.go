@@ -25,8 +25,6 @@ func (a Api) Login(c *gin.Context) {
 	_, err = tools.CompareHashAndPassword(teacher.Password, objParams.Password)
 	tools.HasError(err, "账号或密码错误.", -1)
 
-	fmt.Println("model.id....", teacher.Id)
-
 	idStr := fmt.Sprintf("%d", teacher.Id)
 	token := tools.GenRandomString(36) + idStr
 	key := tools.Keys{}.ApiToken(token)

@@ -104,3 +104,34 @@ func GetAllLines(c *gin.Context) {
 	tools.HasError(err, "", -1)
 	app.OK(c, result,"")
 }
+//获取站点的所有车辆
+func GetCars(c *gin.Context){
+	var data models.ScbLines
+	data.Id, _ = tools.StringToInt(c.Param("id"))
+
+	lineData, err := data.Get()
+	tools.HasError(err, "线路找不到", -1)
+
+	var carIdsSelected []int
+	carIds := strings.Split(lineData.CarIds, ",")
+	for i := 0; i < len(carIds); i++ {
+		carId, _ := strconv.Atoi(carIds[i])
+		carIdsSelected = append(carIdsSelected, carId)
+	}
+	carsData, _ := models.ScbCars{}.GetbyIds(carIdsSelected)
+	app.OK(c, carsData,"")
+
+}
+//获取线路下的所有站点
+func GetSites(c *gin.Context){
+	var data models.ScbLines
+	data.Id, _ = tools.StringToInt(c.Param("id"))
+
+	lineData, err := data.Get()
+	tools.HasError(err, "线路找不到", -1)
+
+	var siteModel models.SchSites
+	siteModel.LineId = lineData.Id
+	sitesData, err := siteModel.GetAll()
+	app.OK(c, sitesData,"")
+}

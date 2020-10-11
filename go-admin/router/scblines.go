@@ -26,7 +26,12 @@ func registerScbLinesRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddl
 	{
 		l.GET("/scblinesList", scblines.GetScbLinesList)
 		l.GET("/carsTreeselect/:id", scblines.GetScbLinesTreeCarsselect)
+		//获取所有线路
 		l.GET("/getAllLines", scblines.GetAllLines)
+		//获取线路的所有车辆
+		l.GET("/getLines/cars", scblines.GetCars)
+		//获取线路的所有站点
+		l.GET("/getLines/sites", scblines.GetSites)
 	}
 
 }
