@@ -16,7 +16,7 @@ type ScbStudents struct {
 	CarId         int    `json:"carId" gorm:"type:int(11);"`         // 车辆id
 	IsPickUp      int    `json:"isPickUp" gorm:"type:tinyint(4);"`
 	ParentPhone   string `json:"parentPhone" gorm:"type:varchar(50);"` // 家长电话
-	Picture       string `json:"picture" gorm:"type:varchar(200);"`    // 图片
+	Picture       string `json:"picture" gorm:"type:text;"`    // 图片
 	IsDeleted     int    `json:"isDeleted" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
 	DataScope     string `json:"dataScope" gorm:"-"`
 	Params        string `json:"params"  gorm:"-"`

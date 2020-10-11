@@ -1,6 +1,7 @@
 package scbstudents
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	tools2 "go-admin/apis/tools"
@@ -58,34 +59,43 @@ func InsertScbStudents(c *gin.Context) {
 	err := c.ShouldBindJSON(&data)
 	tools.HasError(err, "", 500)
 
+	picture := data.Picture
+	data.Picture = ""
 	//新增学生信息
 	result, err := data.Create()
 	tools.HasError(err, "", -1)
 
-	api := &tools2.BdApi{}
-	studentIdStr := strconv.Itoa(result.Id)
-	faceToken := api.FacesetAdd(studentIdStr, data.Picture)
+	if "" != picture {
+		api := &tools2.BdApi{}
+		studentIdStr := strconv.Itoa(result.Id)
+		faceToken := api.FacesetAdd(studentIdStr, picture)
+		if "" != faceToken {
+			var updateData models.ScbStudents
+			updateData.FaceToken = faceToken
 
-	var updateData models.ScbStudents
-	updateData.FaceToken = faceToken
+			//更新人脸
+			_, err := data.Update(data.Id)
+			tools.HasError(err, "更换相片失败", -1)
+		}
+	}
 
-	//更新人脸
-	updateResult, err := data.Update(data.Id)
-	tools.HasError(err, "", -1)
-
-	app.OK(c, updateResult, "")
+	app.OK(c, nil, "")
 }
-
+// 更新学生信息
 func UpdateScbStudents(c *gin.Context) {
 	var data models.ScbStudents
 	err := c.MustBindWith(&data, binding.JSON)
+	fmt.Println("err...", err)
 	tools.HasError(err, "数据解析失败", -1)
 
 	api := &tools2.BdApi{}
 	studentIdStr := strconv.Itoa(data.Id)
 	faceToken := api.FacesetAdd(studentIdStr, data.Picture)
-
-	data.FaceToken = faceToken
+	fmt.Println("faceToken...", faceToken)
+	if "" != faceToken {
+		data.FaceToken = faceToken
+	}
+	data.Picture = ""
 	result, err := data.Update(data.Id)
 	tools.HasError(err, "", -1)
 

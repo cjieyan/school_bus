@@ -24,7 +24,7 @@ type SchSites struct {
 	QqLng     float64 `json:"qq_lng" gorm:"type:varchar(100)"`     // qq经度
 	QqLat     float64 `json:"qq_lat" gorm:"type:varchar(100)"`     // qq纬度
 	Address   string  `json:"address" gorm:"type:varchar(500);"`   //地址
-	Picture   string  `json:"picture" gorm:"type:varchar(200);"`   // 图片
+	Picture   string  `json:"picture" gorm:"type:text;"`   // 图片
 	IsDelete  int     `json:"isDelete" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
 	DataScope string  `json:"dataScope" gorm:"-"`
 	Params    string  `json:"params" gorm:"-"`

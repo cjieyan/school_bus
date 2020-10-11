@@ -174,15 +174,15 @@
           />
         </el-form-item>
         <el-form-item label="跟车员" prop="attendantId">
-          <treeselect
-            v-model="form.attendantId"
-            :options="attendantsOptions"
-            :normalizer="normalizer"
-            :show-count="true"
-            placeholder="选择跟车员"
-            :is-disabled="isEdit"
-          />
-
+          <el-select v-model="form.attendantId" placeholder="选择跟车员" clearable :style="{width: '100%'}">
+            <el-option
+              v-for="(item, index) in attendantsOptions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="司机" prop="driver">
           <el-input
@@ -214,11 +214,9 @@
 <script>
 import { addScbCars, delScbCars, getScbCars, listScbCars, updateScbCars } from '@/api/scbcars'
 import { getAttendants } from '@/api/scbteachers'
-import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
   name: 'Scbcars',
-  components: { Treeselect },
   data() {
     return {
       attendantsOptions: [],
@@ -308,9 +306,14 @@ export default {
     getTreeselect(e) {
       getAttendants().then(response => {
         this.attendantsOptions = []
-        const attendants = { id: 0, name: '请选择', children: [] }
-        attendants.children = response.data
-        this.attendantsOptions.push(attendants)
+        for (var i = 0; i < response.data.length; i++) {
+          const d = response.data[i]
+          const formatData = {
+            'label': d.name,
+            'value': d.id
+          }
+          this.attendantsOptions.push(formatData)
+        }
       })
     },
     // 取消按钮

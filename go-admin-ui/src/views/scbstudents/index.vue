@@ -75,15 +75,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <!--      <el-form-item label="图片" prop="picture">-->
-      <!--        <el-input-->
-      <!--          v-model="queryParams.picture"-->
-      <!--          placeholder="请输入图片"-->
-      <!--          clearable-->
-      <!--          size="small"-->
-      <!--          @keyup.enter.native="handleQuery"-->
-      <!--        />-->
-      <!--      </el-form-item>-->
       <el-form-item label="创建时间" prop="createdAt">
         <el-input
           v-model="queryParams.createdAt"
@@ -263,14 +254,15 @@
           />
         </el-form-item>
         <el-form-item label="线路" prop="lineId">
-          <treeselect
-            v-model="form.lineId"
-            :options="linesOptions"
-            :normalizer="normalizerLines"
-            :show-count="true"
-            placeholder="选择线路"
-            :is-disabled="isEdit"
-          />
+          <el-select v-model="form.lineId" placeholder="选择线路" clearable :style="{width: '100%'}">
+            <el-option
+              v-for="(item, index) in linesOptions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="车辆" prop="carId">
           <el-radio-group v-model="form.carId" size="medium">
@@ -525,10 +517,14 @@ export default {
     getLinesSelect(e) {
       getAllLines().then(response => {
         this.linesOptions = []
-        const lines = { id: 0, name: '请选择', children: [] }
-        lines.children = response.data
-        console.log('getLinesSelect.children....', response.data)
-        this.linesOptions.push(lines)
+        for (var i = 0; i < response.data.length; i++) {
+          const d = response.data[i]
+          const formatData = {
+            'label': d.name,
+            'value': d.id
+          }
+          this.linesOptions.push(formatData)
+        }
       })
     },
     getTreeselect(e) {
@@ -582,9 +578,10 @@ export default {
       }
       var reader = new FileReader()
       reader.readAsDataURL(file.raw)
+      const that = this
       reader.onload = function(e) {
         console.log(this.result) // 图片的base64数据
-        this.form.picture = this.result
+        that.form.picture = this.result
       }
     },
     pictureBeforeUpload(file) {
@@ -638,6 +635,11 @@ export default {
     submitForm: function() {
       this.$refs['form'].validate(valid => {
         if (valid) {
+          if (this.form.isPickUp) {
+            this.form.isPickUp = 1
+          } else {
+            this.form.isPickUp = 0
+          }
           if (this.form.id !== undefined) {
             updateScbStudents(this.form).then(response => {
               if (response.code === 200) {

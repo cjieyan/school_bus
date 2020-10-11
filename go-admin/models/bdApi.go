@@ -8,12 +8,26 @@ type BdApiGetTokenRsp struct {
 	SessionSecret string `json:"session_secret"`
 
 }
-type BdApiFacesetAddRsp struct {
-	FaceToken string `json:"face_token"`
-	Location BdApiFacesetAddRspLocation `json:"location"`
-
+type BdApiFacesetAddReq struct {
+	Image string `json:"image"`
+	ImageType string `json:"image_type"`
+	GroupId string `json:"group_id"`
+	UserId string `json:"user_id"`
+	ActionType string `json:"action_type"`
 }
-type BdApiFacesetAddRspLocation struct {
+type BdApiFacesetAddRsp struct {
+	ErrorCode int `json:"error_code"`
+	ErrorMsg string `json:"error_msg"`
+	LogId int64 `json:"log_id"`
+	Timestamp int `json:"timestamp"`
+	Cached int `json:"cached"`
+	Result BdApiFacesetAddRspResult
+}
+type BdApiFacesetAddRspResult struct {
+	FaceToken string `json:"face_token"`
+	Location BdApiFacesetAddRspResultLocation `json:"location"`
+}
+type BdApiFacesetAddRspResultLocation struct {
 	LogId string
 	Left float64
 	Top float64
