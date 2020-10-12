@@ -2,10 +2,12 @@ package xcx
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"go-admin/models"
 	"go-admin/tools"
 	"go-admin/tools/app"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Api struct {
@@ -27,11 +29,13 @@ func (a Api) Login(c *gin.Context) {
 
 	fmt.Println("model.id....", teacher.Id)
 
-	idStr := fmt.Sprintf("%d", teacher.Id)
+	//idStr := fmt.Sprintf("%v", teacher.Id)
+	idStr := strconv.Itoa(teacher.Id)
 	token := tools.GenRandomString(36) + idStr
 	key := tools.Keys{}.ApiToken(token)
 
-	tools.RdbSet(key, idStr)
+	b, err := tools.RdbSet(key, idStr)
+	fmt.Println("----------------------", b, err)
 	tools.RdbSetKeyExp(key, 3600*2)
 	rsp := models.XcxLoginRsp{}
 	rsp.Token = token
