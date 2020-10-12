@@ -272,14 +272,15 @@
           />
         </el-form-item>
         <el-form-item label="站点属性" prop="prop">
-          <treeselect
-            v-model="form.prop"
-            :options="attrsOptions"
-            :normalizer="normalizer"
-            :show-count="true"
-            placeholder="选择站点属性"
-            :is-disabled="isEdit"
-          />
+          <el-select v-model="form.prop" placeholder="选择站点属性" clearable :style="{width: '100%'}">
+            <el-option
+              v-for="(item, index) in attrsOptions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="到达时间" prop="arriveAt">
           <el-time-picker
@@ -306,6 +307,7 @@
             :action="pictureAction"
             :auto-upload="false"
             :before-upload="pictureBeforeUpload"
+            :on-change="onUploadChange"
             list-type="picture-card"
             accept="image/*"
             name="picture"
@@ -398,7 +400,7 @@ export default {
       // 线路列表
       linesOptions: [],
       // 站点属性列表
-      attrsOptions: [],
+      attrsOptions: [{ value: 1, label: '上车' }, { value: 2, label: '下车' }],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -496,7 +498,7 @@ export default {
                 ],
       picture:
                 [
-                  { required: false, message: '图片不能为空', trigger: 'blur' }
+                  //{ required: false, message: '图片不能为空', trigger: 'blur' }
                 ],
       createdAt:
                 [
@@ -559,9 +561,24 @@ export default {
       // var local = new BMap.LocalSearch(this.map, options)
       // local.search(str)
     },
-    /***百度地图***/
+    /***百度地图 end ***/
 
+    onUploadChange(file){
+      const isIMAGE = (file.raw.type === 'image/jpeg' || file.raw.type === 'image/png' || file.raw.type === 'image/gif');
+      // const isLt1M = file.size / 1024 / 1024 < 1;
 
+      if (!isIMAGE) {
+        this.$message.error('上传文件只能是图片格式!')
+        return false
+      }
+      var reader = new FileReader()
+      reader.readAsDataURL(file.raw)
+      const that = this
+      reader.onload = function(e) {
+        console.log(this.result) // 图片的base64数据
+        that.form.picture =  this.result
+      }
+    },
     pictureBeforeUpload(file) {
       const isRightSize = file.size / 1024 / 1024 < 2
       if (!isRightSize) {
@@ -589,7 +606,7 @@ export default {
       }
       )
     },
-    /** 查询班级下拉树结构 */
+    /** 查询线路下拉树结构 */
     getTreeselect(e) {
       getAllLines().then(response => {
         this.linesOptions = []
@@ -597,12 +614,6 @@ export default {
         lines.children = response.data
         this.linesOptions.push(lines)
       })
-    },
-    getSitesAttrs(e) {
-      this.attrsOptions = []
-      const attrs = { id: 0, name: '请选择', children: [] }
-      attrs.children = [{ id: 1, name: '上车' }, { id: 2, name: '下车' }]
-      this.attrsOptions.push(attrs)
     },
     // 取消按钮
     cancel() {
@@ -646,7 +657,6 @@ export default {
       this.title = '添加站点管理'
       this.isEdit = false
       this.getTreeselect('add')
-      this.getSitesAttrs('add')
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -665,7 +675,6 @@ export default {
         this.isEdit = true
       })
       this.getTreeselect('update')
-      this.getSitesAttrs('update')
     },
     /** 提交按钮 */
     submitForm: function() {

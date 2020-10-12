@@ -26,16 +26,13 @@ func (a Api) Login(c *gin.Context) {
 	tools.HasError(err, "账号或密码错误", -1)
 	_, err = tools.CompareHashAndPassword(teacher.Password, objParams.Password)
 	tools.HasError(err, "账号或密码错误.", -1)
-
-	fmt.Println("model.id....", teacher.Id)
-
 	//idStr := fmt.Sprintf("%v", teacher.Id)
 	idStr := strconv.Itoa(teacher.Id)
+
 	token := tools.GenRandomString(36) + idStr
 	key := tools.Keys{}.ApiToken(token)
 
 	b, err := tools.RdbSet(key, idStr)
-	fmt.Println("----------------------", b, err)
 	tools.RdbSetKeyExp(key, 3600*2)
 	rsp := models.XcxLoginRsp{}
 	rsp.Token = token

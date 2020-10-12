@@ -30,37 +30,37 @@
           :is-disabled="isEdit"
         />
       </el-form-item>
-      <el-form-item label="线路id" prop="lineId">
+      <el-form-item label="线路" prop="lineId">
         <el-input
           v-model="queryParams.lineId"
-          placeholder="请输入线路id"
+          placeholder="请输入线路"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="站点名称" prop="siteName">
+      <el-form-item label="上车站点" prop="siteIdUp">
         <el-input
-          v-model="queryParams.siteName"
-          placeholder="请输入站点名称"
+          v-model="queryParams.siteIdUp"
+          placeholder="请输入站点"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="站点id" prop="siteId">
+      <el-form-item label="下车站点" prop="siteIdDown">
         <el-input
-          v-model="queryParams.siteId"
-          placeholder="请输入站点id"
+          v-model="queryParams.siteIdDown"
+          placeholder="请输入站点"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="车辆id" prop="carId">
+      <el-form-item label="车辆" prop="carId">
         <el-input
           v-model="queryParams.carId"
-          placeholder="请输入车辆id"
+          placeholder="请输入车辆"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -70,15 +70,6 @@
         <el-input
           v-model="queryParams.parentPhone"
           placeholder="请输入家长电话"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="图片" prop="picture">
-        <el-input
-          v-model="queryParams.picture"
-          placeholder="请输入图片"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -262,29 +253,51 @@
             :is-disabled="isEdit"
           />
         </el-form-item>
-        <el-form-item label="线路id" prop="lineId">
-          <el-input
-            v-model="form.lineId"
-            placeholder="线路id"
-          />
+        <el-form-item label="线路" prop="lineId">
+          <el-select v-model="form.lineId" placeholder="选择线路" clearable :style="{width: '100%'}">
+            <el-option
+              v-for="(item, index) in linesOptions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled"
+            />
+          </el-select>
         </el-form-item>
-        <el-form-item label="站点名称" prop="siteName">
-          <el-input
-            v-model="form.siteName"
-            placeholder="站点名称"
-          />
+        <el-form-item label="车辆" prop="carId">
+          <el-radio-group v-model="form.carId" size="medium">
+            <el-radio
+              v-for="(item, index) in carIdsOptions"
+              :key="index"
+              :label="item.value"
+              :disabled="item.disabled"
+            >{{ item.label }}</el-radio>
+          </el-radio-group>
         </el-form-item>
-        <el-form-item label="站点id" prop="siteId">
-          <el-input
-            v-model="form.siteId"
-            placeholder="站点id"
-          />
+        <el-form-item label="上车站点" prop="siteIdUp">
+          <el-select v-model="form.siteIdUp" placeholder="上车站点" clearable :style="{width: '100%'}">
+            <el-option
+              v-for="(item, index) in siteIdsOptions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled"
+            />
+          </el-select>
         </el-form-item>
-        <el-form-item label="车辆id" prop="carId">
-          <el-input
-            v-model="form.carId"
-            placeholder="车辆id"
-          />
+        <el-form-item label="下车站点" prop="siteIdDown">
+          <el-select v-model="form.siteIdDown" placeholder="上车站点" clearable :style="{width: '100%'}">
+            <el-option
+              v-for="(item, index) in siteIdsOptions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="是否接送" prop="isPickUp">
+          <el-switch v-model="form.isPickUp" />
         </el-form-item>
         <el-form-item label="家长电话" prop="parentPhone">
           <el-input
@@ -293,10 +306,20 @@
           />
         </el-form-item>
         <el-form-item label="图片" prop="picture">
-          <el-input
-            v-model="form.picture"
-            placeholder="图片"
-          />
+          <el-upload
+            ref="picture"
+            :file-list="picturefileList"
+            :action="pictureAction"
+            :auto-upload="false"
+            :before-upload="pictureBeforeUpload"
+            :on-change="onUploadChange"
+            list-type="picture-card"
+            accept="image/*"
+            name="picture"
+          >
+            <i class="el-icon-plus" />
+            <div slot="tip" class="el-upload__tip">只能上传不超过 2MB 的图片文件</div>
+          </el-upload>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -312,6 +335,7 @@ import { addScbStudents, delScbStudents, getScbStudents, listScbStudents, update
 import { getDeptList } from '@/api/scbdept'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import { getAllLines, getLineCars, getLineSites } from '@/api/scblines'
 
 export default {
   name: 'Scbstudents',
@@ -320,6 +344,14 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      pictureAction: 'https://jsonplaceholder.typicode.com/posts/',
+      picturefileList: [],
+      // 线路列表
+      linesOptions: [],
+      // 站点列表
+      siteIdsOptions: [],
+      // 线路车辆列表
+      carIdsOptions: [],
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -368,11 +400,14 @@ export default {
         updatedAt:
             undefined,
         isDeleted:
+            undefined,
+        isPickUp:
             undefined
 
       },
       // 表单参数
       form: {
+        picture: ''
       },
       // 表单校验
       rules: { id:
@@ -389,19 +424,19 @@ export default {
                 ],
       classId:
                 [
-                  { required: true, message: '班级id不能为空', trigger: 'blur' }
+                  { required: true, message: '班级不能为空', trigger: 'blur' }
                 ],
       lineId:
                 [
-                  { required: true, message: '线路id不能为空', trigger: 'blur' }
+                  { required: true, message: '线路不能为空', trigger: 'blur' }
                 ],
-      siteName:
+      siteIdUp:
                 [
-                  { required: true, message: '站点名称不能为空', trigger: 'blur' }
+                  { required: true, message: '上车站点不能为空', trigger: 'blur' }
                 ],
-      siteId:
+      siteIdDown:
                 [
-                  { required: true, message: '站点id不能为空', trigger: 'blur' }
+                  { required: true, message: '下车站点不能为空', trigger: 'blur' }
                 ],
       carId:
                 [
@@ -413,15 +448,7 @@ export default {
                 ],
       picture:
                 [
-                  { required: true, message: '图片不能为空', trigger: 'blur' }
-                ],
-      createdAt:
-                [
-                  { required: true, message: '创建时间不能为空', trigger: 'blur' }
-                ],
-      updatedAt:
-                [
-                  { required: true, message: '更新时间不能为空', trigger: 'blur' }
+                  // { required: true, message: '图片不能为空', trigger: 'blur' }
                 ],
       isDeleted:
                 [
@@ -430,10 +457,41 @@ export default {
       }
     }
   },
+  watch: {
+    // 监听deptId
+    'form.lineId': 'curLineChange'
+  },
   created() {
     this.getList()
   },
   methods: {
+    // 线路切换
+    curLineChange(val) {
+      // 获取上下车站点
+      getLineCars().then(response => {
+        this.carIdsOptions = []
+        for (var i = 0; i < response.data.length; i++) {
+          const d = response.data[i]
+          this.carIdsOptions.push({
+            'label': d.carNo,
+            'value': d.id
+          })
+        }
+      })
+      getLineSites().then(response => {
+        this.siteIdsOptions = []
+        for (var i = 0; i < response.data.length; i++) {
+          const d = response.data[i]
+          const formatData = {
+            'label': d.name,
+            'value': d.id
+          }
+          this.siteIdsOptions.push(formatData)
+        }
+      })
+
+      // 车辆列表
+    },
     /** 转换班级数据结构 */
     normalizer(node) {
       if (node.children && !node.children.length) {
@@ -445,20 +503,37 @@ export default {
         children: node.children
       }
     },
+    normalizerLines(node) {
+      if (node.children && !node.children.length) {
+        delete node.children
+      }
+      return {
+        id: node.id,
+        label: node.name
+        // children: node.children
+      }
+    },
     /** 查询班级下拉树结构 */
+    getLinesSelect(e) {
+      getAllLines().then(response => {
+        this.linesOptions = []
+        for (var i = 0; i < response.data.length; i++) {
+          const d = response.data[i]
+          const formatData = {
+            'label': d.name,
+            'value': d.id
+          }
+          this.linesOptions.push(formatData)
+        }
+      })
+    },
     getTreeselect(e) {
       getDeptList().then(response => {
         this.deptOptions = []
-
-        if (e === 'update') {
-          const dept = { deptId: 0, deptName: '请选择', children: [] }
-          dept.children = response.data
-          this.deptOptions.push(dept)
-        } else {
-          const dept = { deptId: 0, deptName: '请选择', children: [] }
-          dept.children = response.data
-          this.deptOptions.push(dept)
-        }
+        const dept = { deptId: 0, deptName: '请选择', children: [] }
+        dept.children = response.data
+        console.log('dept.children....', dept.children)
+        this.deptOptions.push(dept)
       })
     },
     /** 查询参数列表 */
@@ -468,8 +543,7 @@ export default {
         this.scbstudentsList = response.data.list
         this.total = response.data.count
         this.loading = false
-      }
-      )
+      })
     },
     // 取消按钮
     cancel() {
@@ -494,6 +568,29 @@ export default {
       }
       this.resetForm('form')
     },
+    onUploadChange(file) {
+      const isIMAGE = (file.raw.type === 'image/jpeg' || file.raw.type === 'image/png' || file.raw.type === 'image/gif')
+      // const isLt1M = file.size / 1024 / 1024 < 1;
+
+      if (!isIMAGE) {
+        this.$message.error('上传文件只能是图片格式!')
+        return false
+      }
+      var reader = new FileReader()
+      reader.readAsDataURL(file.raw)
+      const that = this
+      reader.onload = function(e) {
+        console.log(this.result) // 图片的base64数据
+        that.form.picture = this.result
+      }
+    },
+    pictureBeforeUpload(file) {
+      const isRightSize = file.size / 1024 / 1024 < 2
+      if (!isRightSize) {
+        this.$message.error('文件大小超过 2MB')
+      }
+      return isRightSize
+    },
 
     /** 搜索按钮操作 */
     handleQuery() {
@@ -510,6 +607,7 @@ export default {
     handleAdd() {
       this.reset()
       this.getTreeselect('add')
+      this.getLinesSelect('add')
       this.open = true
       this.title = '添加学生信息表'
       this.isEdit = false
@@ -524,6 +622,7 @@ export default {
     handleUpdate(row) {
       this.reset()
       this.getTreeselect('update')
+      this.getLinesSelect('update')
       const id = row.id || this.ids
       getScbStudents(id).then(response => {
         this.form = response.data
@@ -536,6 +635,11 @@ export default {
     submitForm: function() {
       this.$refs['form'].validate(valid => {
         if (valid) {
+          if (this.form.isPickUp) {
+            this.form.isPickUp = 1
+          } else {
+            this.form.isPickUp = 0
+          }
           if (this.form.id !== undefined) {
             updateScbStudents(this.form).then(response => {
               if (response.code === 200) {

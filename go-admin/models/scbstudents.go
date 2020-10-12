@@ -6,21 +6,22 @@ import (
 )
 
 type ScbStudents struct {
-	Id            int    `json:"id" gorm:"type:int(11);primary_key"`   //
-	Name          string `json:"name" gorm:"type:varchar(100);"`       // 名称
-	Number        string `json:"number" gorm:"type:varchar(100);"`     // 学号
-	ClassId       string `json:"classId" gorm:"type:int(11);"`         // 班级id
-	LineId        int    `json:"lineId" gorm:"type:int(11);"`          // 线路id
-	SiteName      string `json:"siteName" gorm:"type:varchar(200);"`   // 站点名称
-	SiteId        string `json:"siteId" gorm:"type:int(11);"`          // 站点id
-	CarId         string `json:"carId" gorm:"type:int(11);"`           // 车辆id
+	Id            int    `json:"id" gorm:"type:int(11);primary_key"` //
+	Name          string `json:"name" gorm:"type:varchar(100);"`     // 名称
+	Number        string `json:"number" gorm:"type:varchar(100);"`   // 学号
+	ClassId       int    `json:"classId" gorm:"type:int(11);"`       // 班级id
+	LineId        int    `json:"lineId" gorm:"type:int(11);"`        // 线路id
+	SiteIdUp      int    `json:"siteIdUp" gorm:"type:int(11);"`      // 站点id
+	SiteIdDown    int    `json:"siteIdDown" gorm:"type:int(11);"`    // 站点id
+	CarId         int    `json:"carId" gorm:"type:int(11);"`         // 车辆id
+	IsPickUp      int    `json:"isPickUp" gorm:"type:tinyint(4);"`
 	ParentPhone   string `json:"parentPhone" gorm:"type:varchar(50);"` // 家长电话
-	Picture       string `json:"picture" gorm:"type:varchar(200);"`    // 图片
-	IsDeleted     string `json:"isDeleted" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
+	Picture       string `json:"picture" gorm:"type:text;"`    // 图片
+	IsDeleted     int    `json:"isDeleted" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
 	DataScope     string `json:"dataScope" gorm:"-"`
 	Params        string `json:"params"  gorm:"-"`
 	FaceToken     string `json:"faceToken" gorm:"type:varchar(255);"`
-	LogId         string `json:"logId" gorm:"type:varchar(255);"`
+	LogId         int `json:"logId" gorm:"type:int(10);"`
 	BaiduGroupId  string `json:"baidu_group_id" gorm:"type:varchar(255);"`
 	BaiduUserId   string `json:"baidu_user_id" gorm:"type:varchar(255);"`
 	BaiduUserInfo string `json:"baidu_user_info" gorm:"type:varchar(255);"`
@@ -60,7 +61,7 @@ func (e *ScbStudents) Get() (ScbStudents, error) {
 		table = table.Where("number = ?", e.Number)
 	}
 
-	if e.ClassId != "" {
+	if e.ClassId != 0 {
 		table = table.Where("class_id = ?", e.ClassId)
 	}
 
@@ -68,15 +69,15 @@ func (e *ScbStudents) Get() (ScbStudents, error) {
 		table = table.Where("line_id = ?", e.LineId)
 	}
 
-	if e.SiteName != "" {
-		table = table.Where("site_name = ?", e.SiteName)
+	if e.SiteIdUp != 0 {
+		table = table.Where("site_id_up = ?", e.SiteIdUp)
 	}
 
-	if e.SiteId != "" {
-		table = table.Where("site_id = ?", e.SiteId)
+	if e.SiteIdDown != 0 {
+		table = table.Where("site_id_down = ?", e.SiteIdDown)
 	}
 
-	if e.CarId != "" {
+	if e.CarId != 0 {
 		table = table.Where("car_id = ?", e.CarId)
 	}
 
@@ -88,7 +89,7 @@ func (e *ScbStudents) Get() (ScbStudents, error) {
 		table = table.Where("picture = ?", e.Picture)
 	}
 
-	if e.IsDeleted != "" {
+	if e.IsDeleted != 0 {
 		table = table.Where("is_deleted = ?", e.IsDeleted)
 	}
 
@@ -96,7 +97,7 @@ func (e *ScbStudents) Get() (ScbStudents, error) {
 		table = table.Where("face_token = ?", e.FaceToken)
 	}
 
-	if e.LogId != "" {
+	if e.LogId != 0 {
 		table = table.Where("log_id = ?", e.LogId)
 	}
 
@@ -136,7 +137,7 @@ func (e *ScbStudents) GetPage(pageSize int, pageIndex int) ([]ScbStudents, int, 
 		table = table.Where("number = ?", e.Number)
 	}
 
-	if e.ClassId != "" {
+	if e.ClassId != 0 {
 		table = table.Where("class_id = ?", e.ClassId)
 	}
 
@@ -144,15 +145,19 @@ func (e *ScbStudents) GetPage(pageSize int, pageIndex int) ([]ScbStudents, int, 
 		table = table.Where("line_id = ?", e.LineId)
 	}
 
-	if e.SiteName != "" {
-		table = table.Where("site_name = ?", e.SiteName)
+	if e.SiteIdUp != 0 {
+		table = table.Where("site_id = ?", e.SiteIdUp)
 	}
 
-	if e.SiteId != "" {
-		table = table.Where("site_id = ?", e.SiteId)
+	if e.SiteIdDown != 0 {
+		table = table.Where("site_id = ?", e.SiteIdDown)
 	}
 
-	if e.CarId != "" {
+	if e.IsPickUp != 0 {
+		table = table.Where("is_pick_up = ?", e.IsPickUp)
+	}
+
+	if e.CarId != 0 {
 		table = table.Where("car_id = ?", e.CarId)
 	}
 
@@ -165,7 +170,7 @@ func (e *ScbStudents) GetPage(pageSize int, pageIndex int) ([]ScbStudents, int, 
 	}
 
 	// BaiduGroupId
-	if e.IsDeleted != "" {
+	if e.IsDeleted != 0 {
 		table = table.Where("is_deleted = ?", e.IsDeleted)
 	}
 
