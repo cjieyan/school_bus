@@ -19,5 +19,6 @@ func registerXcxRouter(v1 *gin.RouterGroup) {
 		authGroup.POST("/record", xcx.Api{}.Record)
 		authGroup.POST("/faceinfo", xcx.Api{}.StudentFaceInfo)
 		authGroup.POST("/sites", xcx.Api{}.Sites)
+		authGroup.GET("/line-info", xcx.Api{}.LineInfo)
 	}
 }

@@ -45,7 +45,7 @@ func GetScbLines(c *gin.Context) {
 
 	app.OK(c, result, "")
 }
-
+//新增线路
 func InsertScbLines(c *gin.Context) {
 	var data models.ScbLines
 	err := c.ShouldBindJSON(&data)

@@ -10,7 +10,7 @@ type ScbPost struct {
 	PostName  string `json:"postName" gorm:"type:varchar(128);"`     // 岗位名称
 	PostCode  string `json:"postCode" gorm:"type:varchar(128);"`     // 岗位代码
 	Sort      int `json:"sort" gorm:"type:int(11);"`              // 岗位排序
-	Status    string `json:"status" gorm:"type:varchar(4);"`         // 状态
+	Status    int `json:"status" gorm:"type:int(4);"`         // 状态
 	Remark    string `json:"remark" gorm:"type:varchar(255);"`       //
 	CreateBy  string `json:"createBy" gorm:"type:varchar(128);"`     //
 	UpdateBy  string `json:"updateBy" gorm:"type:varchar(128);"`     //
@@ -52,7 +52,7 @@ func (e *ScbPost) Get() (ScbPost, error) {
 		table = table.Where("post_code = ?", e.PostCode)
 	}
 
-	if e.Status != "" {
+	if e.Status != 0 {
 		table = table.Where("status = ?", e.Status)
 	}
 
@@ -76,7 +76,7 @@ func (e *ScbPost) GetPage(pageSize int, pageIndex int) ([]ScbPost, int, error) {
 		table = table.Where("post_code = ?", e.PostCode)
 	}
 
-	if e.Status != "" {
+	if e.Status != 0 {
 		table = table.Where("status = ?", e.Status)
 	}
 
@@ -143,7 +143,7 @@ func (e *ScbPost) GetList() ([]ScbPost, error) {
 	if e.PostCode != "" {
 		table = table.Where("post_code = ?", e.PostCode)
 	}
-	if e.Status != "" {
+	if e.Status != 0 {
 		table = table.Where("status = ?", e.Status)
 	}
 

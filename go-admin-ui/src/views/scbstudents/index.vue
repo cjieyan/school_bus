@@ -2,98 +2,15 @@
 <template>
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
-      <el-form-item label="名称" prop="name">
+      <el-form-item label="关键词" prop="name">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入名称"
+          placeholder="请输入学号/姓名"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="学号" prop="number">
-        <el-input
-          v-model="queryParams.number"
-          placeholder="请输入学号"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="班级id" prop="classId">
-        <treeselect
-          v-model="form.classId"
-          :options="deptOptions"
-          :normalizer="normalizer"
-          :show-count="true"
-          placeholder="选择班级"
-          :is-disabled="isEdit"
-        />
-      </el-form-item>
-      <el-form-item label="线路" prop="lineId">
-        <el-input
-          v-model="queryParams.lineId"
-          placeholder="请输入线路"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="上车站点" prop="siteIdUp">
-        <el-input
-          v-model="queryParams.siteIdUp"
-          placeholder="请输入站点"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="下车站点" prop="siteIdDown">
-        <el-input
-          v-model="queryParams.siteIdDown"
-          placeholder="请输入站点"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="车辆" prop="carId">
-        <el-input
-          v-model="queryParams.carId"
-          placeholder="请输入车辆"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="家长电话" prop="parentPhone">
-        <el-input
-          v-model="queryParams.parentPhone"
-          placeholder="请输入家长电话"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="创建时间" prop="createdAt">
-        <el-input
-          v-model="queryParams.createdAt"
-          placeholder="请输入创建时间"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="更新时间" prop="updatedAt">
-        <el-input
-          v-model="queryParams.updatedAt"
-          placeholder="请输入更新时间"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -136,28 +53,24 @@
     </el-row>
 
     <el-table v-loading="loading" :data="scbstudentsList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" /><el-table-column
-        label=""
-        align="center"
-        prop="id"
-        :show-overflow-tooltip="true"
-      /><el-table-column
-        label="名称"
-        align="center"
-        prop="name"
-        :show-overflow-tooltip="true"
-      /><el-table-column
+      <el-table-column
         label="学号"
         align="center"
         prop="number"
         :show-overflow-tooltip="true"
+      />
+      <el-table-column
+        label="姓名"
+        align="center"
+        prop="name"
+        :show-overflow-tooltip="true"
       /><el-table-column
-        label="班级id"
+        label="班级"
         align="center"
         prop="classId"
         :show-overflow-tooltip="true"
       /><el-table-column
-        label="线路id"
+        label="线路"
         align="center"
         prop="lineId"
         :show-overflow-tooltip="true"
@@ -167,12 +80,12 @@
         prop="siteName"
         :show-overflow-tooltip="true"
       /><el-table-column
-        label="站点id"
+        label="站点"
         align="center"
         prop="siteId"
         :show-overflow-tooltip="true"
       /><el-table-column
-        label="车辆id"
+        label="车辆"
         align="center"
         prop="carId"
         :show-overflow-tooltip="true"
@@ -185,16 +98,6 @@
         label="图片"
         align="center"
         prop="picture"
-        :show-overflow-tooltip="true"
-      /><el-table-column
-        label="创建时间"
-        align="center"
-        prop="createdAt"
-        :show-overflow-tooltip="true"
-      /><el-table-column
-        label="更新时间"
-        align="center"
-        prop="updatedAt"
         :show-overflow-tooltip="true"
       />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -226,101 +129,135 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px">
+    <el-dialog :title="title" :visible.sync="open" width="600px">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-
-        <el-form-item label="名称" prop="name">
-          <el-input
-            v-model="form.name"
-            placeholder="名称"
-          />
-        </el-form-item>
-        <el-form-item label="学号" prop="number">
-          <el-input
-            v-model="form.number"
-            placeholder="学号"
-          />
-        </el-form-item>
-        <el-form-item label="班级" prop="classId">
-          <treeselect
-            v-model="form.classId"
-            :options="deptOptions"
-            :normalizer="normalizer"
-            :show-count="true"
-            placeholder="选择班级"
-            :is-disabled="isEdit"
-          />
-        </el-form-item>
-        <el-form-item label="线路" prop="lineId">
-          <el-select v-model="form.lineId" placeholder="选择线路" clearable :style="{width: '100%'}">
-            <el-option
-              v-for="(item, index) in linesOptions"
-              :key="index"
-              :label="item.label"
-              :value="item.value"
-              :disabled="item.disabled"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="车辆" prop="carId">
-          <el-radio-group v-model="form.carId" size="medium">
-            <el-radio
-              v-for="(item, index) in carIdsOptions"
-              :key="index"
-              :label="item.value"
-              :disabled="item.disabled"
-            >{{ item.label }}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="上车站点" prop="siteIdUp">
-          <el-select v-model="form.siteIdUp" placeholder="上车站点" clearable :style="{width: '100%'}">
-            <el-option
-              v-for="(item, index) in siteIdsOptions"
-              :key="index"
-              :label="item.label"
-              :value="item.value"
-              :disabled="item.disabled"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="下车站点" prop="siteIdDown">
-          <el-select v-model="form.siteIdDown" placeholder="上车站点" clearable :style="{width: '100%'}">
-            <el-option
-              v-for="(item, index) in siteIdsOptions"
-              :key="index"
-              :label="item.label"
-              :value="item.value"
-              :disabled="item.disabled"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="是否接送" prop="isPickUp">
-          <el-switch v-model="form.isPickUp" />
-        </el-form-item>
-        <el-form-item label="家长电话" prop="parentPhone">
-          <el-input
-            v-model="form.parentPhone"
-            placeholder="家长电话"
-          />
-        </el-form-item>
-        <el-form-item label="图片" prop="picture">
-          <el-upload
-            ref="picture"
-            :file-list="picturefileList"
-            :action="pictureAction"
-            :auto-upload="false"
-            :before-upload="pictureBeforeUpload"
-            :on-change="onUploadChange"
-            list-type="picture-card"
-            accept="image/*"
-            name="picture"
-          >
-            <i class="el-icon-plus" />
-            <div slot="tip" class="el-upload__tip">只能上传不超过 2MB 的图片文件</div>
-          </el-upload>
-        </el-form-item>
+        <el-row :gutter="15">
+          <el-col :span="12">
+            <el-form-item label="姓名" prop="name">
+              <el-input
+                v-model="form.name"
+                placeholder="姓名"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12" style="position: absolute ;right: 10px">
+            <el-form-item label="图片" prop="picture">
+              <el-upload
+                ref="picture"
+                :file-list="picturefileList"
+                :action="pictureAction"
+                :auto-upload="false"
+                :before-upload="pictureBeforeUpload"
+                :on-change="onUploadChange"
+                list-type="picture-card"
+                accept="image/*"
+                name="picture"
+              >
+                <i class="el-icon-plus" />
+                <div slot="tip" class="el-upload__tip">只能上传不超过 2MB 的图片文件</div>
+              </el-upload>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="12">
+            <el-form-item label="学号" prop="number">
+              <el-input
+                v-model="form.number"
+                placeholder="学号"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="12">
+            <el-form-item label="班级" prop="classId">
+              <treeselect
+                v-model="form.classId"
+                :options="deptOptions"
+                :normalizer="normalizer"
+                :show-count="true"
+                placeholder="选择班级"
+                :is-disabled="isEdit"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="12">
+            <el-form-item label="线路" prop="lineId">
+              <el-select v-model="form.lineId" placeholder="选择线路" clearable :style="{width: '100%'}">
+                <el-option
+                  v-for="(item, index) in linesOptions"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                  :disabled="item.disabled"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="24">
+            <el-form-item label="车辆" prop="carId">
+              <el-radio-group v-model="form.carId" size="medium">
+                <el-radio
+                  v-for="(item, index) in carIdsOptions"
+                  :key="index"
+                  :label="item.value"
+                  :disabled="item.disabled"
+                >{{ item.label }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="12">
+            <el-form-item label="上车站点" prop="siteIdUp">
+              <el-select v-model="form.siteIdUp" placeholder="上车站点" clearable :style="{width: '100%'}">
+                <el-option
+                  v-for="(item, index) in siteIdsOptions"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                  :disabled="item.disabled"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="下车站点" prop="siteIdDown">
+              <el-select v-model="form.siteIdDown" placeholder="上车站点" clearable :style="{width: '100%'}">
+                <el-option
+                  v-for="(item, index) in siteIdsOptions"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                  :disabled="item.disabled"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="12">
+            <el-form-item label="是否接送" prop="isPickUp">
+              <el-switch v-model="form.isPickUp" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="12">
+            <el-form-item label="家长电话" prop="parentPhone">
+              <el-input
+                v-model="form.parentPhone"
+                placeholder="家长电话"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>

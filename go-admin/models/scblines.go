@@ -48,6 +48,14 @@ func (e *ScbLines) Create() (ScbLines, error) {
 		err := result.Error
 		return doc, err
 	}
+
+	for _, carId := range e.CarIdsSubmit {
+		carModel := ScbCars{}
+		carModel.LineId = e.Id
+		carModel.Update(carId)
+	}
+
+
 	doc = *e
 	return doc, nil
 }
@@ -166,7 +174,6 @@ func (e *ScbLines) Update(id int) (update ScbLines, err error) {
 	if err = orm.Eloquent.Table(e.TableName()).Where("id = ?", id).First(&update).Error; err != nil {
 		return
 	}
-
 	//参数1:是要修改的数据
 	carIds := ""
 	for _, carId := range e.CarIdsSubmit{
@@ -176,12 +183,35 @@ func (e *ScbLines) Update(id int) (update ScbLines, err error) {
 			carIds = strconv.Itoa( carId )
 		}
 	}
-	fmt.Println("doc.CarIdsSubmit..Update..,  carIds", e.CarIdsSubmit, carIds)
+
 	e.CarIds = carIds
 	//参数2:是修改的数据
 	if err = orm.Eloquent.Table(e.TableName()).Model(&update).Updates(&e).Error; err != nil {
 		return
 	}
+	//清理当前线路的车辆绑定的线路id
+
+
+	//先解绑车辆
+	carModel := ScbCars{}
+	carModel.LineId = e.Id
+	carsData, err := carModel.GetAll()
+	if nil == err {
+		for _, carData := range carsData {
+			updateData := make(map[string]interface{})
+			updateData["id"] = carData.Id
+			updateData["line_id"] = 0
+			carModel.UpdateMap(carData.Id, updateData)
+		}
+	}
+
+	carModel = ScbCars{}
+	//重新绑定车辆
+	for _, carId := range e.CarIdsSubmit{
+		carModel.LineId = e.Id
+		carModel.Update(carId)
+	}
+
 	return
 }
 

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	orm "go-admin/global"
 	"go-admin/tools"
 )
@@ -11,6 +12,7 @@ type ScbCars struct {
 	CarNo       string `json:"carNo" gorm:"type:varchar(50);"`      // 车牌号
 	SeatsNum    string `json:"seatsNum" gorm:"type:int(11);"`       // 座位数
 	AttendantId int `json:"attendantId" gorm:"type:int(11);"`    // 跟车员
+	LineId		int `json:"line_id gorm:"type:int(11)"`
 	Driver      string `json:"driver" gorm:"type:varchar(50);"`         // 司机
 	Phone       string `json:"phone" gorm:"type:varchar(50);"`      // 手机号
 	Dept        string `json:"dept" gorm:"type:int(11);"`           // 所属部门
@@ -112,7 +114,7 @@ func (e *ScbCars) GetPage(pageSize int, pageIndex int) ([]ScbCars, int, error) {
 	return doc, count, nil
 }
 
-// 更新ScbCars
+// 更新ScbCars 不可以更新"", 0, false值
 func (e *ScbCars) Update(id int) (update ScbCars, err error) {
 	if err = orm.Eloquent.Table(e.TableName()).Where(" id = ?", id).First(&update).Error; err != nil {
 		return
@@ -120,7 +122,23 @@ func (e *ScbCars) Update(id int) (update ScbCars, err error) {
 
 	//参数1:是要修改的数据
 	//参数2:是修改的数据
+	fmt.Println("update.id->....", update.Id, "update.LineId->", update.LineId, "e.Id->", e.Id, "e.LineId->", e.LineId)
 	if err = orm.Eloquent.Table(e.TableName()).Model(&update).Updates(&e).Error; err != nil {
+		return
+	}
+	return
+}
+
+// 更新ScbCars  可以更新"", 0, false值
+func (e *ScbCars) UpdateMap(id int, updateData map[string]interface{}) (update ScbCars, err error) {
+	if err = orm.Eloquent.Table(e.TableName()).Where(" id = ?", id).First(&update).Error; err != nil {
+		return
+	}
+
+	//参数1:是要修改的数据
+	//参数2:是修改的数据
+	fmt.Println("update.id->....", update.Id, "update.LineId->", update.LineId, "e.Id->", e.Id, "e.LineId->", e.LineId)
+	if err = orm.Eloquent.Table(e.TableName()).Model(&update).Updates(updateData).Error; err != nil {
 		return
 	}
 	return

@@ -7,6 +7,7 @@ import (
 	"go-admin/tools"
 	"go-admin/tools/app"
 	"go-admin/tools/app/msg"
+	"strconv"
 )
 
 func GetScbPostList(c *gin.Context) {
@@ -24,7 +25,7 @@ func GetScbPostList(c *gin.Context) {
 
 	data.PostName = c.Request.FormValue("postName")
 	data.PostCode = c.Request.FormValue("postCode")
-	data.Status = c.Request.FormValue("status")
+	data.Status, _ = strconv.Atoi( c.Request.FormValue("status") )
 
 	data.DataScope = tools.GetUserIdStr(c)
 	result, count, err := data.GetPage(pageSize, pageIndex)

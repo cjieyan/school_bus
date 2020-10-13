@@ -1,20 +1,11 @@
 
 <template>
   <div class="app-container">
-    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
-      <el-form-item label="" prop="id">
-        <el-input
-          v-model="queryParams.id"
-          placeholder="请输入"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="名称" prop="name">
+    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="80px">
+      <el-form-item label="教师姓名" prop="name">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入名称"
+          placeholder="请输入教师姓名"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -28,18 +19,6 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
-
-      <el-form-item label="岗位">
-        <el-select v-model="form.postId" placeholder="请选择" @change="$forceUpdate()">
-          <el-option
-            v-for="item in postOptions"
-            :key="item.postId"
-            :label="item.postName"
-            :value="item.postId"
-            :disabled="item.status == 1"
-          />
-        </el-select>
       </el-form-item>
 
       <el-form-item>
@@ -101,7 +80,7 @@
         :show-overflow-tooltip="true"
       />
       <el-table-column
-        label="岗位id"
+        label="岗位"
         align="center"
         prop="postId"
         :show-overflow-tooltip="true"
@@ -153,7 +132,7 @@
 
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px">
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
 
         <el-form-item label="名称" prop="name">
           <el-input
@@ -167,7 +146,7 @@
             placeholder="手机号"
           />
         </el-form-item>
-        <el-form-item label="小程序登录密码" prop="password">
+        <el-form-item label="小程序密码" prop="password">
           <el-input v-model="form.password" placeholder="请输入密码" type="password" />
         </el-form-item>
         <el-form-item label="班级" prop="classId">
