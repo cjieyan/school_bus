@@ -8,3 +8,9 @@ type XcxLoginReq struct {
 type XcxLoginRsp struct {
 	Token string `json:"token"`
 }
+type XcxGetOn struct {
+	StudentId int `json:"student_id"`
+}
+type XcxGetOff struct {
+	StudentId int `json:"student_id"`
+}

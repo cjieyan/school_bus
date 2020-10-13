@@ -290,3 +290,11 @@ func RdbSISMembers(key, v string) bool {
 	}
 	return b
 }
+
+func RdbZAdd(key, v string) error{
+	_, err := Rdb.Do("ZADD", key, v)
+	if err != nil {
+		return err
+	}
+	return nil
+}

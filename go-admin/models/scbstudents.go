@@ -44,6 +44,20 @@ func (e *ScbStudents) Create() (ScbStudents, error) {
 	return doc, nil
 }
 
+//获取数量
+func (e *ScbStudents)GetCount()(count int, err error){
+
+	table := orm.Eloquent.Table(e.TableName())
+
+	if e.CarId != 0 {
+		table = table.Where("car_id = ?", e.CarId)
+	}
+
+	if err := table.Count(&count).Error; err != nil {
+		return count, err
+	}
+	return
+}
 // 获取ScbStudents
 func (e *ScbStudents) Get() (ScbStudents, error) {
 	var doc ScbStudents
