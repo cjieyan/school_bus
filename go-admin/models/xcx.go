@@ -8,14 +8,18 @@ type XcxLoginReq struct {
 type XcxLoginRsp struct {
 	Token string `json:"token"`
 }
-type XcxGetOn struct {
+type SwipeReq struct {
 	StudentId int `json:"student_id"`
 }
-type XcxGetOff struct {
-	StudentId int `json:"student_id"`
+type SwipeRsp struct {
+	Status int `json:"status"`
 }
 //刷脸时间
 type SwipeAt struct {
 	Status int `json:"status"`
 	Time int 	`json:"time"`
+}
+
+type LineFinishReq struct {
+	StudentId int `json:"student_id"`
 }

@@ -15,13 +15,11 @@ func registerXcxRouter(v1 *gin.RouterGroup) {
 	authGroup := v1.Group("/auth")
 	authGroup.Use(handler.XcxCheckToken)
 	{
-		//authGroup.GET("/info", xcx.Api{}.Info) 此接口已废弃 请使用 /line-info
-		authGroup.POST("/record", xcx.Api{}.Record)
 		authGroup.POST("/faceinfo", xcx.Api{}.StudentFaceInfo)
 		authGroup.POST("/sites", xcx.Api{}.Sites)
 		authGroup.GET("/line-info", xcx.Api{}.LineInfo) //线路信息
-		authGroup.POST("/swipe", xcx.Api{}.Swipe) //上车
+		authGroup.POST("/swipe", xcx.Api{}.Swipe) //打卡上下车
 		authGroup.POST("/line-finish", xcx.Api{}.LineFinish) //结束行程
-		//authGroup.POST("/get-off", xcx.Api{}.GetOff) //下车
+		authGroup.GET("/line-students", xcx.Api{}.LineStudents) //获取一条线路的所有学生信息
 	}
 }

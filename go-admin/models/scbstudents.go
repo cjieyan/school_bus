@@ -16,15 +16,16 @@ type ScbStudents struct {
 	CarId         int    `json:"carId" gorm:"type:int(11);"`         // 车辆id
 	IsPickUp      int    `json:"isPickUp" gorm:"type:tinyint(4);"`
 	ParentPhone   string `json:"parentPhone" gorm:"type:varchar(50);"` // 家长电话
-	Picture       string `json:"picture" gorm:"type:text;"`    // 图片
+	Picture       string `json:"picture" gorm:"type:text;"`            // 图片
 	IsDeleted     int    `json:"isDeleted" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
 	DataScope     string `json:"dataScope" gorm:"-"`
 	Params        string `json:"params"  gorm:"-"`
 	FaceToken     string `json:"faceToken" gorm:"type:varchar(255);"`
-	LogId         int `json:"logId" gorm:"type:int(10);"`
+	LogId         int    `json:"logId" gorm:"type:int(10);"`
 	BaiduGroupId  string `json:"baidu_group_id" gorm:"type:varchar(255);"`
 	BaiduUserId   string `json:"baidu_user_id" gorm:"type:varchar(255);"`
 	BaiduUserInfo string `json:"baidu_user_info" gorm:"type:varchar(255);"`
+	SwipeStatus   int    `json:"swipeStatus"  gorm:"-"` // -1未上车 0已上车 1已下车
 	BaseModel
 }
 
@@ -45,7 +46,7 @@ func (e *ScbStudents) Create() (ScbStudents, error) {
 }
 
 //获取数量
-func (e *ScbStudents)GetCount()(count int, err error){
+func (e *ScbStudents) GetCount() (count int, err error) {
 
 	table := orm.Eloquent.Table(e.TableName())
 
@@ -58,6 +59,7 @@ func (e *ScbStudents)GetCount()(count int, err error){
 	}
 	return
 }
+
 // 获取ScbStudents
 func (e *ScbStudents) Get() (ScbStudents, error) {
 	var doc ScbStudents
@@ -235,4 +237,15 @@ func (e *ScbStudents) BatchDelete(id []int) (Result bool, err error) {
 	}
 	Result = true
 	return
+}
+
+// 获取一辆车的所有ScbStudents
+func (e *ScbStudents) GetAllByCarId() ([]ScbStudents, error) {
+	var doc []ScbStudents
+	table := orm.Eloquent.Select("*").Table(e.TableName())
+	if e.CarId != 0 {
+		table = table.Where("car_id = ?", e.CarId)
+	}
+	err := table.Find(&doc).Error
+	return doc, err
 }
