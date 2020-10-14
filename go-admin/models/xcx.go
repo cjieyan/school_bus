@@ -14,3 +14,8 @@ type XcxGetOn struct {
 type XcxGetOff struct {
 	StudentId int `json:"student_id"`
 }
+//刷脸时间
+type SwipeAt struct {
+	Status int `json:"status"`
+	Time int 	`json:"time"`
+}

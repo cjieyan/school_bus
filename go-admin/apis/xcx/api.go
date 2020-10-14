@@ -1,6 +1,7 @@
 package xcx
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"go-admin/models"
@@ -158,8 +159,8 @@ func (a Api)LineInfo(c *gin.Context){
 	rsp["studentGetOnCount"] = len(students)//已上車的學生
 	app.OK(c, rsp, "")
 }
-// 上车
-func (a Api)GetOn(c *gin.Context){
+// 上车or下册刷脸打卡
+func (a Api)Swipe(c *gin.Context){
 
 	data := models.XcxGetOn{}
 
@@ -182,6 +183,7 @@ func (a Api)GetOn(c *gin.Context){
 
 	tools.HasError(err, "", 500)
 
+	//年月日
 	year := time.Now().Year()
 	month := time.Now().Format("01")
 	day := time.Now().Day()
@@ -189,6 +191,7 @@ func (a Api)GetOn(c *gin.Context){
 
 	studentIdStr := strconv.Itoa(data.StudentId)
 
+	//获取学生信息
 	student := models.ScbStudents{}
 	student.Id = data.StudentId
 	studentData, err := student.Get()
@@ -204,79 +207,71 @@ func (a Api)GetOn(c *gin.Context){
 
 	//hour, err := strconv.Atoi(time.Now().Format("15"))
 
-	if nil == err {
-		//上车
-		key := tools.Keys{}.GetOn(ymd, teacher.Id)
-		exist := tools.RdbSISMembers(key, studentIdStr)
-		//未上车
-		if !exist {
-			tools.RdbZAdd(key, studentIdStr)
-			tools.RdbSetKeyExp(key, 86400)
-			app.OK(c, nil, "上车刷脸成功")
-		} else {
-			app.OK(c, nil, "您已刷脸上车了")
+	//查询学生是否在车上
+	//Todo... 废弃
+	//key := tools.Keys{}.GetOn(ymd, teacher.Id)
+	//exist := tools.RdbSISMembers(key, studentIdStr)
+
+
+	now := int(time.Now().Unix())
+
+	//记录学生刷脸时间  用于标记上/下车状态 以及上/下车时间
+	swipeAtKey := tools.Keys{}.SwipeAt(ymd, teacher.Id)
+	swipeData, err := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
+	fmt.Println(", err ...", err )
+	fmt.Println("swipeData,  ...", swipeData,  )
+
+	exist := true
+	if redis.ErrNil == err{//redis无数据
+		exist = false
+	}else{
+		var swipeAtInfo models.SwipeAt
+		err = json.Unmarshal([]byte(swipeData), &swipeAtInfo)
+
+		fmt.Println("swipeAtInfo....", swipeAtInfo, now - swipeAtInfo.Time)
+		if nil == err{
+			//距离上次上车刷脸成功大于5分钟
+			if 0 == swipeAtInfo.Status  && (now - swipeAtInfo.Time) > 60 * 1{
+				//将标记为下车状态
+				swipeAtStruct := models.SwipeAt{
+					Status: 1,
+					Time: now,
+				}
+				jsonBytes, err := json.Marshal(swipeAtStruct)
+				if err != nil {
+					fmt.Println(err)
+				}
+				//记录学生刷脸时间
+				tools.RdbHSet(swipeAtKey, studentIdStr, string(jsonBytes))
+				tools.RdbSetKeyExp(swipeAtKey, 86400)
+				app.OK(c, nil, "下车刷脸成功..")
+			}else if 1 == swipeAtInfo.Status {
+				app.OK(c, nil, "您已下车了..")
+			}else{
+				app.OK(c, nil, "您已刷脸上车了..")
+			}
 		}
 	}
-	tools.HasError(err, "系统时间异常,请稍后重试", 500)
+
+	//未上车
+	if !exist {
+		//记录用户上车信息
+		swipeAtStruct := models.SwipeAt{
+			Status: 0,
+			Time: now,
+		}
+		jsonBytes, err := json.Marshal(swipeAtStruct)
+		if err != nil {
+			fmt.Println("记录学生刷脸时间...", err)
+		}
+		//记录学生刷脸时间
+		tools.RdbHSet(swipeAtKey, studentIdStr, string(jsonBytes))
+		tools.RdbSetKeyExp(swipeAtKey, 86400)
+
+		app.OK(c, nil, "上车刷脸成功")
+	}
 }
 
-func (a Api)GetOff(c *gin.Context){
-	data := models.XcxGetOn{}
-
-	err := c.ShouldBindJSON(&data)
-	userId := c.GetInt(models.UserId)
-
-	teacherModel := models.ScbTeachers{}
-
-	//获取跟车员信息
-	teacherModel.Id = userId
-	teacher, err := teacherModel.Get()
-	if teacher.PostId != 1{
-		tools.HasError(err, "您不是跟车员, sch_teachers表的postId = 1", -1)
-	}
-
-	//获取车辆信息
-	carModel := models.ScbCars{}
-	carModel.AttendantId = teacher.Id
-	carData, err := carModel.Get()
-
-	tools.HasError(err, "", 500)
-
-	year := time.Now().Year()
-	month := time.Now().Format("01")
-	day := time.Now().Day()
-	ymd := strconv.Itoa( year) + month + strconv.Itoa( day )
-	//下车
-	key := tools.Keys{}.GetOff(ymd, teacher.Id)
-
-	studentIdStr := strconv.Itoa(data.StudentId)
-
-	student := models.ScbStudents{}
-	student.Id = data.StudentId
-	studentData, err := student.Get()
-	tools.HasError(err, "学生信息不存在", 500)
-
-	if 0 == studentData.CarId{
-		tools.HasError(err, "您尚未分配车辆", 500)
-	}
-
-	if studentData.CarId != carData.Id{
-		tools.HasError(err, "您搭错车了", 500)
-	}
-
-	exist := tools.RdbSISMembers(key, studentIdStr)
-	//未下车
-	if ! exist {
-		tools.RdbZAdd(key, studentIdStr)
-		tools.RdbSetKeyExp(key, 86400)
-		app.OK(c, nil, "下车刷脸成功")
-	} else {
-		app.OK(c, nil, "您已刷脸下车了")
-	}
-
-	tools.HasError(err, "系统时间异常,请稍后重试", 500)
-	return
-}
 // 线路结束
 func (a Api)LineFinish(c *gin.Context){
 
@@ -298,15 +293,7 @@ func (a Api)LineFinish(c *gin.Context){
 	month := time.Now().Format("01")
 	day := time.Now().Day()
 	ymd := strconv.Itoa( year) + month + strconv.Itoa( day )
-	//下车
-	keyOff := tools.Keys{}.GetOff(ymd, teacher.Id)
-	//上车
-	keyOn := tools.Keys{}.GetOn(ymd, teacher.Id)
-
-	tools.RdbDel(keyOn)
-	tools.RdbDel(keyOff)
-}
-// 线路开始
-func (a Api) LineStart(){
-
+	//清除当前行程的刷脸数据
+	swipeAtKey := tools.Keys{}.SwipeAt(ymd, teacher.Id)
+	tools.RdbDel(swipeAtKey)
 }
