@@ -81,6 +81,7 @@ redis  GET
 */
 func RdbGet(key string) (string, error) {
 	val, err := redis.String(Rdb.Do("GET", key))
+	fmt.Println("RdbGet.....", val, err)
 	if err != nil {
 		//logs.Error("get error", err.Error())
 		return "", err
