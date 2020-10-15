@@ -137,7 +137,7 @@
 											})
 										},
 										fail: (err) => {
-											this.tip = err.data.error_msg
+											
 											console.log(err)
 										}
 									})
@@ -145,6 +145,7 @@
 									// uni.showModal({
 									// 	title: "识别失败"
 									// })
+									this.tip = "识别失败"
 									console.log("识别失败")
 								}
 							},
@@ -257,5 +258,12 @@
 		padding: 25px 0;
 		color: #fff;
 		margin-top: 30px;
+	}
+	.tips{
+		height: 30rpx;
+		font-weight: bold;
+		font-size: 18px;
+		color: #ff0000;
+		text-align: center;
 	}
 </style>
