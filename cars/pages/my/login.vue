@@ -98,7 +98,7 @@
 				if (this.phone != "" && this.password != "") {
 					
 					uni.request({
-						url: "http://localhost:8000/xcx/login",
+						url: this.$store.state.apihost+"/xcx/login",
 						method: "POST",
 						data: {
 							"phone": this.phone,

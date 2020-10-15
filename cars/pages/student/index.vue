@@ -97,7 +97,7 @@
 			studentList() {
 				const token = uni.getStorageSync('token')
 				uni.request({
-					url: "http://localhost:8000/xcx/auth/line-students",
+					url: this.$store.state.apihost+"/xcx/auth/line-students",
 					method:"POST",
 					header: {
 						'token': token,

@@ -89,7 +89,7 @@
 			setInfo() {
 				var token = uni.getStorageSync('token')
 				uni.request({
-					url: "http://localhost:8000/xcx/auth/line-info",
+					url: this.$store.state.apihost+"/xcx/auth/line-info",
 					method: "GET",
 					header: {
 						'token': token,

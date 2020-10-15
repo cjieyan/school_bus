@@ -12,14 +12,14 @@
 	export default {
 		data() {
 			return {
-
+  
 			}
 		},
 		methods: {
 			finish() {
 				var token = uni.getStorageSync('token')
 				uni.request({
-					url: "http://localhost:8000/xcx/auth/line-finish",
+					url: this.$store.state.apihost+"/xcx/auth/line-finish",
 					method: "POST",
 					header: {
 						'token': token,

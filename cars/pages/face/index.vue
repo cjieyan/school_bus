@@ -88,7 +88,7 @@
 									this.$store.commit('changecantakephone', true)
 									const token = uni.getStorageSync('token')
 									uni.request({
-										url: "http://localhost:8000/xcx/auth/faceinfo",
+										url: this.$store.state.apihost+"/xcx/auth/faceinfo",
 										method: "POST",
 										header: {
 											'token': token,
@@ -113,7 +113,7 @@
 											console.log(userid)
 											var token = uni.getStorageSync('token')
 											uni.request({
-												url: "http://localhost:8000/xcx/auth/swipe",
+												url: this.$store.state.apihost+"/xcx/auth/swipe",
 												method: "POST",
 												header: {
 													'token': token,
