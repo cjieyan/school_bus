@@ -9,7 +9,7 @@
 					<image src="../../static/location.png" style="width: 32px; height: 31px;" class="location-image"></image>
 				</span>
 				<span class="location-info">
-					梧桐小学--六约新村
+					梧桐小学
 				</span>
 			</view>
 			<view class="student-list">

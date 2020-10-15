@@ -23,7 +23,7 @@
 						<image src="../../static/location.png" class="location-image"></image>
 					</span>
 					<span class="location-info">
-						梧桐小学--六约新村
+						{{line.name}}
 					</span>
 				</view>
 				<view class="location-d">

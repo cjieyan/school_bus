@@ -46,9 +46,9 @@
 					}
 				})
 			},
-			stoptakephone(){
+			stoptakephone() {
 				uni.redirectTo({
-					url:"../index/index"
+					url: "../index/index"
 				})
 			},
 			takephone() {
@@ -60,10 +60,10 @@
 					quality: 'high',
 					success: (res) => {
 						console.log(res.tempImagePath)
-						var imgbase64Url = wx.getFileSystemManager().readFileSync(res.tempImagePath, "base64");
-						
+						const imgbase64Url = wx.getFileSystemManager().readFileSync(res.tempImagePath, "base64");
+
 						// data:image/png;base64,
-						// console.log(imgbase64Url)
+						console.log(imgbase64Url)
 						// that.uploadImg(encodeURIComponent(imgbase64Url))
 						// 识别成功之后跳转
 						//请求百度接口
@@ -128,8 +128,10 @@
 													this.$store.commit('setstudent', {
 														"studentCount": this.$store.state.student.studentCount,
 														"studentGetOnCount": this.$store.state.student.studentGetOnCount + 1
-														},
-													)
+													}, )
+													uni.redirectTo({
+														url: "./complete"
+													})
 												},
 												fail: (err) => {
 													console.log(err)
@@ -137,7 +139,7 @@
 											})
 										},
 										fail: (err) => {
-											
+
 											console.log(err)
 										}
 									})
@@ -187,15 +189,16 @@
 			})
 			uni.hideLoading()
 			this.timer = setInterval(() => {
-				if (!this.$store.state.cantakephone) {
-					this.takephone()
-				} else {
-					uni.redirectTo({
-						url: "./complete"
-					})
-				}
+				this.takephone()
+				// if (!this.$store.state.cantakephone) {
+				// 	this.takephone()
+				// } else {
+				// 	uni.redirectTo({
+				// 		url: "../student/index"
+				// 	})
+				// }
 
-			}, 2000)
+			}, 3000)
 		},
 		onUnload() {
 			console.log("this.timer")
@@ -259,7 +262,8 @@
 		color: #fff;
 		margin-top: 30px;
 	}
-	.tips{
+
+	.tips {
 		height: 30rpx;
 		font-weight: bold;
 		font-size: 18px;
