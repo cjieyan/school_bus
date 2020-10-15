@@ -1,9 +1,9 @@
 <template>
 	<view>
-		<u-navbar back-text="返回" title="用户信息"></u-navbar>
+		<u-navbar back-text="返回"  @tap="back" title="用户信息"></u-navbar>
 
 		<view class="u-flex">
-			<u-image width="100%" height="300rpx" src="../../static/login-banner.jpg"></u-image>
+			<image src="../../static/login-banner.jpg" mode="heightFix" @error="imageError"></image>
 		</view>
 		<view class="page-content">
 			<view class="u-m-t-20">
@@ -11,11 +11,11 @@
 					<u-cell-item icon="rmb-circle" @tap="follow" title="跟车记录"></u-cell-item>
 				</u-cell-group>
 			</view>
-			<view class="u-m-t-20">
+			<!-- <view class="u-m-t-20">
 				<u-cell-group class="page-item">
 					<u-cell-item icon="star" @tap="setting" title="设置"></u-cell-item>
 				</u-cell-group>
-			</view>
+			</view> -->
 		</view>
 	</view>
 </template>
@@ -30,9 +30,13 @@
 		},
 		methods: {
 			back() {
-				uni.navigateBack({
-					success:function(){
-						beforePage.onLoad();
+				uni.switchTab({
+					url:"../index/index",
+					success: (res) => {
+						console.log(res)
+					},
+					fail: (err) => {
+						console.log(err)
 					}
 				})
 			},

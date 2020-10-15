@@ -9,6 +9,9 @@ App.mpType = 'app'
 import uView from 'uview-ui'
 Vue.use(uView);
 
+import store from './store'  
+Vue.prototype.$store = store
+
 const app = new Vue({
     ...App
 })

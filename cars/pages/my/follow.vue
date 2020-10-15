@@ -1,6 +1,6 @@
 <template class="container">
 	<view class="page-content">
-		<u-navbar title="跟车记录" @click="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
+		<u-navbar title="跟车记录" @tap="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		<view class="infolist" @click="popo">
 			<view class="info-content">
 				<view class="car-info">
@@ -67,9 +67,13 @@
 				console.log(this.show)
 			},
 			back() {
-				uni.navigateBack({
-					success:function(){
-						beforePage.onLoad();
+				uni.switchTab({
+					url:"../index/index",
+					success: (res) => {
+						console.log(res)
+					},
+					fail: (err) => {
+						console.log(err)
 					}
 				})
 			},

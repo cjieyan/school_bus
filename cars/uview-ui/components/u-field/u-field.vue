@@ -20,10 +20,10 @@
 					<input
 						v-else
 						:style="[fieldStyle]"
-						:type="type"
+						:type="type == 'password' ? 'text' : type"
 						class="u-flex-1 u-field__input-wrap"
 						:value="value"
-						:password="password || this.type === 'password'"
+						:password="type == 'password' && !showPassword"
 						:placeholder="placeholder"
 						:placeholderStyle="placeholderStyle"
 						:disabled="disabled"
@@ -40,6 +40,7 @@
 				<u-icon :size="clearSize" v-if="clearable && value != '' && focused" name="close-circle-fill" color="#c0c4cc" class="u-clear-icon" @click="onClear"/>
 				<view class="u-button-wrap"><slot name="right" /></view>
 				<u-icon v-if="rightIcon" @click="rightIconClick" :name="rightIcon" color="#c0c4cc" :style="[rightIconStyle]" size="26" class="u-arror-right" />
+				<u-icon size="40" v-if="passwordIcon && type == 'password'" :name="!showPassword ? 'eye' : 'eye-fill'" color="#c0c4cc" @click="showPassword = !showPassword"/>
 			</view>
 		</view>
 		<view v-if="errorMessage !== false && errorMessage != ''" class="u-error-message" :style="{
@@ -128,6 +129,10 @@ export default {
 			type: [String, Boolean],
 			default: ''
 		},
+		passwordIcon: {
+			type: Boolean,
+			default: true
+		},
 		placeholder: String,
 		placeholderStyle: String,
 		focus: Boolean,
@@ -164,7 +169,7 @@ export default {
 		// 清除按钮的大小
 		clearSize: {
 			type: [Number, String],
-			default: 30
+			default: 40
 		},
 		// lable左边的图标样式，对象形式
 		iconStyle: {
@@ -193,6 +198,7 @@ export default {
 		return {
 			focused: false,
 			itemIndex: 0,
+			showPassword: false,
 		};
 	},
 	computed: {

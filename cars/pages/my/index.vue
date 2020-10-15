@@ -1,6 +1,6 @@
 <template>
 	<view>
-		
+
 	</view>
 </template>
 
@@ -8,18 +8,19 @@
 	export default {
 		data() {
 			return {
-				
+
 			}
 		},
 		methods: {
 			back() {
 				uni.navigateBack({
-					success:function(){
+					success: function() {
 						beforePage.onLoad();
 					}
 				})
 			},
-		}
+			
+		},
 	}
 </script>
 

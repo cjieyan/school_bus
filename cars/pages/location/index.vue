@@ -4,17 +4,17 @@
 			<u-navbar title="智慧校车" @click="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		</view>
 		<view class="image-content">
-			<image src="../../static/banner.jpg" @error="imageError"></image>
+			<image src="../../static/banner.jpg" mode="heightFix" @error="imageError"></image>
 		</view>
 		<view class="content">
 			<view class="content-header">
 				<view class="content-header-top">
-					<span class="border"></span><span class="teacher">王老师</span> <span class="school">（梧桐小学）</span>
+					<span class="border"></span><span class="teacher">{{teacher.name}}</span> <span class="school">（{{line.name}}）</span>
 				</view>
 			</view>
 			<view class="content-info">
-				<view class="carinfo">1号车粤12345（已上车15人/共20人）</view>
-				<view class="carinfo">张师傅12345678911</view>
+				<view class="carinfo">{{carinfo.carNumber}}{{carinfo.carNo}}（已上车{{students.studentGetOnCount}}人/共{{students.studentCount}}人）</view>
+				<view class="carinfo">{{carinfo.driver}}{{carinfo.phone}}</view>
 			</view>
 			<view class="content-hr"></view>
 			<view class="location">
@@ -27,8 +27,8 @@
 					</span>
 				</view>
 				<view class="location-d">
-					<u-steps :list="numList" active-color="rgb(255 114 58)" mode="dot" direction="column">
-						
+					<u-steps :list="numList" active-color="rgb(255 114 58)" mode="dot" direction="column" current=3>
+
 					</u-steps>
 				</view>
 			</view>
@@ -46,6 +46,7 @@
 		components: {},
 		data() {
 			return {
+				timer: "",
 				ifOnShow: false,
 				ak: 'tjSZDrqGonHtUiDfmKpa8WbdEoOtSIcH',
 				latitude: '',
@@ -56,7 +57,11 @@
 					backgroundColor: '#12c497',
 				},
 				numList: [],
-				pk: 180 / 3.14169
+				pk: 180 / 3.14169,
+				line: {},
+				carinfo: {},
+				teacher: {},
+				students: {},
 			};
 		},
 		methods: {
@@ -80,132 +85,106 @@
 					complete: () => {}
 				})
 				uni.hideLoading();
-			}
-		},
-		onHide() {
-			console.log('this.ifOnShow=true')
-			this.ifOnShow = true
-		},
-
-		onShow() {
-			if (this.ifOnShow) {
-				uni.showLoading({
-					title: "正在定位"
-				})
-				var that = this;
-				/* 获取定位地理位置 */
-				uni.getLocation({
-					type: 'wgs84',
-					success: function(res) {
-						console.log('当前位置的经度：' + res.longitude);
-						console.log('当前位置的纬度：' + res.latitude);
-						uni.request({
-							url: "http://api.map.baidu.com/reverse_geocoding/v3/?ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7&output=json&coordtype=wgs84ll&location=" +
-								res.latitude + "," + res.longitude,
-							data: {},
-							success: (res) => {
-								// console.log(res)
-								// uni.showModal({
-								// 	title: res.data.result.formatted_address
-								// })
-								//获取最近的站点
-
-							},
-							fail: (err) => {
-								console.log(err)
-							}
-						})
-						console.log("eeeeeeeeeeeeeeeeeee")
-						uni.request({
-							url: "http://localhost:8000/xcx/sites",
-							method: "POST",
-							data: {},
-							success: (res) => {
-								console.log("------计算最近站点-------")
-								console.log(res.data.data.length)
-								var t = 0
-								for (var i = 0; i < res.data.data.length; i++) {
-
-								}
-							},
-							fail: (err) => {
-								console.log("------计算最近站点err-------")
-								console.log(err)
-							}
-						})
-						console.log("fffffffffffffffffffffffffff")
-					},
-					fail: (err) => {
-						console.log(err)
-						uni.showModal({
-							title: "定位失败"
-						})
-					}
-				});
-				uni.hideLoading()
-			}
-		},
-		onLoad() {
-			uni.showLoading({
-				title: "正在获取定位"
-			})
-			var that = this;
-			/* 获取定位地理位置 */
-			
-			uni.getLocation({
-				// type: 'wgs84',
-				type:"wgs84",
-				success: function(res) {
-					console.log('当前位置的经度：' + res.longitude);
-					console.log('当前位置的纬度：' + res.latitude);
-					that.longitude = res.longitude
-					that.latitude = res.latitude
-					//转换成百度坐标系
-					uni.request({
-						url:"http://api.map.baidu.com/geoconv/v1/?coords=114.52152,22.741887&from=1&to=5&ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7",
-						method:"GET",
-						data:{},
+			},
+			getLocation() {
+				new Promise(resolve => {
+					uni.getLocation({
+						type: "wgs84",
 						success: (res) => {
-							console.log("---------百度坐标系--------")
-							console.log(res)
-							that.blat = res.data.result[0].y
-							that.blng = res.data.result[0].x
-						},
-						fail: (err) => {
-							console.log(err)
+							this.latitude = res.latitude
+							this.longitude = res.longitude
+							resolve(res);
 						}
 					})
-					var a1 = that.latitude / that.pk
-					var a2 = that.longitude / that.pk
-					uni.request({
-						url: "http://api.map.baidu.com/reverse_geocoding/v3/?ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7&output=json&coordtype=wgs84ll&location=" +
-							res.latitude + "," + res.longitude,
-						data: {pois: 1,},
-						success: (res) => {
-							console.log("-----百度地图----")
-							console.log(res)
+				}).then((res) => {
+					const lat = res.latitude
+					const lng = res.longitude
+					new Promise(resolve => {
+						uni.request({
+							url: "http://api.map.baidu.com/geoconv/v1/?coords=" + lng + "," + lat +
+								"&from=1&to=5&ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7",
+							method: "GET",
+							data: {},
+							success: (res) => {
+								this.blat = res.data.result[0].y
+								this.blng = res.data.result[0].x
+								const data = {
+									"blat": res.data.result[0].y,
+									"blng": res.data.result[0].x
+								}
+								// resolve(res.data.result[0])
+								resolve(data)
+							},
+							fail: (err) => {
+								console.log(err)
+							}
+						})
+					}).then((res) => {
+						console.log("res-----------------")
+						console.log(res)
+						// const blat = res.y
+						// const blng = res.x
+						console.log("this.blat")
+						console.log(res.blat)
+						console.log("this.blng") 
+						console.log(res.blng)
+						console.log("this.latitude")
+						console.log(this.latitude) 
+						console.log(this.longitude)
+						new Promise(resolve => {
+							var token = uni.getStorageSync('token')
 							uni.request({
-								url: "http://localhost:8000/xcx/sites",
-								method: "POST",
+								url: "http://api.map.baidu.com/reverse_geocoding/v3/?ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7&output=json&coordtype=wgs84ll&location=" +
+									this.latitude + "," + this.longitude,
+								data: {
+									pois: 1,
+								},
+								success: (res) => {
+									console.log("-----百度地图----")
+									console.log(res)
+									resolve(res)
+								},
+								fail: (err) => {
+									console.log(err)
+								}
+							})
+						}).then((res) => {
+							var token = uni.getStorageSync('token')
+							uni.request({
+								url: "http://localhost:8000/xcx/auth/line-info",
+								method: "GET",
+								header: {
+									'token': token,
+								},
 								data: {},
 								success: (res) => {
+									if(res.data.code == 200){
+										// this.line = res.data.data.line
+										// this.carinfo = res.data.data.car
+										// this.teacher = res.data.data.teacher
+										// this.students = {
+										// 	"studentCount": res.data.data.studentCount,
+										// 	"studentGetOnCount": res.data.data.studentGetOnCount
+										// }
+									}
+									console.log(this)
 									console.log("------计算最近站点-------")
 									console.log("------计算最近站点-------")
-									console.log(res.data)
+									console.log(res)
 									var t = 0
 									var siteList = []
 									//22.744943742471953,114.53285132220785,22.744943742471953
-									for (var i = 0; i < res.data.data.length; i++) {
-										var distict = utils.getGreatCircleDistance(that.blat,that.blng, res.data.data[i].latitude, res.data.data[i].longitude)
-										console.log("-------"+ res.data.data[i].name +"-----")
+									for (var i = 0; i < res.data.data.sites.length; i++) {
+										var distict = utils.getGreatCircleDistance(this.blat, this.blng, res.data.data.sites[i].latitude, res.data.data.sites[i].longitude)
+										console.log("-------" + res.data.data.sites[i].name + "-----")
 										console.log(distict)
 										console.log("------------")
 										var resdata = {
-											"name": res.data.data[i].name+"("+Math.round(distict)+"米)",
+											"name": res.data.data.sites[i].name + "(" + Math.round(distict) + "米)",
 											"distict": Math.round(distict)
 										}
 										siteList.push(resdata)
-										that.numList = siteList
+										this.numList = siteList
 									}
 									console.log(siteList)
 								},
@@ -213,22 +192,37 @@
 									console.log(err)
 								}
 							})
-						},
-						fail: (err) => {
-							console.log(err)
-						}
+						})
 					})
+				})
 
+			},
+		},
+		onHide() {
+			console.log('this.ifOnShow=true')
+			this.ifOnShow = true
+			if (this.timer) {
+				clearInterval(this.timer)
+				this.timer = null
+			}
+		},
 
-				},
-				fail: (err) => {
-					console.log(err)
-					uni.showModal({
-						title: "定位失败"
-					})
-				}
-			});
+		onShow() {
+			uni.showLoading({
+				title: "正在加载"
+			})
+			this.timer = setInterval(()=>{
+				this.getLocation()
+			}, 3000)
+			
 			uni.hideLoading()
+		},
+		onLoad() {
+			this.getLocation()
+			this.line = this.$store.state.liniInfo
+			this.carinfo = this.$store.state.carInfo
+			this.teacher = this.$store.state.teacher
+			this.students = this.$store.state.student
 		}
 	}
 </script>

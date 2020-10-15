@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="top">
-			<u-navbar back-text="返回" title="学生列表"></u-navbar>
+			<u-navbar back-text="返回" @tap="back" title="学生列表"></u-navbar>
 		</view>
 		<view class="student">
 			<view class="student-top">
@@ -13,20 +13,21 @@
 				</span>
 			</view>
 			<view class="student-list">
-				<view class="student-list-info">
+				<view class="student-list-info" v-for="item in students">
 					<view class="student-img">
 						<image src="../../static/location.png" style="width: 30px; height: 30px;" class="location-image"></image>
 						<view class="inboard">
-							<span>已上车</span>
+							<span v-if="item.swipeStatus == '-1'">已上车</span>
+							<span v-else>未上车</span>
 							<!-- <fa-icon type="check" size="14" color="white" class="font-icon inboard-check"></fa-icon> -->
 							<u-icon name="checkbox-mark" color="#fff" size="14" class="inboard-check"></u-icon>
 						</view>
 					</view>
 					<view class="student-name">
-						张三
+						{{item.name}}
 					</view>
 				</view>
-				<view class="student-list-info">
+				<!-- <view class="student-list-info">
 					<view class="student-img">
 						<image src="../../static/location.png" style="width: 30px; height: 30px;" class="location-image"></image>
 						<view class="outboard">
@@ -60,12 +61,12 @@
 					<view class="student-name">
 						张三
 					</view>
-				</view>
+				</view> -->
 				<view style="clear:both;height:0"></view>
 			</view>
 		</view>
 		<view class="comfirm">
-			<button class="comfirm-bottom" @tap="gotoLunBo">确认结束</button>
+			<button class="comfirm-bottom" @tap="back">确认结束</button>
 		</view>
 	</view>
 </template>
@@ -78,17 +79,45 @@
 		},
 		data() {
 			return {
-
+				students: {}
 			}
 		},
 		methods: {
 			back() {
-				uni.navigateBack({
-					success: function() {
-						beforePage.onLoad();
+				uni.switchTab({
+					url: "../index/index",
+					success: (res) => {
+						console.log(res)
+					},
+					fail: (err) => {
+						console.log(err)
 					}
 				})
 			},
+			studentList() {
+				const token = uni.getStorageSync('token')
+				uni.request({
+					url: "http://localhost:8000/xcx/auth/line-students",
+					method:"POST",
+					header: {
+						'token': token,
+					},
+					method: "GET",
+					success: (res) => {
+						console.log(res)
+						this.students = res.data.data.studentsDataRet
+					},
+					fail: (err) => {
+						console.log(err)
+					}
+				})
+			}
+		},
+		onShow() {
+			this.studentList()
+		},
+		onLoad() {
+			this.studentList()
 		}
 	}
 </script>
@@ -145,14 +174,14 @@
 		font-size: 8px;
 		color: #fff;
 		position: absolute;
-		top: 12px;
-		left: 3px;
+		top: 16px;
+		left: 9px;
 	}
 
 	.inboard-check {
 		position: absolute;
 		bottom: -6px;
-		left: 15px;
+		left: 18px;
 		background-color: #4CD964;
 		border-radius: 6px;
 	}

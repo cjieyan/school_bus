@@ -4,7 +4,7 @@
 			<u-navbar title="智慧校车" @click="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		</view>
 		<view class="image-content">
-			<image src="../../static/banner.jpg" @error="imageError"></image>
+			<image src="../../static/banner.jpg" mode="heightFix" @error="imageError"></image>
 		</view>
 		<view class="u-demo-wrap">
 			<view class="u-demo-area">
@@ -21,10 +21,6 @@
 					<u-grid-item :index="2" @tap="student">
 						<u-icon name="account" :size="46"></u-icon>
 						<view class="grid-text">学生</view>
-					</u-grid-item>
-					<u-grid-item :index="3" @tap="regist">
-						<u-icon name="account" :size="46"></u-icon>
-						<view class="grid-text">人脸注册</view>
 					</u-grid-item>
 				</u-grid>
 			</view>
@@ -49,48 +45,101 @@
 		methods: {
 			back() {
 				uni.navigateBack({
-					success:function(){
+					success: function() {
 						beforePage.onLoad();
 					}
 				})
 			},
 			gotocars() {
 				uni.showLoading({
-					
+
 				});
 				uni.switchTab({
-					
-					url:"../location/index",
-					success:function(){
+					url: "../location/index",
+					success: function() {
 						uni.hideLoading({
-							
+
 						})
 					},
-					fail:function(e){
+					fail: function(e) {
 						console.log(e)
 					}
 				})
 			},
 			carinfo() {
 				uni.redirectTo({
-					url:"../my/follow"
+					url: "../my/follow"
 				})
 			},
-			student(){
+			student() {
 				uni.switchTab({
-					url:"../student/index"
+					url: "../student/index"
 				})
 			},
-			regist(){
+			regist() {
 				uni.showLoading({
-					title:"加载中"
+					title: "加载中"
 				})
 				uni.redirectTo({
-					url:"../face/regist"
+					url: "../face/regist"
+				})
+				uni.hideLoading()
+			},
+			//设置相关信息 学生人数、上车人数、车辆信息、、、
+			setInfo() {
+				var token = uni.getStorageSync('token')
+				uni.request({
+					url: "http://localhost:8000/xcx/auth/line-info",
+					method: "GET",
+					header: {
+						'token': token,
+					},
+					data: {},
+					success: (res) => {
+						if (res.data.code == 200) {
+							console.log(res)
+							this.$store.commit('setcarinfo', res.data.data.car)
+							this.$store.commit('setTeacher', res.data.data.teacher)
+							this.$store.commit('setLineinfo', res.data.data.line)
+							this.$store.commit('setstudent', {
+								"studentCount": res.data.data.studentCount,
+								"studentGetOnCount": res.data.data.studentGetOnCount
+							})
+						}
+					},
+					fail: (err) => {
+						console.log(err)
+					}
+				})
+			}
+		},
+		onShow() {
+			var token = uni.getStorageSync("token")
+			if (token == "" || token == "undefinded") {
+				uni.showLoading({
+					title: "会话已过期"
+				})
+				uni.redirectTo({
+					url: "../my/login"
 				})
 				uni.hideLoading()
 			}
+		},
+		onLoad() {
+			
+			var token = uni.getStorageSync("token")
+			if (token == "" || token == "undefinded") {
+				uni.showLoading({
+					title: "会话已过期"
+				})
+				uni.redirectTo({
+					url: "../my/login"
+				})
+				uni.hideLoading()
+			}
+			this.setInfo()
 		}
+		
 	};
 </script>
 
