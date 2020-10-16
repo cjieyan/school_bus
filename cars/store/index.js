@@ -9,14 +9,15 @@ const store = new Vuex.Store({
 		liniInfo: {},
 		teacher: {},
 		apihost: "https://sc.kenashua.com",
+		ak: "EtRc2ku5rpOb4aNTskgBr1yb",
+		client_id:"oLPVBkl3gkURkuZPdN13XefG",
+		client_secret: "qOsoDoVAkvotzLn4ismk4dMmDoNaUrim"
     },
     mutations: {
 		changecantakephone(state, iscan){
 			state.cantakephone = iscan
 		},
 		setstudent(state, data){
-			console.log("-------setstudent-------")
-			console.log(data)
 			state.student = data
 		},
 		setcarinfo(state, data){

@@ -62,7 +62,7 @@
 							data: {
 								"image": imgbase64Url,
 								"image_type": "BASE64",
-								"group_id": "school_bus",
+								"group_id": "classa",
 								"user_id": "user1",
 								"user_info": "abc",
 								"quality_control": "LOW",
