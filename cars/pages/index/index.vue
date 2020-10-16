@@ -148,10 +148,6 @@
 				uni.hideLoading()
 			}
 			this.setInfo()
-<<<<<<< HEAD
-=======
-			this.imageLoad()
->>>>>>> 9f813f060f7a0c12841882b3a3ea86b9e4c12acd
 		}
 		
 	};
