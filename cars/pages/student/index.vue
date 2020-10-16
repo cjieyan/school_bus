@@ -17,8 +17,9 @@
 					<view class="student-img">
 						<image src="../../static/location.png" style="width: 30px; height: 30px;" class="location-image"></image>
 						<view class="inboard">
-							<span v-if="item.swipeStatus == '-1'">已上车</span>
-							<span v-else>未上车</span>
+							<span v-if="item.swipeStatus == '-1'">未上车</span>
+							<span v-else-if="item.swipeStatus == '0'">已上车</span>
+							<span v-else>已下车</span>
 							<!-- <fa-icon type="check" size="14" color="white" class="font-icon inboard-check"></fa-icon> -->
 							<u-icon name="checkbox-mark" color="#fff" size="14" class="inboard-check"></u-icon>
 						</view>

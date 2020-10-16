@@ -69,12 +69,11 @@ func Redisinit() {
 redis  SET
 */
 func RdbSet(key, v string) (bool, error) {
-	b, err := redis.Bool(Rdb.Do("SET", key, v))
+	_, err := Rdb.Do("SET", key, v)
 	if err != nil {
-		//logs.Error("set error", err.Error())
 		return false, err
 	}
-	return b, nil
+	return true, nil
 }
 
 /**
@@ -82,6 +81,7 @@ redis  GET
 */
 func RdbGet(key string) (string, error) {
 	val, err := redis.String(Rdb.Do("GET", key))
+	fmt.Println("RdbGet.....", val, err)
 	if err != nil {
 		//logs.Error("get error", err.Error())
 		return "", err
