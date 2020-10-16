@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="top">
-			<u-navbar back-text="返回" title="学生列表"></u-navbar>
+			<u-navbar back-text=" "  :background="background" back-icon-color="#fff"  title-color="#fff" title="学生列表"></u-navbar>
 		</view>
 		<uni-card mode="basic">
 			<view class="student">
@@ -90,7 +90,9 @@
 		},
 		data() {
 			return {
-
+				background: {
+					backgroundColor: '#12C497',
+				},
 			}
 		},
 		methods: {

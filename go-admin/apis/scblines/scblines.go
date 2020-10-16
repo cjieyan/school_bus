@@ -34,7 +34,32 @@ func GetScbLinesList(c *gin.Context) {
 	result, count, err := data.GetPage(pageSize, pageIndex)
 	tools.HasError(err, "", -1)
 
-	app.PageOK(c, result, count, pageIndex, pageSize, "")
+	var linesData []models.ScbLines
+	for _, line := range result{
+		if "" != line.CarIds{
+			carIdsInt := []int{}
+			carIdsArr := strings.Split(line.CarIds, ",")
+			for _, val := range carIdsArr{
+				carId, cErr := strconv.Atoi(val)
+				if nil == cErr && carId > 0 {
+					carIdsInt = append(carIdsInt, carId)
+				}
+			}
+			if len(carIdsInt ) > 0 {
+				carModel := models.ScbCars{}
+				carsData, err := carModel.GetbyIds(carIdsInt)
+				if nil == err{
+					carNos := ""
+					for _, car := range carsData{
+						carNos = carNos + " " + car.CarNo
+					}
+					line.CarNos = carNos
+				}
+			}
+		}
+		linesData = append(linesData, line)
+	}
+	app.PageOK(c, linesData, count, pageIndex, pageSize, "")
 }
 
 func GetScbLines(c *gin.Context) {

@@ -42,7 +42,23 @@ func GetSchSitesList(c *gin.Context) {
 	result, count, err := data.GetPage(pageSize, pageIndex)
 	tools.HasError(err, "", -1)
 
-	app.PageOK(c, result, count, pageIndex, pageSize, "")
+	var sitesData []models.SchSites
+	for _, site := range result{
+		lineModel := models.ScbLines{}
+		lineModel.Id = site.LineId
+		lineData, err := lineModel.Get()
+		if err == nil{
+			site.LineName = lineData.Name
+		}
+		if site.Prop == 2{
+			site.PropName = "下车"
+		}else{
+			site.PropName = "上车"
+		}
+		sitesData = append(sitesData, site)
+	}
+
+	app.PageOK(c, sitesData, count, pageIndex, pageSize, "")
 }
 
 func GetSchSites(c *gin.Context) {

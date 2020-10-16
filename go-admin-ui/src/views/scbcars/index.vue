@@ -1,7 +1,7 @@
 
 <template>
   <div class="app-container">
-    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
+    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="100px">
       <el-form-item label="车牌编号" prop="carNumber">
         <el-input
           v-model="queryParams.carNumber"
@@ -81,12 +81,8 @@
     </el-row>
 
     <el-table v-loading="loading" :data="scbcarsList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" /><el-table-column
-        label=""
-        align="center"
-        prop="id"
-        :show-overflow-tooltip="true"
-      /><el-table-column
+      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column
         label="车牌编号"
         align="center"
         prop="carNumber"
@@ -104,7 +100,7 @@
       /><el-table-column
         label="跟车员"
         align="center"
-        prop="attendantId"
+        prop="attendantName"
         :show-overflow-tooltip="true"
       /><el-table-column
         label="司机"

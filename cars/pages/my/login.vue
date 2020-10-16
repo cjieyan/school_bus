@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar :is-back="isback" title="登录"></u-navbar>
+		<u-navbar :background="background" title-color="#fff" :is-back="isback" title="登录"></u-navbar>
 		<view class="image-content">
 			<image src="../../static/login-banner.jpg" 
 			mode="widthFix" 
@@ -28,6 +28,9 @@
 				isback:false,
 				phone: "17620323840",
 				password: "123456",
+				background: {
+					backgroundColor: '#12C497',
+				},
 			}
 		},
 		methods: {

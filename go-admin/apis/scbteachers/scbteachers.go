@@ -33,7 +33,18 @@ func GetScbTeachersList(c *gin.Context) {
 	result, count, err := data.GetPage(pageSize, pageIndex)
 	tools.HasError(err, "", -1)
 
-	app.PageOK(c, result, count, pageIndex, pageSize, "")
+	var teacherDatas []models.ScbTeachers
+	for _, teacher := range result{
+		postModel := models.ScbPost{}
+		postModel.PostId = teacher.PostId
+		postData, err := postModel.Get()
+		if nil == err{
+			teacher.PostName = postData.PostName
+		}
+		teacherDatas = append(teacherDatas, teacher)
+	}
+
+	app.PageOK(c, teacherDatas, count, pageIndex, pageSize, "")
 }
 //获取教师信息
 func GetScbTeachers(c *gin.Context) {

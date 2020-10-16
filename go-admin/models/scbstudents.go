@@ -26,6 +26,11 @@ type ScbStudents struct {
 	BaiduUserId   string `json:"baidu_user_id" gorm:"type:varchar(255);"`
 	BaiduUserInfo string `json:"baidu_user_info" gorm:"type:varchar(255);"`
 	SwipeStatus   int    `json:"swipeStatus"  gorm:"-"` // -1未上车 0已上车 1已下车
+	LineName      string `json:"lineName"  gorm:"-"`
+	SiteDownName  string `json:"siteDownName" gorm:"-"`
+	SiteUpName    string `json:"siteUpName" gorm:"-"`
+	ClassName     string `json:"className" gorm:"-"`
+	CarNo     string `json:"carNo" gorm:"-"`
 	BaseModel
 }
 

@@ -18,6 +18,7 @@ type ScbTeachers struct {
 	IsDeleted int `json:"isDeleted" gorm:"type:tinyint(4);"`           // 0未删除 1已删除
 	DataScope string `json:"dataScope" gorm:"-"`
 	Params    string `json:"params"  gorm:"-"`
+	PostName    string `json:"postName"  gorm:"-"`
 	BaseModel
 }
 

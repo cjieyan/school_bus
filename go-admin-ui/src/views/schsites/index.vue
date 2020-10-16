@@ -1,20 +1,11 @@
 
 <template>
   <div class="app-container">
-    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
-      <el-form-item label="" prop="id">
-        <el-input
-          v-model="queryParams.id"
-          placeholder="请输入"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="线路id" prop="lineId">
+    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="100px">
+      <el-form-item label="线路" prop="lineId">
         <el-input
           v-model="queryParams.lineId"
-          placeholder="请输入线路id"
+          placeholder="请选择线路"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -29,79 +20,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="用途" prop="purpose">
-        <el-input
-          v-model="queryParams.purpose"
-          placeholder="请输入用途"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="排序" prop="sort">
-        <el-input
-          v-model="queryParams.sort"
-          placeholder="请输入排序"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="站点属性" prop="prop">
-        <el-input
-          v-model="queryParams.prop"
-          placeholder="请输入站点属性"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="到达时间" prop="arriveAt">
-        <el-input
-          v-model="queryParams.arriveAt"
-          placeholder="请输入到达时间"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="备注" prop="remark">
-        <el-input
-          v-model="queryParams.remark"
-          placeholder="请输入备注"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="图片" prop="picture">
-        <el-input
-          v-model="queryParams.picture"
-          placeholder="请输入图片"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="创建时间" prop="createdAt">
-        <el-input
-          v-model="queryParams.createdAt"
-          placeholder="请输入创建时间"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="更新时间" prop="updatedAt">
-        <el-input
-          v-model="queryParams.updatedAt"
-          placeholder="请输入更新时间"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -144,20 +62,16 @@
     </el-row>
 
     <el-table v-loading="loading" :data="schsitesList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" /><el-table-column
-        label=""
-        align="center"
-        prop="id"
-        :show-overflow-tooltip="true"
-      /><el-table-column
-        label="线路id"
-        align="center"
-        prop="lineId"
-        :show-overflow-tooltip="true"
-      /><el-table-column
+      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column
         label="名称"
         align="center"
         prop="name"
+        :show-overflow-tooltip="true"
+      /><el-table-column
+        label="线路"
+        align="center"
+        prop="lineName"
         :show-overflow-tooltip="true"
       /><el-table-column
         label="用途"
@@ -165,14 +79,9 @@
         prop="purpose"
         :show-overflow-tooltip="true"
       /><el-table-column
-        label="排序"
-        align="center"
-        prop="sort"
-        :show-overflow-tooltip="true"
-      /><el-table-column
         label="站点属性"
         align="center"
-        prop="prop"
+        prop="propName"
         :show-overflow-tooltip="true"
       /><el-table-column
         label="到达时间"
@@ -180,34 +89,9 @@
         prop="arriveAt"
         :show-overflow-tooltip="true"
       /><el-table-column
-        label="备注"
+        label="排序"
         align="center"
-        prop="remark"
-        :show-overflow-tooltip="true"
-      /><el-table-column
-        label="经度"
-        align="center"
-        prop="longitude"
-        :show-overflow-tooltip="true"
-      /><el-table-column
-        label="维度"
-        align="center"
-        prop="latitude"
-        :show-overflow-tooltip="true"
-      /><el-table-column
-        label="图片"
-        align="center"
-        prop="picture"
-        :show-overflow-tooltip="true"
-      /><el-table-column
-        label="创建时间"
-        align="center"
-        prop="createdAt"
-        :show-overflow-tooltip="true"
-      /><el-table-column
-        label="更新时间"
-        align="center"
-        prop="updatedAt"
+        prop="sort"
         :show-overflow-tooltip="true"
       />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">

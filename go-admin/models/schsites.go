@@ -28,6 +28,8 @@ type SchSites struct {
 	IsDelete  int     `json:"isDelete" gorm:"type:tinyint(4);"`    // 0未删除 1已删除
 	DataScope string  `json:"dataScope" gorm:"-"`
 	Params    string  `json:"params" gorm:"-"`
+	LineName		string `json:"lineName" gorm:"-"`
+	PropName string    `json:"propName" gorm:"-"`
 	BaseModel
 }
 type SchSitesQqMapData struct {

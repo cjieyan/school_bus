@@ -97,7 +97,7 @@
 			})
 			//获取百度access_token
 			uni.request({
-				url: "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=tTyqXmbuYWkl3nGMmCtkL6pY&client_secret=yoG5QAsLuCp9yU4cmXi8Gf2vapOTZGAi&",
+				url: "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id="+this.$store.state.client_id+"&client_secret="+this.$store.state.client_secret+"&",
 				method: 'POST',
 				dataType: "json",
 				data: {},

@@ -21,6 +21,9 @@ type ScbDept struct {
 	DataScope string    `json:"dataScope" gorm:"-"`
 	Params    string    `json:"params" gorm:"-"`
 	Children  []ScbDept `json:"children" gorm:"-"`
+	Id			int 	`json:"id" gorm:"-"`
+	Value     int 	`json:"value" gorm:"-"`
+	Label     string `json:"label" gorm:"-"`
 	BaseModel
 }
 
@@ -139,7 +142,9 @@ func (e *ScbDept) SetDept(bl bool) ([]ScbDept, error) {
 			continue
 		}
 		info := e.Digui(&list, list[i])
-
+		info.Id = info.DeptId
+		info.Label = info.DeptName
+		info.Value = info.DeptId
 		m = append(m, info)
 	}
 	return m, err
@@ -155,6 +160,10 @@ func (e ScbDept)Digui(deptlist *[]ScbDept, menu ScbDept) ScbDept {
 			continue
 		}
 		mi := ScbDept{}
+
+		mi.Id = list[j].DeptId
+		mi.Label = list[j].DeptName
+		mi.Value = list[j].DeptId
 		mi.DeptId = list[j].DeptId
 		mi.ParentId = list[j].ParentId
 		mi.DeptPath = list[j].DeptPath

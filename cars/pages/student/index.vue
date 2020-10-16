@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="top">
-			<u-navbar back-text="返回" @tap="back" title="学生列表"></u-navbar>
+			<u-navbar back-text=" " :background="background" back-icon-color="#fff" title-color="#fff" @tap="back" title="学生列表"></u-navbar>
 		</view>
 		<view class="student">
 			<view class="student-top">
@@ -79,20 +79,40 @@
 		},
 		data() {
 			return {
-				students: {}
+				students: {},
+				background: {
+					backgroundColor: '#12C497',
+				},
 			}
 		},
 		methods: {
 			back() {
-				uni.switchTab({
-					url: "../index/index",
+				var token = uni.getStorageSync('token')
+				uni.request({
+					url: this.$store.state.apihost+"/xcx/auth/line-finish",
+					method: "POST",
+					header: {
+						'token': token,
+					},
+					data: {},
 					success: (res) => {
-						console.log(res)
+						if (res.data.code == 200) {
+							uni.switchTab({
+								url: "../index/index",
+								success: (res) => {
+									console.log(res)
+								},
+								fail: (err) => {
+									console.log(err)
+								}
+							})
+						}
 					},
 					fail: (err) => {
 						console.log(err)
 					}
 				})
+				
 			},
 			studentList() {
 				const token = uni.getStorageSync('token')
