@@ -491,7 +491,7 @@
 							data: {
 								"image": imgbase64Url,
 								"image_type": "BASE64",
-								"group_id_list": "school_bus",
+								"group_id_list": "classa",
 								"quality_control": "LOW",
 								"liveness_control": "NORMAL"
 							},
