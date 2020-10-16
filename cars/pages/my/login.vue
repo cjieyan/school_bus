@@ -1,7 +1,13 @@
 <template>
 	<view>
 		<u-navbar :is-back="isback" title="登录"></u-navbar>
-		<image mode="heightFix" src="../../static/login-banner.jpg"></image>
+		<view class="image-content">
+			<image src="../../static/login-banner.jpg" 
+			mode="widthFix" 
+			:fade="true" 
+			duration="450"
+			@error="imageError"></image>
+		</view>
 		<view class="page-content">
 			<!-- <u-input class="login-input" v-model="phone" type="number" value="17620323840" placeholder="请输入手机号码" /> -->
 			<!-- <u-input class="login-input" v-model="password" type="password" value="123456" placeholder="请输入密码" /> -->
@@ -149,7 +155,9 @@
 	page {
 		background-color: #fff;
 	}
-
+	.image-content image{
+		width: 100%;
+	}
 	.page-content {
 		padding: 20px 16%;
 		margin: 0 auto;
