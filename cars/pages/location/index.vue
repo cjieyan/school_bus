@@ -102,7 +102,7 @@
 					new Promise(resolve => {
 						uni.request({
 							url: "http://api.map.baidu.com/geoconv/v1/?coords=" + lng + "," + lat +
-								"&from=1&to=5&ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7",
+								"&from=1&to=5&ak="+this.$store.state.ak,
 							method: "GET",
 							data: {},
 							success: (res) => {
@@ -134,7 +134,7 @@
 						new Promise(resolve => {
 							var token = uni.getStorageSync('token')
 							uni.request({
-								url: "http://api.map.baidu.com/reverse_geocoding/v3/?ak=hpMsWg4OXrCajEUgHhuiYHMoFEYcCRL7&output=json&coordtype=wgs84ll&location=" +
+								url: "http://api.map.baidu.com/reverse_geocoding/v3/?ak="+this.$store.state.ak+"&output=json&coordtype=wgs84ll&location=" +
 									this.latitude + "," + this.longitude,
 								data: {
 									pois: 1,
