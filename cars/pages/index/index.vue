@@ -26,10 +26,6 @@
 						<u-icon name="account" :size="46"></u-icon>
 						<view class="grid-text">学生</view>
 					</u-grid-item>
-					<u-grid-item :index="2" @tap="regist">
-						<u-icon name="account" :size="46"></u-icon>
-						<view class="grid-text">注册人脸</view>
-					</u-grid-item>
 				</u-grid>
 			</view>
 		</view>
