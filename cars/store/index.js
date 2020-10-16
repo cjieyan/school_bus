@@ -8,7 +8,7 @@ const store = new Vuex.Store({
 		carInfo: {},
 		liniInfo: {},
 		teacher: {},
-		apihost: "http://localhost:8000",
+		apihost: "https://sc.kenashua.com",
     },
     mutations: {
 		changecantakephone(state, iscan){
