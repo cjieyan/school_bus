@@ -11,7 +11,7 @@ const store = new Vuex.Store({
 		apihost: "https://sc.kenashua.com",
 		ak: "EtRc2ku5rpOb4aNTskgBr1yb",
 		client_id:"oLPVBkl3gkURkuZPdN13XefG",
-		client_secret: "qOsoDoVAkvotzLn4ismk4dMmDoNaUrim",
+		client_secret: "qOsoDoVAkvotzLn4ismk4dMmDoNaUrim"
     },
     mutations: {
 		changecantakephone(state, iscan){
