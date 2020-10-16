@@ -4,7 +4,7 @@ settings:
     host: 0.0.0.0
     mode: dev
     name: testApp
-    port: 8000
+    port: 8001
     readtimeout: 1
     writertimeout: 2
   database:
