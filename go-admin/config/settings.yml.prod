@@ -9,7 +9,7 @@ settings:
     writertimeout: 2
   database:
     driver: mysql
-    source: root:mI>goQXh43giC@tcp(127.0.0.1:3306)/school_bus?charset=utf8&parseTime=True&loc=Local&timeout=3000ms
+    source: root:mI>goQXh43giC@tcp(127.0.0.1:3507)/school_bus?charset=utf8&parseTime=True&loc=Local&timeout=3000ms
   gen:
     dbname: school_bus
     frontpath: ../go-admin-ui/src
