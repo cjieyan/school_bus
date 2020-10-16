@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar back-text="返回" title="登录"></u-navbar>
+		<u-navbar :is-back="isback" title="登录"></u-navbar>
 		<image mode="heightFix" src="../../static/login-banner.jpg"></image>
 		<view class="page-content">
 			<!-- <u-input class="login-input" v-model="phone" type="number" value="17620323840" placeholder="请输入手机号码" /> -->
@@ -19,6 +19,7 @@
 	export default {
 		data() {
 			return {
+				isback:false,
 				phone: "17620323840",
 				password: "123456",
 			}

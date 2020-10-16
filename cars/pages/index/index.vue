@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="top">
-			<u-navbar title="智慧校车" @click="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
+			<u-navbar :is-back="isback" title="智慧校车" @click="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		</view>
 		<view class="image-content">
 			<image src="../../static/banner.jpg" mode="heightFix" @error="imageError"></image>
@@ -22,6 +22,10 @@
 						<u-icon name="account" :size="46"></u-icon>
 						<view class="grid-text">学生</view>
 					</u-grid-item>
+					<u-grid-item :index="2" @tap="regist">
+						<u-icon name="account" :size="46"></u-icon>
+						<view class="grid-text">注册人脸</view>
+					</u-grid-item>
 				</u-grid>
 			</view>
 		</view>
@@ -32,6 +36,7 @@
 	export default {
 		data() {
 			return {
+				isback: false,
 				background: {
 					backgroundColor: '#12c497',
 				},

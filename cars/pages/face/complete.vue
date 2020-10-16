@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar title="识别成功" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
+		<u-navbar title="打卡成功" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		<view class="completeFetch">
 			<image src="../../static/complete.png"></image>
 		</view>
@@ -17,6 +17,9 @@
 		},
 		methods: {
 			finish() {
+				uni.showLoading({
+					
+				})
 				var token = uni.getStorageSync('token')
 				uni.request({
 					url: this.$store.state.apihost+"/xcx/auth/line-finish",
@@ -36,11 +39,10 @@
 									console.log(err)
 								}
 							})
-						}, 4000)
-
+						}, 3000)
+						uni.hideLoading()
 					},
 					fail: (err) => {
-						console.log(err)
 					}
 				})
 			}
