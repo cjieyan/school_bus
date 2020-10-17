@@ -4,11 +4,7 @@
 			<u-navbar :is-back="isback" title="智慧校车" @click="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		</view>
 		<view class="image-content">
-			<image src="../../static/banner.jpg" 
-			mode="widthFix" 
-			:fade="true" 
-			duration="450"
-			@error="imageError"></image>
+			<image src="../../static/banner.jpg" mode="aspectFill" style="width: 100%;" @error="imageError"></image>
 		</view>
 		<view class="u-demo-wrap">
 			<view class="u-demo-area">
@@ -143,21 +139,20 @@
 				uni.hideLoading()
 			}
 			this.setInfo()
-			this.imageLoad()
 		}
 		
 	};
 </script>
 
 <style scoped lang="scss">
-	.image-content image {
-			width: 100%;
-		}
-	
 	.grid-text {
 		font-size: 28rpx;
 		margin-top: 4rpx;
 		color: $u-type-info;
+	}
+
+	.image-content image {
+		height: 150px;
 	}
 
 	.badge-icon {

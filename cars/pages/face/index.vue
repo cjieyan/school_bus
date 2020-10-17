@@ -17,7 +17,7 @@
 			</camera>
 		</view>
 		<view class="bottom-btn">
-			<button type="error" class="start-facing" @tap="stoptakephone">停止打卡</button>
+			<button :type="btntype" class="start-facing" @tap="stoptakephone">{{btntxt}}</button>
 		</view>
 
 	</view>
@@ -30,7 +30,10 @@
 				background: {
 					backgroundColor: '#12c497',
 				},
+				btntxt:"停止打卡",
+				btntype:"error",
 				tipclass: "",
+				istakephone: true,
 				accesstoken: "",
 				student: {},
 				userid: "",
@@ -465,10 +468,30 @@
 				})
 			},
 			stoptakephone() {
-				if (this.timer) {
-					clearInterval(this.timer)
-					this.timer = null
+				if(this.istakephone){
+					this.istakephone  = false
+					this.btntype = "primary"
+					this.btntxt = "开始打卡"
+					this.tip = "已停止识别"
+					if (this.timer) {
+						clearInterval(this.timer)
+						this.timer = null
+					}
+					
+					
+				}else{
+					this.btntype = "error"
+					this.istakephone  = true
+					// btntxt:"停止打卡",
+					this.btntxt = "停止打卡"
+					this.tip = "正在识别"
+					if (this.timer == null) {
+						this.timer = setInterval(() => {
+							this.takephone()
+						}, 3000)
+					}
 				}
+				
 			},
 			takephone() {
 				this.tip = "正在识别"

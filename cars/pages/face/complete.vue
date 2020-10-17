@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar title="打卡成功" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
+		<u-navbar title="打卡成功" :is-back="isback" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		<view class="completeFetch">
 			<image src="../../static/complete.png"></image>
 		</view>
@@ -12,7 +12,10 @@
 	export default {
 		data() {
 			return {
-  
+				"isback":false,
+				background: {
+					backgroundColor: '#12c497',
+				},
 			}
 		},
 		methods: {
@@ -36,6 +39,7 @@
 
 								},
 								fail: (err) => {
+									console.log("-------err------------")
 									console.log(err)
 								}
 							})
@@ -43,6 +47,7 @@
 						uni.hideLoading()
 					},
 					fail: (err) => {
+						console.log(err)
 					}
 				})
 			}
