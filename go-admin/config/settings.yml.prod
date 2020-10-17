@@ -27,5 +27,5 @@ settings:
     RedisConn: 127.0.0.1:6379
     RedisDbNum: 2
     RedisPassword: ""
-    RedisMaxIdle: 5
-    RedisMaxActive: 20
+    RedisMaxIdle: 300
+    RedisMaxActive: 600
