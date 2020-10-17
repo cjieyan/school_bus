@@ -4,7 +4,7 @@
 			<u-navbar title="智慧校车" @click="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		</view>
 		<view class="image-content">
-			<image src="../../static/banner.jpg" mode="heightFix" @error="imageError"></image>
+			<image src="../../static/banner.jpg" mode="aspectFill" style="width: 100%;" @error="imageError"></image>
 		</view>
 		<view class="content">
 			<view class="content-header">

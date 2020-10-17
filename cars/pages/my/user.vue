@@ -3,7 +3,7 @@
 		<u-navbar back-text=" " :background="background" back-icon-color="#fff"  title-color="#fff" @tap="back" title="用户信息"></u-navbar>
 
 		<view class="u-flex">
-			<image src="../../static/login-banner.jpg" mode="widthFix" @error="imageError"></image>
+			<image src="../../static/login-banner.jpg" mode="heightFix" @error="imageError"></image>
 		</view>
 		<view class="page-content">
 			<view class="u-m-t-20">
@@ -60,9 +60,6 @@
 </script>
 
 <style lang="scss">
-	.u-flex image{
-		width: 100%;
-	}
 	.camera {
 		width: 54px;
 		height: 44px;
