@@ -1,16 +1,7 @@
 
 <template>
   <div class="app-container">
-    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
-      <el-form-item label="" prop="id">
-        <el-input
-          v-model="queryParams.id"
-          placeholder="请输入"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="100px">
       <el-form-item label="线路名称" prop="name">
         <el-input
           v-model="queryParams.name"
@@ -20,77 +11,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="出发时间" prop="departed_at">
-        <el-time-picker
-          v-model="queryParams.departed_at"
-          format="HH:mm:ss"
-          value-format="HH:mm:ss"
-          :picker-options="{&quot;selectableRange&quot;:&quot;00:00:00-23:59:59&quot;}"
-          :style="{width: '100%'}"
-          placeholder="请选择出发时间"
-          clearable
-        />
-      </el-form-item>
-
-      <el-form-item label="到达时间" prop="arrivedAt">
-        <el-time-picker
-          v-model="queryParams.arrivedAt"
-          format="HH:mm:ss"
-          value-format="HH:mm:ss"
-          :picker-options="{&quot;selectableRange&quot;:&quot;00:00:00-23:59:59&quot;}"
-          :style="{width: '100%'}"
-          placeholder="请选择到达时间"
-          clearable
-        />
-      </el-form-item>
-      <el-form-item label="换站截止时间" prop="changeExpiredAt">
-        <el-time-picker
-          v-model="queryParams.changeExpiredAt"
-          format="HH:mm:ss"
-          value-format="HH:mm:ss"
-          :picker-options="{&quot;selectableRange&quot;:&quot;00:00:00-23:59:59&quot;}"
-          :style="{width: '100%'}"
-          placeholder="请选择换站截止时间"
-          clearable
-        />
-      </el-form-item>
-      <el-form-item label="绑定车辆" prop="carIdsSelected">
-        <el-input
-          v-model="queryParams.carIdsSelected"
-          placeholder="请选择车辆"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="创建时间" prop="createdAt">
-        <el-input
-          v-model="queryParams.createdAt"
-          placeholder="请输入创建时间"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="更新时间" prop="updatedAt">
-        <el-input
-          v-model="queryParams.updatedAt"
-          placeholder="请输入更新时间"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="" prop="deletedAt">
-        <el-input
-          v-model="queryParams.deletedAt"
-          placeholder="请输入"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -133,12 +53,8 @@
     </el-row>
 
     <el-table v-loading="loading" :data="scblinesList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" /><el-table-column
-        label=""
-        align="center"
-        prop="id"
-        :show-overflow-tooltip="true"
-      /><el-table-column
+      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column
         label="线路名称"
         align="center"
         prop="name"
@@ -162,7 +78,7 @@
       /><el-table-column
         label="绑定车辆"
         align="center"
-        prop="carIdsSelected"
+        prop="carNos"
         :show-overflow-tooltip="true"
       /><el-table-column
         label="创建时间"

@@ -22,6 +22,9 @@
 				isback:false,
 				phone: "17620323840",
 				password: "123456",
+				background: {
+					backgroundColor: '#12C497',
+				},
 			}
 		},
 		methods: {

@@ -42,7 +42,50 @@ func GetScbStudentsList(c *gin.Context) {
 	result, count, err := data.GetPage(pageSize, pageIndex)
 	tools.HasError(err, "", -1)
 
-	app.PageOK(c, result, count, pageIndex, pageSize, "")
+	var studentsData []models.ScbStudents
+	for _, student := range result{
+		//线路
+		lineModel := models.ScbLines{}
+		lineModel.Id = student.LineId
+		lineData, err := lineModel.Get()
+		if nil == err {
+			student.LineName = lineData.Name
+		}
+
+		//下车站点
+		siteModel := models.SchSites{}
+		siteModel.Id = student.SiteIdDown
+		siteDownData, err := siteModel.Get()
+		if nil == err {
+			student.SiteDownName = siteDownData.Name
+		}
+
+		//上车站点
+		siteModel.Id = student.SiteIdUp
+		siteUpData, err := siteModel.Get()
+		if nil == err {
+			student.SiteUpName = siteUpData.Name
+		}
+		//班级信息
+		deptModel := models.ScbDept{}
+		deptModel.DeptId = student.ClassId
+		classData, err := deptModel.Get()
+		if nil == err {
+			student.ClassName = classData.DeptName
+		}
+
+		//车牌
+		carModel := models.ScbCars{}
+		carModel.Id = student.CarId
+		carData, err := carModel.Get()
+		if nil == err{
+			student.CarNo = carData.CarNo
+		}
+		studentsData = append(studentsData, student)
+	}
+
+
+	app.PageOK(c, studentsData, count, pageIndex, pageSize, "")
 }
 
 func GetScbStudents(c *gin.Context) {

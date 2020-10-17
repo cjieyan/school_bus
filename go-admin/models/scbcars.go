@@ -7,18 +7,19 @@ import (
 )
 
 type ScbCars struct {
-	Id          int    `json:"id" gorm:"type:int(11);"`             //
-	CarNumber   string `json:"carNumber" gorm:"type:varchar(100);"` // 车牌编号
-	CarNo       string `json:"carNo" gorm:"type:varchar(50);"`      // 车牌号
-	SeatsNum    string `json:"seatsNum" gorm:"type:int(11);"`       // 座位数
-	AttendantId int `json:"attendantId" gorm:"type:int(11);"`    // 跟车员
-	LineId		int `json:"line_id gorm:"type:int(11)"`
-	Driver      string `json:"driver" gorm:"type:varchar(50);"`         // 司机
-	Phone       string `json:"phone" gorm:"type:varchar(50);"`      // 手机号
-	Dept        string `json:"dept" gorm:"type:int(11);"`           // 所属部门
-	IsDelete    int `json:"isDelete" gorm:"type:int(11);"`       // 0正常 1已删除
-	DataScope   string `json:"dataScope" gorm:"-"`
-	Params      string `json:"params"  gorm:"-"`
+	Id            int    `json:"id" gorm:"type:int(11);"`             //
+	CarNumber     string `json:"carNumber" gorm:"type:varchar(100);"` // 车牌编号
+	CarNo         string `json:"carNo" gorm:"type:varchar(50);"`      // 车牌号
+	SeatsNum      string `json:"seatsNum" gorm:"type:int(11);"`       // 座位数
+	AttendantId   int    `json:"attendantId" gorm:"type:int(11);"`    // 跟车员
+	LineId        int    `json:"line_id gorm:"type:int(11)"`
+	Driver        string `json:"driver" gorm:"type:varchar(50);"` // 司机
+	Phone         string `json:"phone" gorm:"type:varchar(50);"`  // 手机号
+	Dept          string `json:"dept" gorm:"type:int(11);"`       // 所属部门
+	IsDelete      int    `json:"isDelete" gorm:"type:int(11);"`   // 0正常 1已删除
+	DataScope     string `json:"dataScope" gorm:"-"`
+	Params        string `json:"params"  gorm:"-"`
+	AttendantName string `json:"attendantName" gorm:"-"`
 	BaseModel
 }
 
@@ -63,7 +64,7 @@ func (e *ScbCars) Get() (ScbCars, error) {
 		table = table.Where("phone = ?", e.Phone)
 	}
 
-	if e.AttendantId != 0{
+	if e.AttendantId != 0 {
 		table = table.Where("attendant_id = ? ", e.AttendantId)
 	}
 	if err := table.First(&doc).Error; err != nil {
@@ -111,7 +112,18 @@ func (e *ScbCars) GetPage(pageSize int, pageIndex int) ([]ScbCars, int, error) {
 		return nil, 0, err
 	}
 	table.Where("`is_delete` = 0").Count(&count)
-	return doc, count, nil
+	var carsData []ScbCars
+	for _, car := range doc {
+		teacherModel := ScbTeachers{}
+		teacherModel.Id = car.AttendantId
+		teacherData, err := teacherModel.Get()
+		if nil == err{
+			car.AttendantName = teacherData.Name
+		}
+		carsData = append(carsData, car)
+	}
+
+	return carsData, count, nil
 }
 
 // 更新ScbCars 不可以更新"", 0, false值
@@ -163,7 +175,7 @@ func (e *ScbCars) BatchDelete(id []int) (Result bool, err error) {
 	return
 }
 
-func (e *ScbCars) GetAll()([]MenuLable, error){
+func (e *ScbCars) GetAll() ([]MenuLable, error) {
 	var doc []ScbCars
 	table := orm.Eloquent.Select("*").Table(e.TableName())
 
@@ -190,8 +202,9 @@ func (e *ScbCars) GetAll()([]MenuLable, error){
 
 	return m, nil
 }
+
 //多个id获取车辆列表
-func (e ScbCars) GetbyIds( ids []int) ([]ScbCars, error) {
+func (e ScbCars) GetbyIds(ids []int) ([]ScbCars, error) {
 	var doc []ScbCars
 
 	table := orm.Eloquent.Select("*").Table(e.TableName())

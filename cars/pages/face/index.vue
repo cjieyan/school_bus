@@ -464,6 +464,7 @@
 				uni.navigateBack({
 					success: function() {
 						beforePage.onLoad();
+						clearInterval(this.timer)
 					}
 				})
 			},
@@ -495,6 +496,7 @@
 			},
 			takephone() {
 				this.tip = "正在识别"
+				this.tipclass = "tips yellow"
 				console.log("ee")
 				const ctx = wx.createCameraContext()
 				console.log(ctx)
@@ -534,11 +536,11 @@
 											"user_id": this.userid
 										},
 										success: (res) => {
-											console.log("--------学生信息------")
+											console.log("--------学生信息start------")
 											console.log(res)
 											console.log(res.data.data)
 											//
-											if (res.code == 200) {
+											if (res.data.code == 200) {
 												this.tipclass = "tips green"
 												this.tip = "识别成功"
 												this.student = res.data
@@ -546,7 +548,7 @@
 											}
 											console.log("this.student")
 											console.log(res.data.data.id)
-											console.log("----------学生信息--------")
+											console.log("----------学生信息 end--------")
 											console.log(res.data)
 											var token = uni.getStorageSync('token')
 											uni.request({
@@ -561,6 +563,12 @@
 												success: (res) => {
 													console.log("打卡结果-  --------")
 													console.log(res)
+													if ( 200 == res.data.code){
+														this.tipclass = "tips green"
+													}else{
+														this.tipclass = "tips red"
+													}
+													this.tip = res.data.msg
 													this.$store.commit('changecantakephone', true)
 													this.$store.commit('setstudent', {
 														"studentCount": this.$store.state.student.studentCount,
@@ -583,7 +591,6 @@
 								} else {
 									this.tipclass = "tips red"
 									for(var i = 0; i< this.faceError.length; i++){
-		
 										if(this.faceError[i].code == res.data.error_code){
 											this.tip = this.faceError[i].msg
 											break
@@ -671,8 +678,8 @@
 	}
 
 	.camera camera {
-		width: 220px;
-		height: 220px;
+		width: 300px;
+		height: 300px;
 		position: absolute;
 		display: flex;
 		align-items: center;

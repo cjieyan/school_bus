@@ -53,6 +53,7 @@
     </el-row>
 
     <el-table v-loading="loading" :data="scbstudentsList" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center" />
       <el-table-column
         label="学号"
         align="center"
@@ -67,27 +68,27 @@
       /><el-table-column
         label="班级"
         align="center"
-        prop="classId"
+        prop="className"
         :show-overflow-tooltip="true"
       /><el-table-column
         label="线路"
         align="center"
-        prop="lineId"
+        prop="lineName"
         :show-overflow-tooltip="true"
       /><el-table-column
-        label="站点名称"
+        label="上车站点名称"
         align="center"
-        prop="siteName"
+        prop="siteUpName"
         :show-overflow-tooltip="true"
       /><el-table-column
-        label="站点"
+        label="下车站点名称"
         align="center"
-        prop="siteId"
+        prop="siteDownName"
         :show-overflow-tooltip="true"
       /><el-table-column
         label="车辆"
         align="center"
-        prop="carId"
+        prop="carNo"
         :show-overflow-tooltip="true"
       /><el-table-column
         label="家长电话"
@@ -141,7 +142,7 @@
               />
             </el-form-item>
           </el-col>
-          <el-col :span="12" style="position: absolute ;right: 10px">
+          <el-col :span="12" style="position: absolute ;right: 10px;z-index: 5">
             <el-form-item label="图片" prop="picture">
               <el-upload
                 ref="picture"
@@ -173,13 +174,13 @@
         <el-row :gutter="15">
           <el-col :span="12">
             <el-form-item label="班级" prop="classId">
-              <treeselect
+              <el-cascader
                 v-model="form.classId"
                 :options="deptOptions"
-                :normalizer="normalizer"
-                :show-count="true"
-                placeholder="选择班级"
-                :is-disabled="isEdit"
+                :props="classIdProps"
+                :style="{width: '100%'}"
+                placeholder="请选择级联选择"
+                clearable
               />
             </el-form-item>
           </el-col>
@@ -270,13 +271,11 @@
 <script>
 import { addScbStudents, delScbStudents, getScbStudents, listScbStudents, updateScbStudents } from '@/api/scbstudents'
 import { getDeptList } from '@/api/scbdept'
-import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import { getAllLines, getLineCars, getLineSites } from '@/api/scblines'
 
 export default {
   name: 'Scbstudents',
-  components: { Treeselect },
   data() {
     return {
       // 遮罩层
@@ -361,7 +360,12 @@ export default {
                 ],
       classId:
                 [
-                  { required: true, message: '班级不能为空', trigger: 'blur' }
+                  {
+                    required: true,
+                    type: 'array',
+                    message: '请至少选择一个班级',
+                    trigger: 'change'
+                  }
                 ],
       lineId:
                 [
@@ -391,6 +395,12 @@ export default {
                 [
                   { required: true, message: '0未删除 1已删除不能为空', trigger: 'blur' }
                 ]
+      },
+      classIdProps: {
+        'multiple': false,
+        'label': 'label',
+        'value': 'value',
+        'children': 'children'
       }
     }
   },
@@ -429,27 +439,6 @@ export default {
 
       // 车辆列表
     },
-    /** 转换班级数据结构 */
-    normalizer(node) {
-      if (node.children && !node.children.length) {
-        delete node.children
-      }
-      return {
-        id: node.deptId,
-        label: node.deptName,
-        children: node.children
-      }
-    },
-    normalizerLines(node) {
-      if (node.children && !node.children.length) {
-        delete node.children
-      }
-      return {
-        id: node.id,
-        label: node.name
-        // children: node.children
-      }
-    },
     /** 查询班级下拉树结构 */
     getLinesSelect(e) {
       getAllLines().then(response => {
@@ -466,12 +455,21 @@ export default {
     },
     getTreeselect(e) {
       getDeptList().then(response => {
-        this.deptOptions = []
-        const dept = { deptId: 0, deptName: '请选择', children: [] }
-        dept.children = response.data
-        console.log('dept.children....', dept.children)
-        this.deptOptions.push(dept)
+        this.deptOptions = this.getTreeData(response.data)
       })
+    },
+    getTreeData(data) {
+      // 循环遍历json数据
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].children.length < 1) {
+          // children若为空数组，则将children设为undefined
+          data[i].children = undefined
+        } else {
+          // children若不为空数组，则继续 递归调用 本方法
+          this.getTreeData(data[i].children)
+        }
+      }
+      return data
     },
     /** 查询参数列表 */
     getList() {
@@ -576,6 +574,9 @@ export default {
             this.form.isPickUp = 1
           } else {
             this.form.isPickUp = 0
+          }
+          if (this.form.classId.length > 0) {
+            this.form.classId = this.form.classId[this.form.classId.length - 1]
           }
           if (this.form.id !== undefined) {
             updateScbStudents(this.form).then(response => {

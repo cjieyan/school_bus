@@ -9,18 +9,19 @@ import (
 )
 
 type ScbLines struct {
-	Id              int    `json:"id" gorm:"type:int(11);primary_key"`   //
-	Name            string `json:"name" gorm:"type:varchar(250);"`       // 线路名称
+	Id              int    `json:"id" gorm:"type:int(11);primary_key"`        //
+	Name            string `json:"name" gorm:"type:varchar(250);"`            // 线路名称
 	DepartedAt      string `json:"departed_at" gorm:"type:varchar(100);"`     // 出发时间
-	ArrivedAt       string `json:"arrivedAt" gorm:"type:varchar(11);"`       // 到达时间
+	ArrivedAt       string `json:"arrivedAt" gorm:"type:varchar(11);"`        // 到达时间
 	ChangeExpiredAt string `json:"changeExpiredAt" gorm:"type:varchar(100);"` // 换站截止时间
-	CarIds          string `json:"carIds" gorm:"type:varchar(200);"`     // 绑定的车辆
-	IsDelete        int   `json:"isDelete" gorm:"type:tinyint(4);"`     // 0正常 1已删除
+	CarIds          string `json:"carIds" gorm:"type:varchar(200);"`          // 绑定的车辆
+	IsDelete        int    `json:"isDelete" gorm:"type:tinyint(4);"`          // 0正常 1已删除
 	DataScope       string `json:"dataScope" gorm:"-"`
 	Params          string `json:"params"  gorm:"-"`
 	CarIdsSelected  []int  `json:"carIdsSelected" gorm:"-"`
 	CarIdsSubmit    []int  `json:"carIdsSubmit" gorm:"-"`
-	CarId  			int  `json:"carId" gorm:"-"`			// find_in_set 查询
+	CarId           int    `json:"carId" gorm:"-"` // find_in_set 查询
+	CarNos          string  `json:"carNos" gorm:"-"`
 	BaseModel
 }
 
@@ -32,11 +33,11 @@ func (ScbLines) TableName() string {
 func (e *ScbLines) Create() (ScbLines, error) {
 	var doc ScbLines
 	carIds := ""
-	for _, carId := range e.CarIdsSubmit{
-		if len(carIds) > 0{
-			carIds = carIds + "," + strconv.Itoa( carId )
-		}else{
-			carIds = strconv.Itoa( carId )
+	for _, carId := range e.CarIdsSubmit {
+		if len(carIds) > 0 {
+			carIds = carIds + "," + strconv.Itoa(carId)
+		} else {
+			carIds = strconv.Itoa(carId)
 		}
 	}
 	fmt.Println("doc.CarIdsSubmit...,  carIds", e.CarIdsSubmit, carIds)
@@ -54,7 +55,6 @@ func (e *ScbLines) Create() (ScbLines, error) {
 		carModel.LineId = e.Id
 		carModel.Update(carId)
 	}
-
 
 	doc = *e
 	return doc, nil
@@ -88,7 +88,7 @@ func (e *ScbLines) Get() (ScbLines, error) {
 	if e.CarIds != "" {
 		table = table.Where("car_ids = ?", e.CarIds)
 	}
-	if e.CarId != 0{
+	if e.CarId != 0 {
 		table = table.Where("find_in_set( ?, car_ids )", e.CarId)
 	}
 
@@ -97,8 +97,8 @@ func (e *ScbLines) Get() (ScbLines, error) {
 	}
 	carIds := doc.CarIds
 	carIdsSelected := strings.Split(carIds, ",")
-	for i:=0; i < len(carIdsSelected); i++ {
-		carId , _ := strconv.Atoi(carIdsSelected[i])
+	for i := 0; i < len(carIdsSelected); i++ {
+		carId, _ := strconv.Atoi(carIdsSelected[i])
 		doc.CarIdsSelected = append(doc.CarIdsSelected, carId)
 	}
 	return doc, nil
@@ -115,8 +115,8 @@ func (e *ScbLines) GetCarIds() (ScbLines, error) {
 	}
 	carIds := doc.CarIds
 	carIdsSelected := strings.Split(carIds, ",")
-	for i:=0; i < len(carIdsSelected); i++ {
-		carId , _ := strconv.Atoi(carIdsSelected[i])
+	for i := 0; i < len(carIdsSelected); i++ {
+		carId, _ := strconv.Atoi(carIdsSelected[i])
 		doc.CarIdsSelected = append(doc.CarIdsSelected, carId)
 	}
 
@@ -166,6 +166,7 @@ func (e *ScbLines) GetPage(pageSize int, pageIndex int) ([]ScbLines, int, error)
 		return nil, 0, err
 	}
 	table.Where("`deleted_at` IS NULL").Count(&count)
+
 	return doc, count, nil
 }
 
@@ -176,11 +177,11 @@ func (e *ScbLines) Update(id int) (update ScbLines, err error) {
 	}
 	//参数1:是要修改的数据
 	carIds := ""
-	for _, carId := range e.CarIdsSubmit{
-		if len(carIds) > 0{
-			carIds = carIds + "," + strconv.Itoa( carId )
-		}else{
-			carIds = strconv.Itoa( carId )
+	for _, carId := range e.CarIdsSubmit {
+		if len(carIds) > 0 {
+			carIds = carIds + "," + strconv.Itoa(carId)
+		} else {
+			carIds = strconv.Itoa(carId)
 		}
 	}
 
@@ -190,7 +191,6 @@ func (e *ScbLines) Update(id int) (update ScbLines, err error) {
 		return
 	}
 	//清理当前线路的车辆绑定的线路id
-
 
 	//先解绑车辆
 	carModel := ScbCars{}
@@ -207,7 +207,7 @@ func (e *ScbLines) Update(id int) (update ScbLines, err error) {
 
 	carModel = ScbCars{}
 	//重新绑定车辆
-	for _, carId := range e.CarIdsSubmit{
+	for _, carId := range e.CarIdsSubmit {
 		carModel.LineId = e.Id
 		carModel.Update(carId)
 	}
@@ -233,8 +233,9 @@ func (e *ScbLines) BatchDelete(id []int) (Result bool, err error) {
 	Result = true
 	return
 }
+
 //获取所有线路
-func (e *ScbLines) GetAll()([]ScbLines, error){
+func (e *ScbLines) GetAll() ([]ScbLines, error) {
 	var doc []ScbLines
 	table := orm.Eloquent.Select("*").Table(e.TableName())
 
@@ -250,7 +251,6 @@ func (e *ScbLines) GetAll()([]ScbLines, error){
 	if err := table.Find(&doc).Error; err != nil {
 		return nil, err
 	}
-
 
 	return doc, nil
 }

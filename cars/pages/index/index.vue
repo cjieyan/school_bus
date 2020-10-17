@@ -14,13 +14,18 @@
 						<u-icon name="scan" :size="46"></u-icon>
 						<view class="grid-text">刷脸</view>
 					</u-grid-item>
-					<u-grid-item :index="1" @tap="carinfo">
+				<!-- 	<u-grid-item :index="1" @tap="carinfo">
 						<u-icon name="file-text" :size="46"></u-icon>
 						<view class="grid-text">跟车记录</view>
 					</u-grid-item>
 					<u-grid-item :index="2" @tap="student">
 						<u-icon name="account" :size="46"></u-icon>
 						<view class="grid-text">学生</view>
+					</u-grid-item> -->
+					<!-- <u-grid-item :index="2" @tap="regist">
+						<u-icon name="account" :size="46"></u-icon>
+						<view class="grid-text">注册人脸</view>
+					</u-grid-item> -->
 					</u-grid-item>
 				</u-grid>
 			</view>
@@ -34,7 +39,7 @@
 			return {
 				isback: false,
 				background: {
-					backgroundColor: '#12c497',
+					backgroundColor: '#12C497',
 				},
 				list: ['integral', 'kefu-ermai', 'coupon', 'gift', 'scan', 'pause-circle', 'wifi', 'email', 'list'],
 				isSwiper: false,
