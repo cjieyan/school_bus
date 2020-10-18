@@ -4,6 +4,6 @@ RUN mkdir -p /app
 COPY . /app
 WORKDIR /app
 EXPOSE 9527
-RUN npm install -g cnpm --registry=https://registry.npm.taobao.org && \
-    cnpm install --registry=https://registry.npm.taobao.org
-CMD ["cnpm", "run", "dev"]
+RUN npm rebuild node-sass && npm install -g npm --registry=https://registry.npm.taobao.org && \
+    npm install --registry=https://registry.npm.taobao.org
+CMD ["npm", "run", "dev"]
