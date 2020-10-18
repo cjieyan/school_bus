@@ -1,10 +1,11 @@
-FROM node:12.18.4-alpine3.9
+FROM node:12.18.4
+USER root
 ENV HOST 0.0.0.0
 RUN mkdir -p /app
 COPY . /app
 WORKDIR /app
+RUN npm -g config set user root && \
+    npm rebuild node-sass && \
+    npm install --registry=https://registry.npm.taobao.org
 EXPOSE 9527
-RUN npm install -g cnpm --registry=https://registry.npm.taobao.org && \
-    cnpm rebuild node-sass && \
-    cnpm install --registry=https://registry.npm.taobao.org
-CMD ["cnpm", "run", "dev"]
+CMD ["npm", "run", "dev"]

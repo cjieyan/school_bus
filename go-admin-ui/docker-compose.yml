@@ -1,13 +1,18 @@
 version: "3"
 services:
   nodejs:
-    build: .
+    image: node:12.18.4
+    working_dir: /usr/node/app
+    volumes:
+      - ${PWD}:/usr/node/app
     privileged: true
     container_name: nodejs12
     restart: always
     ports:
       - 8002:9527
-    volumes:
-      - .:/app
-      - /app/node_modules
     tty: true
+    entrypoint: bash
+    command:
+      - -c
+      - |
+        npm rebuild node-sass && npm run dev
