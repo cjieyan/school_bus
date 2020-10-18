@@ -1,0 +1,14 @@
+version: "3"
+services:
+  nodejs:
+    build: .
+    privileged: true
+    container_name: nodejs12
+    restart: always
+    ports:
+      - 8002:9527
+    volumes:
+      - .:/app
+      - /app/node_modules
+    tty: true
+    command: "cnpm run dev"
