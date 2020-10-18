@@ -111,6 +111,13 @@ func (a Api)Lines(c *gin.Context){
 
 // 单一线路信息
 func (a Api) LineInfo(c *gin.Context) {
+
+	objParams := models.LineInfoReq{}
+	err := c.ShouldBindJSON(&objParams)
+	if nil != err {
+		tools.HasError(err, "", -1)
+	}
+
 	userId := c.GetInt(models.UserId)
 
 	lineModel := models.ScbLines{}
@@ -125,6 +132,7 @@ func (a Api) LineInfo(c *gin.Context) {
 
 	//获取车辆信息
 	carModel := models.ScbCars{}
+	carModel.LineId = objParams.LineId
 	carModel.AttendantId = teacher.Id
 	carData, err := carModel.Get()
 
@@ -167,9 +175,9 @@ func (a Api) LineInfo(c *gin.Context) {
 // 上车or下册刷脸打卡
 func (a Api) Swipe(c *gin.Context) {
 
-	data := models.SwipeReq{}
+	objParams := models.SwipeReq{}
 
-	err := c.ShouldBindJSON(&data)
+	err := c.ShouldBindJSON(&objParams)
 	userId := c.GetInt(models.UserId)
 
 	teacherModel := models.ScbTeachers{}
@@ -186,9 +194,10 @@ func (a Api) Swipe(c *gin.Context) {
 	//获取车辆信息
 	carModel := models.ScbCars{}
 	carModel.AttendantId = teacher.Id
+	carModel.LineId = objParams.LineId
 	carData, err := carModel.Get()
 
-	tools.HasError(err, "", 500)
+	tools.HasError(err, "无法查询正常线路信息", 500)
 
 	//年月日
 	year := time.Now().Year()
@@ -196,11 +205,11 @@ func (a Api) Swipe(c *gin.Context) {
 	day := time.Now().Day()
 	ymd := strconv.Itoa(year) + month + strconv.Itoa(day)
 
-	studentIdStr := strconv.Itoa(data.StudentId)
+	studentIdStr := strconv.Itoa(objParams.StudentId)
 
 	//获取学生信息
 	student := models.ScbStudents{}
-	student.Id = data.StudentId
+	student.Id = objParams.StudentId
 	studentData, err := student.Get()
 	tools.HasError(err, "学生信息不存在", 500)
 
@@ -215,7 +224,7 @@ func (a Api) Swipe(c *gin.Context) {
 	now := int(time.Now().Unix())
 
 	//记录学生刷脸时间  用于标记上/下车状态 以及上/下车时间
-	swipeAtKey := tools.Keys{}.SwipeAt(ymd, teacher.Id)
+	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
 	swipeData, err := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
 	fmt.Println(", err ...", err)
 	fmt.Println("swipeData,  ...", swipeData)
@@ -227,10 +236,9 @@ func (a Api) Swipe(c *gin.Context) {
 		var swipeAtInfo models.SwipeAt
 		err = json.Unmarshal([]byte(swipeData), &swipeAtInfo)
 
-		fmt.Println("swipeAtInfo....", swipeAtInfo, now-swipeAtInfo.Time)
 		if nil == err {
 			//距离上次上车刷脸成功大于5分钟
-			if 0 == swipeAtInfo.Status && (now-swipeAtInfo.Time) > 60*1 {
+			if 0 == swipeAtInfo.Status && (now - swipeAtInfo.Time) > 60*1 {
 				//将标记为下车状态
 				swipeAtStruct := models.SwipeAt{
 					Status: 1,
@@ -274,12 +282,53 @@ func (a Api) Swipe(c *gin.Context) {
 	}
 }
 
+func (a Api) LineStart(c *gin.Context){
+	userId := c.GetInt(models.UserId)
+	teacherModel := models.ScbTeachers{}
+
+	//获取跟车员信息
+	teacherModel.Id = userId
+	teacher, err := teacherModel.Get()
+	if teacher.PostId != 1 {
+		tools.HasError(err, "您不是跟车员", -1)
+	}
+
+	swipeNowKey := tools.Keys{}.SwipeNow()
+	swipeRecordKey := tools.Keys{}.SwipeNowRecord(teacher.Id)
+	now := int(time.Now().Unix())
+	nowStr := strconv.Itoa(now)
+	tools.RdbHSet(swipeNowKey, swipeRecordKey, nowStr)
+	app.OK(c, nil, "操作成功")
+}
+
+func(a Api)LineCheck(c *gin.Context){
+
+	userId := c.GetInt(models.UserId)
+	teacherModel := models.ScbTeachers{}
+
+	//获取跟车员信息
+	teacherModel.Id = userId
+	teacher, err := teacherModel.Get()
+	if teacher.PostId != 1 {
+		tools.HasError(err, "您不是跟车员", -1)
+	}
+
+	swipeNowKey := tools.Keys{}.SwipeNow()
+	swipeRecordKey := tools.Keys{}.SwipeNowRecord(teacher.Id)
+
+	lineStartAt, err := redis.Int( tools.RdbHGet(swipeNowKey, swipeRecordKey) )
+	rsp := models.LineCheckRsp{}
+	rsp.StartAt = lineStartAt
+	//rsp.Line =
+	app.OK(c, rsp, "操作成功")
+}
+
 // 线路结束
 func (a Api) LineFinish(c *gin.Context) {
 
-	data := models.LineFinishReq{}
+	objParams := models.LineFinishReq{}
 
-	err := c.ShouldBindJSON(&data)
+	err := c.ShouldBindJSON(&objParams)
 	userId := c.GetInt(models.UserId)
 
 	teacherModel := models.ScbTeachers{}
@@ -288,21 +337,38 @@ func (a Api) LineFinish(c *gin.Context) {
 	teacherModel.Id = userId
 	teacher, err := teacherModel.Get()
 	if teacher.PostId != 1 {
-		tools.HasError(err, "您不是跟车员, sch_teachers表的postId = 1", -1)
+		tools.HasError(err, "您不是跟车员", -1)
 	}
+
+	//获取车辆信息
+	carModel := models.ScbCars{}
+	carModel.AttendantId = teacher.Id
+	carModel.LineId = objParams.LineId
+	_, err = carModel.Get()
+	tools.HasError(err, "无法查询正常线路信息", 500)
 
 	year := time.Now().Year()
 	month := time.Now().Format("01")
 	day := time.Now().Day()
 	ymd := strconv.Itoa(year) + month + strconv.Itoa(day)
 	//清除当前行程的刷脸数据
-	swipeAtKey := tools.Keys{}.SwipeAt(ymd, teacher.Id)
+	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
 	tools.RdbDel(swipeAtKey)
+
+	//结束跟车员当前行程
+	swipeNowKey := tools.Keys{}.SwipeNow()
+	swipeNowRecordKey := tools.Keys{}.SwipeNowRecord(teacher.Id)
+
+	tools.RdbHDel(swipeNowKey, swipeNowRecordKey)
+
 	app.OK(c, nil, "操作成功")
 }
 
 //此线路的所有
 func (a Api) LineStudents(c *gin.Context) {
+	objParams := models.LineStudentsReq{}
+	err := c.ShouldBindJSON(&objParams)
+
 	userId := c.GetInt(models.UserId)
 
 	teacherModel := models.ScbTeachers{}
@@ -317,6 +383,7 @@ func (a Api) LineStudents(c *gin.Context) {
 	//获取车辆信息
 	carModel := models.ScbCars{}
 	carModel.AttendantId = teacher.Id
+	carModel.LineId = objParams.LineId
 	carData, err := carModel.Get()
 
 	tools.HasError(err, "车辆信息不存在", -1)
@@ -331,7 +398,9 @@ func (a Api) LineStudents(c *gin.Context) {
 	month := time.Now().Format("01")
 	day := time.Now().Day()
 	ymd := strconv.Itoa(year) + month + strconv.Itoa(day)
-	swipeAtKey := tools.Keys{}.SwipeAt(ymd, teacher.Id)
+
+	//获取此线路打卡信息
+	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
 	studentsSwipe, err := tools.RdbHGetAll(swipeAtKey)
 	swipesData := make(map[int]int)
 	studentId := 0

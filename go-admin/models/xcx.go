@@ -10,6 +10,7 @@ type XcxLoginRsp struct {
 }
 type SwipeReq struct {
 	StudentId int `json:"student_id"`
+	LineId int `json:"line_id"`
 }
 type SwipeRsp struct {
 	Status int `json:"status"`
@@ -22,4 +23,18 @@ type SwipeAt struct {
 
 type LineFinishReq struct {
 	StudentId int `json:"student_id"`
+	LineId int `json:"line_id"`
+}
+type LineInfoReq struct {
+	LineId int `json:"line_id"`
+}
+type LineStudentsReq struct{
+	LineId int `json:"line_id"`
+}
+type LineCheckReq struct{
+	LineId int `json:"line_id"`
+}
+type LineCheckRsp struct{
+	StartAt int `json:"start_at"`
+	Line ScbLines `json:"line"`
 }

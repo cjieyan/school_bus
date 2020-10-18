@@ -16,8 +16,16 @@ func (k Keys)GetOn( ymd string, teacherId int) string{
 	return "getOn:" + ymd + ":" + strconv.Itoa(teacherId)
 }
 //记录刷脸时间
-func (k Keys)SwipeAt(ymd string, teacherId int) string{
-	return "swipeAt:" + ymd + ":" + strconv.Itoa(teacherId)
+func (k Keys)SwipeAt(ymd string, lineId int) string{
+	return "swipeAt:" + ymd + ":" + strconv.Itoa(lineId)
+}
+//记录正在刷脸的时间
+func (k Keys)SwipeNow() string{
+	return "swipeNow"
+}
+//记录正在刷脸的时间
+func (k Keys)SwipeNowRecord(teacherId int) string{
+	return "swipeNowRecord:" + strconv.Itoa(teacherId)
 }
 //下车
 func (k Keys)GetOff(ymd string, teacherId int) string{

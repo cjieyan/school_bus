@@ -191,6 +191,18 @@ func RdbHGet(key, field string) (interface{}, error) {
 }
 
 /**
+redis HDEL
+*/
+func RdbHDel(key string, field string) error {
+	_, err := Rdb.Do("DEL", key, field)
+	if err != nil {
+		//fmt.Println(err)
+		return err
+	}
+	return nil
+}
+
+/**
 redis hGetAll
 return map
 */
@@ -202,6 +214,18 @@ func RdbHGetAll(key string) (map[string]string, error) {
 		return nil, err
 	}
 	return data, nil
+}
+
+/**
+redis HEXISTS
+*/
+func RdbHExists(key string, field string) bool {
+	b, err := redis.Bool(Rdb.Do("HEXISTS", key, field))
+	if err != nil {
+		//fmt.Println(err)
+		return false
+	}
+	return b
 }
 
 /**
