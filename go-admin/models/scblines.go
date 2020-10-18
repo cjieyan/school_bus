@@ -9,19 +9,21 @@ import (
 )
 
 type ScbLines struct {
-	Id              int    `json:"id" gorm:"type:int(11);primary_key"`        //
-	Name            string `json:"name" gorm:"type:varchar(250);"`            // 线路名称
-	DepartedAt      string `json:"departed_at" gorm:"type:varchar(100);"`     // 出发时间
-	ArrivedAt       string `json:"arrivedAt" gorm:"type:varchar(11);"`        // 到达时间
-	ChangeExpiredAt string `json:"changeExpiredAt" gorm:"type:varchar(100);"` // 换站截止时间
-	CarIds          string `json:"carIds" gorm:"type:varchar(200);"`          // 绑定的车辆
-	IsDelete        int    `json:"isDelete" gorm:"type:tinyint(4);"`          // 0正常 1已删除
-	DataScope       string `json:"dataScope" gorm:"-"`
-	Params          string `json:"params"  gorm:"-"`
-	CarIdsSelected  []int  `json:"carIdsSelected" gorm:"-"`
-	CarIdsSubmit    []int  `json:"carIdsSubmit" gorm:"-"`
-	CarId           int    `json:"carId" gorm:"-"` // find_in_set 查询
-	CarNos          string  `json:"carNos" gorm:"-"`
+	Id              int      `json:"id" gorm:"type:int(11);primary_key"`        //
+	Name            string   `json:"name" gorm:"type:varchar(250);"`            // 线路名称
+	DepartedAt      string   `json:"departed_at" gorm:"type:varchar(100);"`     // 出发时间
+	ArrivedAt       string   `json:"arrivedAt" gorm:"type:varchar(11);"`        // 到达时间
+	ChangeExpiredAt string   `json:"changeExpiredAt" gorm:"type:varchar(100);"` // 换站截止时间
+	CarIds          string   `json:"carIds" gorm:"type:varchar(200);"`          // 绑定的车辆
+	IsDelete        int      `json:"isDelete" gorm:"type:tinyint(4);"`          // 0正常 1已删除
+	DataScope       string   `json:"dataScope" gorm:"-"`
+	Params          string   `json:"params"  gorm:"-"`
+	CarIdsSelected  []int    `json:"carIdsSelected" gorm:"-"`
+	CarIdsSubmit    []int    `json:"carIdsSubmit" gorm:"-"`
+	CarId           int      `json:"carId" gorm:"-"` // find_in_set 查询
+	CarNos          string   `json:"carNos" gorm:"-"`
+	StartSite       SchSites `json:"startSite" gorm:"-"`
+	EndSite         SchSites `json:"endSite" gorm:"-"`
 	BaseModel
 }
 

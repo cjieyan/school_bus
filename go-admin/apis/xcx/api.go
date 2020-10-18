@@ -94,6 +94,16 @@ func (a Api)Lines(c *gin.Context){
 	for _, line := range linesData{
 		line.CarNos = carData.CarNo
 		line.CarId = carData.Id
+		siteModel := models.SchSites{}
+		siteModel.LineId = line.Id
+		startSite, err := siteModel.GetStart()
+		if nil == err{
+			line.StartSite = startSite
+		}
+		endSite, err := siteModel.GetEnd()
+		if nil == err{
+			line.EndSite = endSite
+		}
 		linesRetData = append(linesRetData, line)
 	}
 	app.OK(c, linesRetData, "")

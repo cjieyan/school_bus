@@ -148,6 +148,39 @@ func (e *SchSites) GetAll() ([]SchSites, error) {
 	}
 	return doc, nil
 }
+//线路起点
+func (e *SchSites) GetStart()(SchSites, error){
+
+	var doc SchSites
+	table := orm.Eloquent.Table(e.TableName())
+
+	if e.LineId != 0 {
+		table = table.Where("line_id = ?", e.LineId)
+	}
+	table = table.Order("sort ASC")
+
+	if err := table.First(&doc).Error; err != nil {
+		return doc, err
+	}
+	return doc, nil
+}
+
+//线路终点
+func (e *SchSites) GetEnd()(SchSites, error){
+
+	var doc SchSites
+	table := orm.Eloquent.Table(e.TableName())
+
+	if e.LineId != 0 {
+		table = table.Where("line_id = ?", e.LineId)
+	}
+	table = table.Order("sort DESC")
+
+	if err := table.First(&doc).Error; err != nil {
+		return doc, err
+	}
+	return doc, nil
+}
 
 // 获取SchSites带分页
 func (e *SchSites) GetPage(pageSize int, pageIndex int) ([]SchSites, int, error) {
