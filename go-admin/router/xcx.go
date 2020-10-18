@@ -17,6 +17,7 @@ func registerXcxRouter(v1 *gin.RouterGroup) {
 	{
 		authGroup.POST("/faceinfo", xcx.Api{}.StudentFaceInfo)
 		authGroup.POST("/sites", xcx.Api{}.Sites)
+		authGroup.GET("/lines", xcx.Api{}.Lines)
 		authGroup.GET("/line-info", xcx.Api{}.LineInfo) //线路信息
 		authGroup.POST("/swipe", xcx.Api{}.Swipe) //打卡上下车
 		authGroup.POST("/line-finish", xcx.Api{}.LineFinish) //结束行程

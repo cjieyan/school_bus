@@ -59,8 +59,47 @@ func (a Api) Sites(c *gin.Context) {
 	tools.HasError(err, "账号异常,请联系管理员", -1)
 	app.OK(c, info, "")
 }
+//多线路信息
+//
+func (a Api)Lines(c *gin.Context){
 
-// 线路信息
+	userId := c.GetInt(models.UserId)
+
+	teacherModel := models.ScbTeachers{}
+
+	//获取跟车员信息
+	teacherModel.Id = userId
+	teacherModel.PostId = 1
+	teacher, err := teacherModel.Get()
+
+	tools.HasError(err, "您尚未绑定线路", -1)
+
+	if teacher.PostId != 1 {
+		tools.HasError(err, "您不是跟车员, sch_teachers表的postId = 1", -1)
+	}
+
+	//获取车辆
+	carModel := models.ScbCars{}
+	carModel.AttendantId = teacher.Id
+	carData, err := carModel.Get()
+	tools.HasError(err, "车辆信息不存在", -1)
+
+	//获取线路
+	lineModel := models.ScbLines{}
+	lineModel.CarId = carData.Id
+	linesData, err := lineModel.GetAll()
+
+	tools.HasError(err, "线路不存在", -1)
+	var linesRetData []models.ScbLines
+	for _, line := range linesData{
+		line.CarNos = carData.CarNo
+		line.CarId = carData.Id
+		linesRetData = append(linesRetData, line)
+	}
+	app.OK(c, linesRetData, "")
+}
+
+// 单一线路信息
 func (a Api) LineInfo(c *gin.Context) {
 	userId := c.GetInt(models.UserId)
 

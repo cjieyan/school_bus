@@ -239,6 +239,10 @@ func (e *ScbLines) GetAll() ([]ScbLines, error) {
 	var doc []ScbLines
 	table := orm.Eloquent.Select("*").Table(e.TableName())
 
+	if e.CarId > 0 {
+		table = table.Where("find_in_set( ?, car_ids )", e.CarId)
+	}
+
 	// 数据权限控制(如果不需要数据权限请将此处去掉)
 	dataPermission := new(DataPermission)
 	dataPermission.UserId, _ = tools.StringToInt(e.DataScope)
