@@ -67,9 +67,9 @@ func (e *ScbCars) Get() (ScbCars, error) {
 	if e.AttendantId != 0 {
 		table = table.Where("attendant_id = ? ", e.AttendantId)
 	}
-	//if e.LineId != 0 {
+	if e.LineId != 0 {
 		table = table.Where("line_id = ? ", e.LineId)
-	//}
+	}
 	if err := table.First(&doc).Error; err != nil {
 		return doc, err
 	}
