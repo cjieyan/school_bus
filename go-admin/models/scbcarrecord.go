@@ -7,12 +7,17 @@ import (
 
 type ScbCarRecord struct {
 	Id        int    `json:"id" gorm:"type:int(11);primary_key"` //
-	StudentId string `json:"studentId" gorm:"type:int(11);"`     // 学生id
-	CarId     string `json:"carId" gorm:"type:int(11);"`         // 车辆id
+	StudentId int `json:"studentId" gorm:"type:int(11);"`     // 学生id
+	CarId     int `json:"carId" gorm:"type:int(11);"`         // 车辆id
 	SiteId    string `json:"siteId" gorm:"type:int(11);"`        // 线路id
 	DataScope string `json:"dataScope" gorm:"-"`
 	CreateBy  string `json:"createBy" gorm:"size:64;"`
 	UpdateBy  string `json:"updateBy" gorm:"size:64;"`
+	QqLongitude  string `json:"qqLongitude" gorm:"size:100;"`
+	QqLatitude  string `json:"qqLatitude" gorm:"size:100;"`
+	Longitude  string `json:"longitude" gorm:"size:100;"`
+	Latitude  string `json:"latitude" gorm:"size:100;"`
+	Prop	int `json:"prop" gorm:"prop"`
 	Params    string `json:"params"  gorm:"-"`
 	BaseModel
 }

@@ -11,6 +11,9 @@ type XcxLoginRsp struct {
 type SwipeReq struct {
 	StudentId int `json:"student_id"`
 	LineId int `json:"line_id"`
+	SiteId int `json:"site_id"`
+	QqLongitude string `json:"qq_longitude"`
+	QqLatitude string `json:"qq_latitude"`
 }
 type SwipeRsp struct {
 	Status int `json:"status"`

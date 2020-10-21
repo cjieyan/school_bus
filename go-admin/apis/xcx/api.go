@@ -252,6 +252,18 @@ func (a Api) Swipe(c *gin.Context) {
 				tools.RdbHSet(swipeAtKey, studentIdStr, string(jsonBytes))
 				tools.RdbSetKeyExp(swipeAtKey, 86400)
 				ret.Status = 1
+
+				//记录下车日志
+				carRecordModel := models.ScbCarRecord{}
+				carRecordModel.CarId = carData.Id
+				carRecordModel.QqLongitude = objParams.QqLongitude
+				carRecordModel.QqLatitude = objParams.QqLatitude
+				carRecordModel.StudentId = objParams.StudentId
+				carRecordModel.Prop = 2
+				carRecordModel.Create()
+
+
+
 				app.OK(c, ret, "下车刷脸成功..")
 			} else if 1 == swipeAtInfo.Status {
 				ret.Status = 1
@@ -274,6 +286,16 @@ func (a Api) Swipe(c *gin.Context) {
 		if err != nil {
 			fmt.Println("记录学生刷脸时间...", err)
 		}
+
+		//记录上车日志
+		carRecordModel := models.ScbCarRecord{}
+		carRecordModel.CarId = carData.Id
+		carRecordModel.QqLongitude = objParams.QqLongitude
+		carRecordModel.QqLatitude = objParams.QqLatitude
+		carRecordModel.StudentId = objParams.StudentId
+		carRecordModel.Prop = 1
+		carRecordModel.Create()
+
 		//记录学生刷脸时间
 		tools.RdbHSet(swipeAtKey, studentIdStr, string(jsonBytes))
 		tools.RdbSetKeyExp(swipeAtKey, 86400)
