@@ -28,7 +28,7 @@ func examplesNoCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMidd
 	v1.GET("/nilcheckrole", nil)
 
 	// {{无需认证路由自动补充在此处请勿删除}} 
- registerScbCarRecordRouter(v1)
+    registerScbCarRecordRouter(v1)
 	//registerOrdersRouter(v1)
 	//registerUserAccountRouter(v1)
 	// registerCarsRecordRouter(v1, authMiddleware)
@@ -43,6 +43,7 @@ func examplesCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMiddle
 	v1.GET("/checkrole", nil)
 
 	// {{认证路由自动补充在此处请勿删除}} 
+    registerScbFollowRecordRouter(v1,authMiddleware)
 	registerScbPostRouter(v1, authMiddleware)
 	registerScbDeptRouter(v1, authMiddleware)
 	registerSchSitesRouter(v1, authMiddleware)
