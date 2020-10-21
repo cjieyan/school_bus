@@ -22,6 +22,11 @@ func GetScbFollowRecordList(c *gin.Context) {
 		pageIndex = tools.StrToInt(err, index)
 	}
 
+	data.LineId = c.Request.FormValue("lineId")
+	data.AttendantId = c.Request.FormValue("attendantId")
+	data.UnGetOn = c.Request.FormValue("unGetOn")
+	data.Leave = c.Request.FormValue("leave")
+
 	data.DataScope = tools.GetUserIdStr(c)
 	result, count, err := data.GetPage(pageSize, pageIndex)
 	tools.HasError(err, "", -1)

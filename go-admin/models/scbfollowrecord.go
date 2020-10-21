@@ -17,8 +17,10 @@ type ScbFollowRecord struct {
 	Leave       string `json:"leave" gorm:"type:int(11);"`         // 请假
 	IsDelete    string `json:"isDelete" gorm:"type:tinyint(4);"`   // 0未删除 1已删除
 	DataScope   string `json:"dataScope" gorm:"-"`
+	Params      string `json:"params"  gorm:"-"`
 	CreateBy    string `json:"createBy"  gorm:"type:varchar(50)"`
 	UpdateBy    string `json:"updateBy"  gorm:"type:varchar(50)"`
+	IsFinished  int    `json:"isFinished" gorm:"type:int(4)"`
 	BaseModel
 }
 
@@ -47,6 +49,22 @@ func (e *ScbFollowRecord) Get() (ScbFollowRecord, error) {
 		table = table.Where("id = ?", e.Id)
 	}
 
+	if e.LineId != "" {
+		table = table.Where("line_id = ?", e.LineId)
+	}
+
+	if e.AttendantId != "" {
+		table = table.Where("attendant_id = ?", e.AttendantId)
+	}
+
+	if e.UnGetOn != "" {
+		table = table.Where("un_get_on = ?", e.UnGetOn)
+	}
+
+	if e.Leave != "" {
+		table = table.Where("leave = ?", e.Leave)
+	}
+
 	if err := table.First(&doc).Error; err != nil {
 		return doc, err
 	}
@@ -58,6 +76,22 @@ func (e *ScbFollowRecord) GetPage(pageSize int, pageIndex int) ([]ScbFollowRecor
 	var doc []ScbFollowRecord
 
 	table := orm.Eloquent.Select("*").Table(e.TableName())
+
+	if e.LineId != "" {
+		table = table.Where("line_id = ?", e.LineId)
+	}
+
+	if e.AttendantId != "" {
+		table = table.Where("attendant_id = ?", e.AttendantId)
+	}
+
+	if e.UnGetOn != "" {
+		table = table.Where("un_get_on = ?", e.UnGetOn)
+	}
+
+	if e.Leave != "" {
+		table = table.Where("leave = ?", e.Leave)
+	}
 
 	// 数据权限控制(如果不需要数据权限请将此处去掉)
 	dataPermission := new(DataPermission)

@@ -2,6 +2,42 @@
 <template>
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
+      <el-form-item label="线路id" prop="lineId">
+        <el-input
+          v-model="queryParams.lineId"
+          placeholder="请输入线路id"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="跟车员 关联teachers表的id	" prop="attendantId">
+        <el-input
+          v-model="queryParams.attendantId"
+          placeholder="请输入跟车员 关联teachers表的id	"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="未上车" prop="unGetOn">
+        <el-input
+          v-model="queryParams.unGetOn"
+          placeholder="请输入未上车"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="请假" prop="leave">
+        <el-input
+          v-model="queryParams.leave"
+          placeholder="请输入请假"
+          clearable
+          size="small"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
 
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -45,7 +81,52 @@
     </el-row>
 
     <el-table v-loading="loading" :data="scbfollowrecordList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="55" align="center" /><el-table-column
+        label=""
+        align="center"
+        prop="id"
+        :show-overflow-tooltip="true"
+      /><el-table-column
+        label="线路id"
+        align="center"
+        prop="lineId"
+        :show-overflow-tooltip="true"
+      /><el-table-column
+        label="车辆id"
+        align="center"
+        prop="carId"
+        :show-overflow-tooltip="true"
+      /><el-table-column
+        label="跟车员 关联teachers表的id	"
+        align="center"
+        prop="attendantId"
+        :show-overflow-tooltip="true"
+      /><el-table-column
+        label="所有人数"
+        align="center"
+        prop="allCount"
+        :show-overflow-tooltip="true"
+      /><el-table-column
+        label="已下车"
+        align="center"
+        prop="getOff"
+        :show-overflow-tooltip="true"
+      /><el-table-column
+        label="已上车"
+        align="center"
+        prop="getOn"
+        :show-overflow-tooltip="true"
+      /><el-table-column
+        label="未上车"
+        align="center"
+        prop="unGetOn"
+        :show-overflow-tooltip="true"
+      /><el-table-column
+        label="请假"
+        align="center"
+        prop="leave"
+        :show-overflow-tooltip="true"
+      />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -81,10 +162,17 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
 
         <el-form-item label="线路id" prop="lineId">
-          <el-input
+          <el-select
             v-model="form.lineId"
-            placeholder="线路id"
-          />
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="dict in lineIdOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="车辆id" prop="carId">
           <el-input
@@ -93,10 +181,17 @@
           />
         </el-form-item>
         <el-form-item label="跟车员 关联teachers表的id	" prop="attendantId">
-          <el-input
+          <el-select
             v-model="form.attendantId"
-            placeholder="跟车员 关联teachers表的id	"
-          />
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="dict in attendantIdOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="所有人数" prop="allCount">
           <el-input
@@ -172,14 +267,38 @@ export default {
       // 查询参数
       queryParams: {
         pageIndex: 1,
-        pageSize: 10
+        pageSize: 10,
+        lineId:
+            undefined,
+        attendantId:
+            undefined,
+        unGetOn:
+            undefined,
+        leave:
+            undefined
 
       },
       // 表单参数
       form: {
       },
       // 表单校验
-      rules: {}
+      rules: { lineId:
+                [
+                  { required: true, message: '线路id不能为空', trigger: 'blur' }
+                ],
+      attendantId:
+                [
+                  { required: true, message: '跟车员 关联teachers表的id	不能为空', trigger: 'blur' }
+                ],
+      unGetOn:
+                [
+                  { required: true, message: '未上车不能为空', trigger: 'blur' }
+                ],
+      leave:
+                [
+                  { required: true, message: '请假不能为空', trigger: 'blur' }
+                ]
+      }
     }
   },
   created() {
