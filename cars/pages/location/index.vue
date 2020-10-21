@@ -27,13 +27,12 @@
 					</span>
 				</view>
 				<view class="location-d">
-					<u-steps :list="numList" active-color="rgb(255 114 58)" mode="dot" direction="column" current=3>
-
+					<u-steps :list="numList" active-color="rgb(255 114 58)" mode="dot" direction="column" :current="current">
 					</u-steps>
 				</view>
 			</view>
 			<view class="comfirm">
-				<button class="comfirm-bottom" @tap="gotoLunBo">开始刷脸打卡</button>
+				<button class="comfirm-bottom" :loading="loading" :disabled="disabled" @tap="gotoLunBo">开始刷脸打卡</button>
 			</view>
 		</view>
 	</view>
@@ -62,6 +61,9 @@
 				carinfo: {},
 				teacher: {},
 				students: {},
+				disabled: true,
+				loading: true,
+				current:0,
 			};
 		},
 		methods: {
@@ -102,7 +104,7 @@
 					new Promise(resolve => {
 						uni.request({
 							url: "http://api.map.baidu.com/geoconv/v1/?coords=" + lng + "," + lat +
-								"&from=1&to=5&ak="+this.$store.state.ak,
+								"&from=1&to=5&ak=" + this.$store.state.ak,
 							method: "GET",
 							data: {},
 							success: (res) => {
@@ -126,15 +128,16 @@
 						// const blng = res.x
 						console.log("this.blat")
 						console.log(res.blat)
-						console.log("this.blng") 
+						console.log("this.blng")
 						console.log(res.blng)
 						console.log("this.latitude")
-						console.log(this.latitude) 
+						console.log(this.latitude)
 						console.log(this.longitude)
 						new Promise(resolve => {
 							var token = uni.getStorageSync('token')
 							uni.request({
-								url: "http://api.map.baidu.com/reverse_geocoding/v3/?ak="+this.$store.state.ak+"&output=json&coordtype=wgs84ll&location=" +
+								url: "http://api.map.baidu.com/reverse_geocoding/v3/?ak=" + this.$store.state.ak +
+									"&output=json&coordtype=wgs84ll&location=" +
 									this.latitude + "," + this.longitude,
 								data: {
 									pois: 1,
@@ -149,49 +152,26 @@
 								}
 							})
 						}).then((res) => {
-							var token = uni.getStorageSync('token')
-							uni.request({
-								url: this.$store.state.apihost+"/xcx/auth/line-info",
-								method: "GET",
-								header: {
-									'token': token,
-								},
-								data: {},
-								success: (res) => {
-									if(res.data.code == 200){
-										// this.line = res.data.data.line
-										// this.carinfo = res.data.data.car
-										// this.teacher = res.data.data.teacher
-										// this.students = {
-										// 	"studentCount": res.data.data.studentCount,
-										// 	"studentGetOnCount": res.data.data.studentGetOnCount
-										// }
-									}
-									console.log(this)
-									console.log("------计算最近站点-------")
-									console.log("------计算最近站点-------")
-									console.log(res)
-									var t = 0
-									var siteList = []
-									//22.744943742471953,114.53285132220785,22.744943742471953
-									for (var i = 0; i < res.data.data.sites.length; i++) {
-										var distict = utils.getGreatCircleDistance(this.blat, this.blng, res.data.data.sites[i].latitude, res.data.data.sites[i].longitude)
-										console.log("-------" + res.data.data.sites[i].name + "-----")
-										console.log(distict)
-										console.log("------------")
-										var resdata = {
-											"name": res.data.data.sites[i].name + "(" + Math.round(distict) + "米)",
-											"distict": Math.round(distict)
-										}
-										siteList.push(resdata)
-										this.numList = siteList
-									}
-									console.log(siteList)
-								},
-								fail: (err) => {
-									console.log(err)
+							console.log("--------siteinfo-----")
+							console.log(this.$store.state.siteinfo)
+							var siteList = []
+							for (var i = 0; i < this.$store.state.siteinfo.length; i++) {
+								var distict = utils.getGreatCircleDistance(this.blat, this.blng, this.$store.state.siteinfo[i].latitude, this.$store.state.siteinfo[i].longitude)
+								if(distict <= 100){
+									this.current = i
+									this.$store.state.lat = this.$store.state.siteinfo[i].latitude
+									this.$store.state.lng = this.$store.state.siteinfo[i].longitude
+									this.$store.state.sitename = this.$store.state.siteinfo[i].name
 								}
-							})
+								var resdata = {
+									"name": this.$store.state.siteinfo[i].name + "(" + Math.round(distict) + "米)",
+									"distict": Math.round(distict)
+								}
+								siteList.push(resdata)
+								this.numList = siteList
+								this.disabled = false
+								this.loading = false
+							}
 						})
 					})
 				})
@@ -211,18 +191,22 @@
 			uni.showLoading({
 				title: "正在加载"
 			})
-			this.timer = setInterval(()=>{
+			this.timer = setInterval(() => {
 				this.getLocation()
 			}, 3000)
-			
+
 			uni.hideLoading()
 		},
 		onLoad() {
+			uni.showLoading({
+
+			})
 			this.getLocation()
 			this.line = this.$store.state.liniInfo
 			this.carinfo = this.$store.state.carInfo
 			this.teacher = this.$store.state.teacher
 			this.students = this.$store.state.student
+			uni.hideLoading()
 		}
 	}
 </script>

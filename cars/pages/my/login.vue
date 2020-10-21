@@ -22,9 +22,6 @@
 				isback:false,
 				phone: "17620323840",
 				password: "123456",
-				background: {
-					backgroundColor: '#12C497',
-				},
 			}
 		},
 		methods: {
@@ -113,6 +110,7 @@
 							if (res.data.code == "200") {
 								//保存token
 								uni.setStorageSync("token", res.data.data.token)
+								this.$store.commit("setToken", res.data.data.token)
 								uni.switchTab({
 									url: "../index/index"
 								})
@@ -133,7 +131,7 @@
 						fail: (err) => {
 							console.log(err)
 							uni.showModal({
-								title: "手机号码/密码错误"
+								title: "网络异常，请重试"
 							})
 						}
 					})

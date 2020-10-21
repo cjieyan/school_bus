@@ -3,11 +3,10 @@
 		<view class="top">
 			<u-navbar title="人脸识别" @click="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		</view>
-		<!-- <view class="facing-tip">
-			<image src="../../static/facing-tip.png" />
-		</view> -->
-		<view :class="tipclass">{{tip}}</view>
+		<!-- <u-mask :show="show" @click="show = false"></u-mask> -->
+
 		<view class="camera">
+
 			<canvas type="2d" class="progress_bg" canvas-id="canvasProgressbg"></canvas>
 			<canvas type="2d" class="progress_canvas" canvas-id="canvasProgress"></canvas>
 			<camera device-position="front" flash="off" binderror="error">
@@ -16,10 +15,14 @@
 				</cover-view>
 			</camera>
 		</view>
+		<view :class="tipclass">
+			<u-icon name="checkbox-mark" color="#fff" size="60" class="inboard-check"></u-icon>
+			<text>{{tip}}</text>
+		</view>
 		<view class="bottom-btn">
 			<button :type="btntype" class="start-facing" @tap="stoptakephone">{{btntxt}}</button>
 		</view>
-
+		<view class="bg-t"></view>
 	</view>
 </template>
 
@@ -30,8 +33,9 @@
 				background: {
 					backgroundColor: '#12c497',
 				},
-				btntxt:"停止打卡",
-				btntype:"error",
+				show: true,
+				btntxt: "停止打卡",
+				btntype: "error",
 				tipclass: "",
 				istakephone: true,
 				accesstoken: "",
@@ -464,13 +468,12 @@
 				uni.navigateBack({
 					success: function() {
 						beforePage.onLoad();
-						clearInterval(this.timer)
 					}
 				})
 			},
 			stoptakephone() {
-				if(this.istakephone){
-					this.istakephone  = false
+				if (this.istakephone) {
+					this.istakephone = false
 					this.btntype = "primary"
 					this.btntxt = "开始打卡"
 					this.tip = "已停止识别"
@@ -478,11 +481,11 @@
 						clearInterval(this.timer)
 						this.timer = null
 					}
-					
-					
-				}else{
+
+
+				} else {
 					this.btntype = "error"
-					this.istakephone  = true
+					this.istakephone = true
 					// btntxt:"停止打卡",
 					this.btntxt = "停止打卡"
 					this.tip = "正在识别"
@@ -492,11 +495,10 @@
 						}, 3000)
 					}
 				}
-				
+
 			},
 			takephone() {
 				this.tip = "正在识别"
-				this.tipclass = "tips yellow"
 				console.log("ee")
 				const ctx = wx.createCameraContext()
 				console.log(ctx)
@@ -536,11 +538,11 @@
 											"user_id": this.userid
 										},
 										success: (res) => {
-											console.log("--------学生信息start------")
+											console.log("--------学生信息------")
 											console.log(res)
 											console.log(res.data.data)
 											//
-											if (res.data.code == 200) {
+											if (res.code == 200) {
 												this.tipclass = "tips green"
 												this.tip = "识别成功"
 												this.student = res.data
@@ -548,7 +550,7 @@
 											}
 											console.log("this.student")
 											console.log(res.data.data.id)
-											console.log("----------学生信息 end--------")
+											console.log("----------学生信息--------")
 											console.log(res.data)
 											var token = uni.getStorageSync('token')
 											uni.request({
@@ -559,16 +561,11 @@
 												},
 												data: {
 													"student_id": res.data.data.id.toString(),
+													"line_id": this.$store.state.lineid
 												},
 												success: (res) => {
 													console.log("打卡结果-  --------")
 													console.log(res)
-													if ( 200 == res.data.code){
-														this.tipclass = "tips green"
-													}else{
-														this.tipclass = "tips red"
-													}
-													this.tip = res.data.msg
 													this.$store.commit('changecantakephone', true)
 													this.$store.commit('setstudent', {
 														"studentCount": this.$store.state.student.studentCount,
@@ -590,8 +587,9 @@
 									})
 								} else {
 									this.tipclass = "tips red"
-									for(var i = 0; i< this.faceError.length; i++){
-										if(this.faceError[i].code == res.data.error_code){
+									for (var i = 0; i < this.faceError.length; i++) {
+
+										if (this.faceError[i].code == res.data.error_code) {
 											this.tip = this.faceError[i].msg
 											break
 										}
@@ -632,7 +630,8 @@
 			//获取百度access_token
 
 			uni.request({
-				url: "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id="+this.$store.state.client_id+"&client_secret="+this.$store.state.client_secret+"&",
+				url: "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=" + this.$store.state.client_id +
+					"&client_secret=" + this.$store.state.client_secret + "&",
 				method: 'POST',
 				dataType: "json",
 				data: {},
@@ -678,8 +677,8 @@
 	}
 
 	.camera camera {
-		width: 300px;
-		height: 300px;
+		width: 220px;
+		height: 220px;
 		position: absolute;
 		display: flex;
 		align-items: center;
@@ -706,6 +705,10 @@
 		justify-content: center;
 	}
 
+	.camera {
+		margin-top: 12%;
+	}
+
 	.start-facing {
 		height: 100px;
 		width: 100px;
@@ -720,6 +723,11 @@
 	}
 
 	.tips {
+		position: fixed;
+		bottom: 250rpx;
+		display: flex;
+		width: 100%;
+		justify-content: center;
 		height: auto;
 		font-weight: bold;
 		font-size: 55rpx;
@@ -727,6 +735,13 @@
 		margin: 60rpx 0;
 	}
 
+	.inboard-check {
+		background-color: #4CD964;
+		border-radius: 15px;
+		// width: 30px;
+		// height: 30px;
+		margin-top: 6px;
+	}
 	.yellow {
 		color: #FF9900
 	}

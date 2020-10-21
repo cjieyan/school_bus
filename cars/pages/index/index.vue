@@ -1,33 +1,26 @@
 <template>
 	<view>
 		<view class="top">
-			<u-navbar :is-back="isback" title="智慧校车" @click="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
+			<u-navbar :is-back="isback" title="智慧校车" @click="back" class="top" :background="background" back-icon-color="#fff"
+			 title-color="#fff"></u-navbar>
 		</view>
 		<view class="image-content">
 			<image src="../../static/banner.jpg" mode="aspectFill" style="width: 100%;" @error="imageError"></image>
 		</view>
-		<view class="u-demo-wrap">
-			<view class="u-demo-area">
-				<u-toast ref="uToast"></u-toast>
-				<u-grid :col="col" :border="border">
-					<u-grid-item name="item1" @tap="gotocars">
-						<u-icon name="scan" :size="46"></u-icon>
-						<view class="grid-text">刷脸</view>
-					</u-grid-item>
-				<!-- 	<u-grid-item :index="1" @tap="carinfo">
-						<u-icon name="file-text" :size="46"></u-icon>
-						<view class="grid-text">跟车记录</view>
-					</u-grid-item>
-					<u-grid-item :index="2" @tap="student">
-						<u-icon name="account" :size="46"></u-icon>
-						<view class="grid-text">学生</view>
-					</u-grid-item> -->
-					<!-- <u-grid-item :index="2" @tap="regist">
-						<u-icon name="account" :size="46"></u-icon>
-						<view class="grid-text">注册人脸</view>
-					</u-grid-item> -->
-					</u-grid-item>
-				</u-grid>
+		<view class="wrap">
+			<view v-for="(item, index) in lines" :key="index">
+				<u-card :title="item.carIds+'号线'" :sub-title="'发车 '+item.departed_at+'——到达 '+item.arrivedAt">
+					<view class="" slot="body"  @tap="selectline(item)" :value="item.id" >
+						<view class="u-body-item u-flex u-col-between u-p-t-0">
+							<view class="u-body-item-title">
+								<u-tag class="u-tag" text="出发" mode="dark" type="success" />{{item.startSite.name}}</view>
+						</view>
+						<view class="u-body-item u-flex u-col-between u-p-t-0">
+							<view class="u-body-item-title">
+								<u-tag class="u-tag" text="到达" mode="dark" type="warning" />{{item.endSite.name}}</view>
+						</view>
+					</view>
+				</u-card>
 			</view>
 		</view>
 	</view>
@@ -37,15 +30,17 @@
 	export default {
 		data() {
 			return {
+				checked: false,
 				isback: false,
 				background: {
-					backgroundColor: '#12C497',
+					backgroundColor: '#12c497',
 				},
 				list: ['integral', 'kefu-ermai', 'coupon', 'gift', 'scan', 'pause-circle', 'wifi', 'email', 'list'],
 				isSwiper: false,
 				current: 0,
 				border: true,
-				col: 3
+				col: 3,
+				lines: {}
 			};
 		},
 		methods: {
@@ -53,6 +48,45 @@
 				uni.navigateBack({
 					success: function() {
 						beforePage.onLoad();
+					}
+				})
+			},
+			selectline(item){
+				console.log("----item--------")
+				console.log(item)
+				const lineid = item.id
+				console.log(lineid)
+				this.$store.commit('setLineid', lineid)
+				uni.request({
+					url: this.$store.state.apihost + "/xcx/auth/line-info",
+					method:"POST",
+					header: {
+						'token': this.$store.state.token,
+					},
+					data:{
+						"line_id": lineid
+					},
+					success: (res) => {
+						console.log("--------selectline--------")
+						console.log(this.$store.state.lineid)
+						console.log(res)
+						this.$store.commit('setcarinfo', res.data.data.car)
+						this.$store.commit('setTeacher', res.data.data.teacher)
+						this.$store.commit('setLineinfo', res.data.data.line)
+						this.$store.commit('setSiteinfo', res.data.data.sites)
+						this.$store.commit('setstudent', {
+							"studentCount": res.data.data.studentCount,
+							"studentGetOnCount": res.data.data.studentGetOnCount
+						})
+						uni.switchTab({
+							url:"../location/index",
+							fail: (err) => {
+								console.log(err)
+							}
+						})
+					},
+					fail: (err) => {
+						console.log(err)
 					}
 				})
 			},
@@ -95,8 +129,8 @@
 			setInfo() {
 				var token = uni.getStorageSync('token')
 				uni.request({
-					url: this.$store.state.apihost+"/xcx/auth/line-info",
-					method: "GET",
+					url: this.$store.state.apihost + "/xcx/auth/line-info",
+					method: "POST",
 					header: {
 						'token': token,
 					},
@@ -111,7 +145,31 @@
 								"studentCount": res.data.data.studentCount,
 								"studentGetOnCount": res.data.data.studentGetOnCount
 							})
+						}else{
+							console.log("-----设置相关信息 学生人数、上车人数、车辆信息、、、res-----")
+							console.log(res)
 						}
+					},
+					fail: (err) => {
+						uni.showModal({
+							title:"网络异常,请重试"
+						})
+						return
+					}
+				})
+			},
+			lineInfo() {
+				var token = uni.getStorageSync('token')
+				uni.request({
+					url: this.$store.state.apihost + "/xcx/auth/lines",
+					method: "post",
+					header: {
+						'token': token,
+					},
+					data: {},
+					success: (res) => {
+						this.lines = res.data.data
+						console.log(res)
 					},
 					fail: (err) => {
 						console.log(err)
@@ -132,7 +190,9 @@
 			}
 		},
 		onLoad() {
-			
+			uni.showLoading({
+
+			})
 			var token = uni.getStorageSync("token")
 			if (token == "" || token == "undefinded") {
 				uni.showLoading({
@@ -143,9 +203,11 @@
 				})
 				uni.hideLoading()
 			}
-			this.setInfo()
+			// this.setInfo()
+			this.lineInfo()
+			uni.hideLoading()
 		}
-		
+
 	};
 </script>
 
@@ -168,6 +230,16 @@
 
 	.swiper {
 		height: 480rpx;
+	}
+
+	.u-body-item {
+		font-size: 26rpx;
+		color: #333;
+		padding: 10rpx 10rpx;
+	}
+
+	u-tag {
+		margin-right: 30rpx;
 	}
 
 	.indicator-dots {

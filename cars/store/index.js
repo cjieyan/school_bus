@@ -8,15 +8,24 @@ const store = new Vuex.Store({
 		carInfo: {},
 		liniInfo: {},
 		teacher: {},
-		apihost:"http://127.0.0.1:8000",
-		//apihost: "https://sc.kenashua.com",
+		apihost: "https://sc.kenashua.com",
+		// apihost: "http://localhost:8000",
 		ak: "EtRc2ku5rpOb4aNTskgBr1yb",
 		client_id:"oLPVBkl3gkURkuZPdN13XefG",
-		client_secret: "qOsoDoVAkvotzLn4ismk4dMmDoNaUrim"
+		client_secret: "qOsoDoVAkvotzLn4ismk4dMmDoNaUrim",
+		lat: "",
+		lng:"",
+		sitename:"",
+		lineid:"",
+		token:"",
+		siteinfo: {},
     },
     mutations: {
 		changecantakephone(state, iscan){
 			state.cantakephone = iscan
+		},
+		setToken(state, token){
+			state.token = token
 		},
 		setstudent(state, data){
 			state.student = data
@@ -27,9 +36,15 @@ const store = new Vuex.Store({
 		setLineinfo(state, data){
 			state.liniInfo = data
 		},
+		setSiteinfo(state, data){
+			state.siteinfo = data
+		},
 		setTeacher(state, data){
 			state.teacher = data
-		}
+		},
+		setLineid(state, lineid){
+			state.lineid = lineid
+		},
 	},
     actions: {}
 })

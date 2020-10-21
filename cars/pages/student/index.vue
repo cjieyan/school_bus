@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="top">
-			<u-navbar back-text=" " :background="background" back-icon-color="#fff" title-color="#fff" @tap="back" title="学生列表"></u-navbar>
+			<u-navbar back-text="返回" @tap="back" title="学生列表"></u-navbar>
 		</view>
 		<view class="student">
 			<view class="student-top">
@@ -13,13 +13,12 @@
 				</span>
 			</view>
 			<view class="student-list">
-				<view class="student-list-info" v-for="item in students">
+				<view class="student-list-info" v-for="item in students" :key="index">
 					<view class="student-img">
 						<image src="../../static/location.png" style="width: 30px; height: 30px;" class="location-image"></image>
 						<view class="inboard">
-							<span v-if="item.swipeStatus == -1">未上车</span>
-							<span v-else-if="item.swipeStatus == 0">已上车</span>
-							<span v-else>已上车</span>
+							<span v-if="item.swipeStatus == '-1'">已上车</span>
+							<span v-else>未上车</span>
 							<!-- <fa-icon type="check" size="14" color="white" class="font-icon inboard-check"></fa-icon> -->
 							<u-icon name="checkbox-mark" color="#fff" size="14" class="inboard-check"></u-icon>
 						</view>
@@ -80,42 +79,23 @@
 		},
 		data() {
 			return {
-				students: {},
-				background: {
-					backgroundColor: '#12C497',
-				},
+				students: {}
 			}
 		},
 		methods: {
 			back() {
-				var token = uni.getStorageSync('token')
-				uni.request({
-					url: this.$store.state.apihost+"/xcx/auth/line-finish",
-					method: "POST",
-					header: {
-						'token': token,
-					},
-					data: {},
+				uni.switchTab({
+					url: "../index/index",
 					success: (res) => {
-						if (res.data.code == 200) {
-							uni.switchTab({
-								url: "../index/index",
-								success: (res) => {
-									console.log(res)
-								},
-								fail: (err) => {
-									console.log(err)
-								}
-							})
-						}
+						console.log(res)
 					},
 					fail: (err) => {
 						console.log(err)
 					}
 				})
-				
 			},
 			studentList() {
+				console.log(this.$store.state.lineid)
 				const token = uni.getStorageSync('token')
 				uni.request({
 					url: this.$store.state.apihost+"/xcx/auth/line-students",
@@ -123,7 +103,9 @@
 					header: {
 						'token': token,
 					},
-					method: "GET",
+					data:{
+						"line_id": this.$store.state.lineid
+					},
 					success: (res) => {
 						console.log(res)
 						this.students = res.data.data.studentsDataRet

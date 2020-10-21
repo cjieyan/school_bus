@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar back-text=" " :background="background" back-icon-color="#fff"  title-color="#fff" @tap="back" title="用户信息"></u-navbar>
+		<u-navbar back-text="返回"  @tap="back" title="用户信息"></u-navbar>
 
 		<view class="u-flex">
 			<image src="../../static/login-banner.jpg" mode="heightFix" @error="imageError"></image>
@@ -25,10 +25,7 @@
 		data() {
 			return {
 				pic: 'https://uviewui.com/common/logo.png',
-				show: true,
-				background: {
-					backgroundColor: '#12C497',
-				},
+				show: true
 			}
 		},
 		methods: {
