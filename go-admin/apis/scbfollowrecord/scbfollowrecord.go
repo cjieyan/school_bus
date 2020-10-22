@@ -7,6 +7,7 @@ import (
 	"go-admin/tools"
 	"go-admin/tools/app"
 	"go-admin/tools/app/msg"
+	"strconv"
 )
 
 func GetScbFollowRecordList(c *gin.Context) {
@@ -22,10 +23,10 @@ func GetScbFollowRecordList(c *gin.Context) {
 		pageIndex = tools.StrToInt(err, index)
 	}
 
-	data.LineId = c.Request.FormValue("lineId")
-	data.AttendantId = c.Request.FormValue("attendantId")
-	data.UnGetOn = c.Request.FormValue("unGetOn")
-	data.Leave = c.Request.FormValue("leave")
+	data.LineId, err = strconv.Atoi( c.Request.FormValue("lineId") )
+	data.AttendantId , err = strconv.Atoi( c.Request.FormValue("attendantId") )
+	data.UnGetOn, err  = strconv.Atoi( c.Request.FormValue("unGetOn") )
+	data.Leave, err = strconv.Atoi(c.Request.FormValue("leave"))
 
 	data.DataScope = tools.GetUserIdStr(c)
 	result, count, err := data.GetPage(pageSize, pageIndex)

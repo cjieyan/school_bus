@@ -44,7 +44,6 @@ func examplesCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMiddle
 
 	// {{认证路由自动补充在此处请勿删除}} 
     registerScbFollowRecordRouter(v1,authMiddleware)
-    registerScbFollowRecordRouter(v1,authMiddleware)
 	registerScbPostRouter(v1, authMiddleware)
 	registerScbDeptRouter(v1, authMiddleware)
 	registerSchSitesRouter(v1, authMiddleware)

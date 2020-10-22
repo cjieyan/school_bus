@@ -41,3 +41,7 @@ type LineCheckRsp struct{
 	StartAt int `json:"start_at"`
 	Line ScbLines `json:"line"`
 }
+type FollowRecordReq struct {
+	PageSize int `json:"page_size"`
+	PageIndex int `json:"page_index"`
+}

@@ -463,3 +463,39 @@ func (a Api) LineStudents(c *gin.Context) {
 	ret["studentsDataRet"] = studentsDataRet //所有学生信息
 	app.OK(c, ret, "操作成功")
 }
+
+func (a Api) FollowRecord (c *gin.Context){
+	objParams := models.FollowRecordReq{}
+	err := c.ShouldBindJSON(&objParams)
+	if nil != err {
+		tools.HasError(err, "", -1)
+	}
+
+	userId := c.GetInt(models.UserId)
+
+	followModel := models.ScbFollowRecord{}
+	followModel.AttendantId = userId
+
+	result, count, err := followModel.GetPage(objParams.PageSize, objParams.PageIndex)
+	var followRecordsData []models.ScbFollowRecord
+	for _, follow := range result{
+		carModel := models.ScbCars{}
+		carModel.Id = follow.CarId
+		carData, err := carModel.Get()
+		if nil == err {
+			follow.Car = carData
+		}
+		lineModel := models.ScbLines{}
+		lineModel.Id = follow.LineId
+		lineData, err := lineModel.Get()
+		if nil == err{
+			follow.Line = lineData
+		}
+		followRecordsData = append(followRecordsData, follow)
+	}
+
+	tools.HasError(err, "", -1)
+
+	app.PageOK(c, result, count, objParams.PageIndex, objParams.PageSize, "")
+
+}
