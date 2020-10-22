@@ -7,6 +7,7 @@ import (
 	"go-admin/models"
 	"go-admin/tools"
 	"go-admin/tools/app"
+	"math"
 	"strconv"
 	"time"
 
@@ -470,6 +471,12 @@ func (a Api) FollowRecord (c *gin.Context){
 	if nil != err {
 		tools.HasError(err, "", -1)
 	}
+	if objParams.PageSize <=0 {
+		objParams.PageSize = 10
+	}
+	if objParams.PageSize > 100 {
+		objParams.PageSize = 100
+	}
 
 	userId := c.GetInt(models.UserId)
 
@@ -496,6 +503,12 @@ func (a Api) FollowRecord (c *gin.Context){
 
 	tools.HasError(err, "", -1)
 
-	app.PageOK(c, result, count, objParams.PageIndex, objParams.PageSize, "")
+	ret := make(map[string]interface{})
+	ret["count"] = count                                              //未上车数量
+	ret["result"] = result                                            //已上车数量
+	ret["page_index"] = objParams.PageIndex                           //已下车数量
+	ret["page_size"] = objParams.PageSize                             //每页数量
+	ret["totalpage"] = math.Ceil(float64(count) / float64(objParams.PageSize)) //总页数
+	app.OK(c, ret, "操作成功")
 
 }
