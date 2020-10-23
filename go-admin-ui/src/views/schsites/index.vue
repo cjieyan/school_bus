@@ -128,13 +128,13 @@
     <el-dialog :title="title" :visible.sync="open" width="800px">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="线路" prop="lineId">
-          <treeselect
+          <el-cascader
             v-model="form.lineId"
             :options="linesOptions"
-            :normalizer="normalizer"
-            :show-count="true"
-            placeholder="选择线路"
-            :is-disabled="isEdit"
+            :props="lineIdProps"
+            :style="{width: '100%'}"
+            placeholder="请选择线路"
+            clearable
           />
         </el-form-item>
         <el-form-item label="名称" prop="name">
@@ -392,6 +392,12 @@ export default {
                 [
                   { required: true, message: '更新时间不能为空', trigger: 'blur' }
                 ]
+      },
+      lineIdProps: {
+        'multiple': false,
+        'label': 'name',
+        'value': 'id',
+        'children': 'children'
       }
     }
   },
@@ -494,10 +500,28 @@ export default {
     getTreeselect(e) {
       getAllLines().then(response => {
         this.linesOptions = []
-        const lines = { id: 0, name: '请选择', children: [] }
-        lines.children = response.data
-        this.linesOptions.push(lines)
+        for (var i = 0; i < response.data.length; i++) {
+          const d = response.data[i]
+          const formatData = {
+            'label': d.name,
+            'value': d.id
+          }
+          this.linesOptions.push(d)
+        }
       })
+    },
+    getTreeData(data) {
+      // 循环遍历json数据
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].children.length < 1) {
+          // children若为空数组，则将children设为undefined
+          data[i].children = undefined
+        } else {
+          // children若不为空数组，则继续 递归调用 本方法
+          this.getTreeData(data[i].children)
+        }
+      }
+      return data
     },
     // 取消按钮
     cancel() {

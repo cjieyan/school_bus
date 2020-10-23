@@ -263,8 +263,6 @@ func (a Api) Swipe(c *gin.Context) {
 				carRecordModel.Prop = 2
 				carRecordModel.Create()
 
-
-
 				app.OK(c, ret, "下车刷脸成功..")
 			} else if 1 == swipeAtInfo.Status {
 				ret.Status = 1
@@ -376,6 +374,11 @@ func (a Api) LineFinish(c *gin.Context) {
 	ymd := strconv.Itoa(year) + month + strconv.Itoa(day)
 	//清除当前行程的刷脸数据
 	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
+
+	//打卡总数
+	count, err := tools.RdbHlen(swipeAtKey)
+
+
 	tools.RdbDel(swipeAtKey)
 
 	//结束跟车员当前行程

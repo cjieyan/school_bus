@@ -95,13 +95,13 @@
         <el-row>
           <el-col :span="24">
             <el-form-item label="上一级" prop="parentId">
-              <treeselect
+              <el-cascader
                 v-model="form.parentId"
                 :options="deptOptions"
-                :normalizer="normalizer"
-                :show-count="true"
-                placeholder="选择上一级"
-                :is-disabled="isEdit"
+                :props="parentIdProps"
+                :style="{width: '100%'}"
+                placeholder="请选择上一级"
+                clearable
               />
             </el-form-item>
           </el-col>
@@ -153,12 +153,10 @@
 
 <script>
 import { getDeptList, getScbDept, delScbDept, addScbDept, updateScbDept } from '@/api/scbdept'
-import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 export default {
   name: 'ScbDept',
-  components: { Treeselect },
   data() {
     return {
       // 遮罩层
@@ -205,7 +203,13 @@ export default {
             message: '请输入正确的手机号码',
             trigger: 'blur'
           }
-        ]
+        ],
+        parentIdProps: {
+          'multiple': false,
+          'label': 'name',
+          'value': 'id',
+          'children': 'children'
+        }
       }
     }
   },
@@ -238,18 +242,21 @@ export default {
     /** 查询部门下拉树结构 */
     getTreeselect(e) {
       getDeptList().then(response => {
-        this.deptOptions = []
-
-        if (e === 'update') {
-          const dept = { deptId: 0, deptName: '请选择', children: [] }
-          dept.children = response.data
-          this.deptOptions.push(dept)
-        } else {
-          const dept = { deptId: 0, deptName: '请选择', children: [] }
-          dept.children = response.data
-          this.deptOptions.push(dept)
-        }
+        this.deptOptions = this.getTreeData(response.data)
       })
+    },
+    getTreeData(data) {
+      // 循环遍历json数据
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].children.length < 1) {
+          // children若为空数组，则将children设为undefined
+          data[i].children = undefined
+        } else {
+          // children若不为空数组，则继续 递归调用 本方法
+          this.getTreeData(data[i].children)
+        }
+      }
+      return data
     },
     // 字典状态字典翻译
     statusFormat(row) {

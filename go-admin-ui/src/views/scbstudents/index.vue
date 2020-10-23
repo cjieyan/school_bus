@@ -131,10 +131,10 @@
       @pagination="getList"
     />
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="600px">
+    <el-dialog :title="title" :visible.sync="open" width="700px">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row :gutter="15">
-          <el-col :span="12">
+          <el-col :span="9">
             <el-form-item label="姓名" prop="name">
               <el-input
                 v-model="form.name"
@@ -142,15 +142,20 @@
               />
             </el-form-item>
           </el-col>
-          <el-col :span="12" style="position: absolute ;right: 10px;z-index: 5">
+          <el-col :span="15" style="position: absolute ;right: 10px;z-index: 5">
             <el-form-item label="图片" prop="picture">
               <el-upload
                 ref="picture"
                 :file-list="picturefileList"
+                :class="{disabled:uploadDisabled}"
+                :limit="1"
                 :action="pictureAction"
                 :auto-upload="false"
                 :before-upload="pictureBeforeUpload"
                 :on-change="onUploadChange"
+                :on-success="onUploadSuccess"
+                :on-remove="handleRemove"
+                :disabled="showdisabled"
                 list-type="picture-card"
                 accept="image/*"
                 name="picture"
@@ -162,7 +167,7 @@
           </el-col>
         </el-row>
         <el-row :gutter="15">
-          <el-col :span="12">
+          <el-col :span="9">
             <el-form-item label="学号" prop="number">
               <el-input
                 v-model="form.number"
@@ -172,21 +177,21 @@
           </el-col>
         </el-row>
         <el-row :gutter="15">
-          <el-col :span="12">
+          <el-col :span="9">
             <el-form-item label="班级" prop="classId">
               <el-cascader
                 v-model="form.classId"
                 :options="deptOptions"
                 :props="classIdProps"
                 :style="{width: '100%'}"
-                placeholder="请选择级联选择"
+                placeholder="请选择"
                 clearable
               />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="15">
-          <el-col :span="12">
+          <el-col :span="9">
             <el-form-item label="线路" prop="lineId">
               <el-select v-model="form.lineId" placeholder="选择线路" clearable :style="{width: '100%'}">
                 <el-option
@@ -215,7 +220,7 @@
           </el-col>
         </el-row>
         <el-row :gutter="15">
-          <el-col :span="12">
+          <el-col :span="9">
             <el-form-item label="上车站点" prop="siteIdUp">
               <el-select v-model="form.siteIdUp" placeholder="上车站点" clearable :style="{width: '100%'}">
                 <el-option
@@ -228,7 +233,7 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="9">
             <el-form-item label="下车站点" prop="siteIdDown">
               <el-select v-model="form.siteIdDown" placeholder="上车站点" clearable :style="{width: '100%'}">
                 <el-option
@@ -243,14 +248,14 @@
           </el-col>
         </el-row>
         <el-row :gutter="15">
-          <el-col :span="12">
+          <el-col :span="9">
             <el-form-item label="是否接送" prop="isPickUp">
               <el-switch v-model="form.isPickUp" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="15">
-          <el-col :span="12">
+          <el-col :span="9">
             <el-form-item label="家长电话" prop="parentPhone">
               <el-input
                 v-model="form.parentPhone"
@@ -278,6 +283,7 @@ export default {
   name: 'Scbstudents',
   data() {
     return {
+      showdisabled: false,
       // 遮罩层
       loading: true,
       pictureAction: 'https://jsonplaceholder.typicode.com/posts/',
@@ -306,7 +312,7 @@ export default {
       scbstudentsList: [],
       // 班级树选项
       deptOptions: [],
-
+      uploadDisabled: '',
       // 查询参数
       queryParams: {
         pageIndex: 1,
@@ -436,7 +442,6 @@ export default {
           this.siteIdsOptions.push(formatData)
         }
       })
-
       // 车辆列表
     },
     /** 查询班级下拉树结构 */
@@ -488,7 +493,6 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-
         id: undefined,
         name: undefined,
         number: undefined,
@@ -515,9 +519,17 @@ export default {
       reader.readAsDataURL(file.raw)
       const that = this
       reader.onload = function(e) {
-        console.log(this.result) // 图片的base64数据
         that.form.picture = this.result
       }
+    },
+    onUploadSuccess(file) {
+      if (this.picturefileList.length > 0) {
+        this.uploadDisabled = 'disabled'
+      }
+    },
+    handleRemove(file, fileList) {
+      // 将变量置空
+      this.uploadDisabled = ''
     },
     pictureBeforeUpload(file) {
       const isRightSize = file.size / 1024 / 1024 < 2
@@ -526,7 +538,6 @@ export default {
       }
       return isRightSize
     },
-
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageIndex = 1
@@ -546,6 +557,7 @@ export default {
       this.open = true
       this.title = '添加学生信息表'
       this.isEdit = false
+      this.picture = undefined
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
@@ -559,6 +571,7 @@ export default {
       this.getTreeselect('update')
       this.getLinesSelect('update')
       const id = row.id || this.ids
+      this.picture = undefined
       getScbStudents(id).then(response => {
         this.form = response.data
         this.open = true
@@ -620,3 +633,11 @@ export default {
   }
 }
 </script>
+<style rel="stylesheet/scss" lang="scss" scoped>
+
+</style>
+<style rel="stylesheet/scss" lang="scss">
+.disabled .el-upload--picture-card{
+  display: none;
+}
+</style>

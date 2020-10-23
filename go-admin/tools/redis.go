@@ -202,6 +202,10 @@ func RdbHDel(key string, field string) error {
 	return nil
 }
 
+func RdbHlen(key string)(int, error){
+	return redis.Int(Rdb.Do("HLEN", key))
+}
+
 /**
 redis hGetAll
 return map

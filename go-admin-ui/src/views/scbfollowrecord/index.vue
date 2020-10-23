@@ -161,10 +161,10 @@
     <el-dialog :title="title" :visible.sync="open" width="500px">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
 
-        <el-form-item label="线路id" prop="lineId">
+        <el-form-item label="线路" prop="lineId">
           <el-select
             v-model="form.lineId"
-            placeholder="请选择"
+            placeholder="请选择线路"
           >
             <el-option
               v-for="dict in lineIdOptions"
@@ -174,10 +174,10 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="车辆id" prop="carId">
+        <el-form-item label="车辆" prop="carId">
           <el-input
             v-model="form.carId"
-            placeholder="车辆id"
+            placeholder="车辆"
           />
         </el-form-item>
         <el-form-item label="跟车员 关联teachers表的id	" prop="attendantId">

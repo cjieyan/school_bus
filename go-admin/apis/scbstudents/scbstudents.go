@@ -1,6 +1,7 @@
 package scbstudents
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -9,7 +10,9 @@ import (
 	"go-admin/tools"
 	"go-admin/tools/app"
 	"go-admin/tools/app/msg"
+	"io/ioutil"
 	"strconv"
+	"strings"
 )
 
 func GetScbStudentsList(c *gin.Context) {
@@ -117,8 +120,19 @@ func InsertScbStudents(c *gin.Context) {
 			updateData.FaceToken = faceToken
 
 			//更新人脸
-			_, err := data.Update(data.Id)
+			_, err := data.Update(result.Id)
 			tools.HasError(err, "更换相片失败", -1)
+		}
+
+		imageArr := strings.Split(picture, ";base64,")
+		ext := "png"
+		if len(imageArr) > 1 {
+			imageArrTmp := strings.Split(imageArr[0], "/")
+			if len(imageArrTmp) > 1 {
+				ext = imageArrTmp[1]
+			}
+			ddd, _ := base64.StdEncoding.DecodeString(imageArr[1]) //成图片文件并把文件写入到buffer
+			ioutil.WriteFile("./images/face_" + faceToken + "." + ext, ddd, 0666)   //buffer输出到jpg文件中（不做处理，直接写到文件）
 		}
 	}
 
@@ -138,6 +152,18 @@ func UpdateScbStudents(c *gin.Context) {
 	if "" != faceToken {
 		data.FaceToken = faceToken
 	}
+
+	imageArr := strings.Split(data.Picture, ";base64,")
+	ext := "png"
+	if len(imageArr) > 1 {
+		imageArrTmp := strings.Split(imageArr[0], "/")
+		if len(imageArrTmp) > 1 {
+			ext = imageArrTmp[1]
+		}
+		ddd, _ := base64.StdEncoding.DecodeString(imageArr[1]) //成图片文件并把文件写入到buffer
+		ioutil.WriteFile("./images/face_" + faceToken + "." + ext, ddd, 0666)   //buffer输出到jpg文件中（不做处理，直接写到文件）
+	}
+
 	data.Picture = ""
 	result, err := data.Update(data.Id)
 	tools.HasError(err, "", -1)

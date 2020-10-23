@@ -145,13 +145,13 @@
           <el-input v-model="form.password" placeholder="请输入密码" type="password" />
         </el-form-item>
         <el-form-item label="班级" prop="classId">
-          <treeselect
+          <el-cascader
             v-model="form.classId"
             :options="deptOptions"
-            :normalizer="normalizer"
-            :show-count="true"
-            placeholder="选择班级"
-            :is-disabled="isEdit"
+            :props="classIdProps"
+            :style="{width: '100%'}"
+            placeholder="请选择"
+            clearable
           />
         </el-form-item>
 
@@ -185,12 +185,10 @@
 import { addScbTeachers, delScbTeachers, getScbTeachers, listScbTeachers, updateScbTeachers } from '@/api/scbteachers'
 import { getDeptList } from '@/api/scbdept'
 import { getScbpostAll } from '@/api/scbpost'
-import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 export default {
   name: 'Scbteachers',
-  components: { Treeselect },
   data() {
     return {
       deptOptions: [],
@@ -258,6 +256,12 @@ export default {
                 [
                   { required: true, message: '岗位id不能为空', trigger: 'blur' }
                 ]
+      },
+      classIdProps: {
+        'multiple': false,
+        'label': 'label',
+        'value': 'value',
+        'children': 'children'
       }
     }
   },
@@ -279,11 +283,21 @@ export default {
     /** 查询班级下拉树结构 */
     getTreeselect(e) {
       getDeptList().then(response => {
-        this.deptOptions = []
-        const dept = { deptId: 0, deptName: '请选择', children: [] }
-        dept.children = response.data
-        this.deptOptions.push(dept)
+        this.deptOptions = this.getTreeData(response.data)
       })
+    },
+    getTreeData(data) {
+      // 循环遍历json数据
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].children.length < 1) {
+          // children若为空数组，则将children设为undefined
+          data[i].children = undefined
+        } else {
+          // children若不为空数组，则继续 递归调用 本方法
+          this.getTreeData(data[i].children)
+        }
+      }
+      return data
     },
     /** 查询参数列表 */
     getList() {
