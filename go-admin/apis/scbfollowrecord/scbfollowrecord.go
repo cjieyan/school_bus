@@ -30,9 +30,36 @@ func GetScbFollowRecordList(c *gin.Context) {
 
 	data.DataScope = tools.GetUserIdStr(c)
 	result, count, err := data.GetPage(pageSize, pageIndex)
+
+	var resultDatas []models.ScbFollowRecord
+	for _, followRecord := range result{
+		lineModel := models.ScbLines{}
+		lineModel.Id = followRecord.LineId
+		lineData, err := lineModel.Get()
+		if nil == err{
+			followRecord.LineName = lineData.Name
+		}
+
+		carModel := models.ScbCars{}
+		carModel.Id = followRecord.CarId
+		carData, err := carModel.Get()
+		if nil == err{
+			followRecord.CarNo = carData.CarNo
+		}
+
+		teacherModel := models.ScbTeachers{}
+		teacherModel.Id = followRecord.AttendantId
+		teacherData, err := teacherModel.Get()
+		if nil == err{
+			followRecord.AttendantName = teacherData.Name
+		}
+
+		resultDatas = append(resultDatas, followRecord)
+	}
+
 	tools.HasError(err, "", -1)
 
-	app.PageOK(c, result, count, pageIndex, pageSize, "")
+	app.PageOK(c, resultDatas, count, pageIndex, pageSize, "")
 }
 
 func GetScbFollowRecord(c *gin.Context) {

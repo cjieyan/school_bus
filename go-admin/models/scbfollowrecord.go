@@ -6,23 +6,26 @@ import (
 )
 
 type ScbFollowRecord struct {
-	Id          int    `json:"id" gorm:"type:int(11);primary_key"` //
-	LineId      int `json:"lineId" gorm:"type:int(11);"`        // 线路id
-	CarId       int `json:"carId" gorm:"type:int(11);"`         // 车辆id
-	AttendantId int `json:"attendantId" gorm:"type:int(11);"`   // 跟车员 关联teachers表的id
-	AllCount    int `json:"allCount" gorm:"type:int(11);"`      // 所有人数
-	GetOff      int `json:"getOff" gorm:"type:int(11);"`        // 已下车数量
-	GetOn       int `json:"getOn" gorm:"type:int(11);"`         // 已上车数量
-	UnGetOn     int `json:"unGetOn" gorm:"type:int(11);"`       // 未上车数量
-	Leave       int `json:"leave" gorm:"type:int(11);"`         // 请假数量
-	IsDelete    int `json:"isDelete" gorm:"type:tinyint(4);"`   // 0未删除 1已删除
-	DataScope   string `json:"dataScope" gorm:"-"`
-	Params      string `json:"params"  gorm:"-"`
-	CreateBy    string `json:"createBy"  gorm:"type:varchar(50)"`
-	UpdateBy    string `json:"updateBy"  gorm:"type:varchar(50)"`
-	IsFinished  int    `json:"isFinished" gorm:"type:int(4)"` //跟车记录状态 0未结束 1已结束
-	Car         ScbCars `json:"car", gorm:"-"`
-	Line        ScbLines `json:"line" gorm:"-"`
+	Id            int      `json:"id" gorm:"type:int(11);primary_key"` //
+	LineId        int      `json:"lineId" gorm:"type:int(11);"`        // 线路id
+	CarId         int      `json:"carId" gorm:"type:int(11);"`         // 车辆id
+	AttendantId   int      `json:"attendantId" gorm:"type:int(11);"`   // 跟车员 关联teachers表的id
+	AllCount      int      `json:"allCount" gorm:"type:int(11);"`      // 所有人数
+	GetOff        int      `json:"getOff" gorm:"type:int(11);"`        // 已下车数量
+	GetOn         int      `json:"getOn" gorm:"type:int(11);"`         // 已上车数量
+	UnGetOn       int      `json:"unGetOn" gorm:"type:int(11);"`       // 未上车数量
+	Leave         int      `json:"leave" gorm:"type:int(11);"`         // 请假数量
+	IsDelete      int      `json:"isDelete" gorm:"type:tinyint(4);"`   // 0未删除 1已删除
+	DataScope     string   `json:"dataScope" gorm:"-"`
+	Params        string   `json:"params"  gorm:"-"`
+	CreateBy      string   `json:"createBy"  gorm:"type:varchar(50)"`
+	UpdateBy      string   `json:"updateBy"  gorm:"type:varchar(50)"`
+	IsFinished    int      `json:"isFinished" gorm:"type:int(4)"` //跟车记录状态 0未结束 1已结束
+	CarNo         string   `json:"carNo" gorm:"-"`
+	LineName      string   `json:"lineName" gorm:"-"`
+	AttendantName string   `json:"attendantName" gorm:"-"`
+	Car           ScbCars  `json:"car", gorm:"-"`
+	Line          ScbLines `json:"line" gorm:"-"`
 	BaseModel
 }
 

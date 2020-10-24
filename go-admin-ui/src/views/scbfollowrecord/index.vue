@@ -2,43 +2,24 @@
 <template>
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
-      <el-form-item label="线路id" prop="lineId">
+      <el-form-item label="线路" prop="lineId">
         <el-input
           v-model="queryParams.lineId"
-          placeholder="请输入线路id"
+          placeholder="请输入线路"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="跟车员 关联teachers表的id	" prop="attendantId">
+      <el-form-item label="跟车员" prop="attendantId">
         <el-input
           v-model="queryParams.attendantId"
-          placeholder="请输入跟车员 关联teachers表的id	"
+          placeholder="请输入跟车员"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="未上车" prop="unGetOn">
-        <el-input
-          v-model="queryParams.unGetOn"
-          placeholder="请输入未上车"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="请假" prop="leave">
-        <el-input
-          v-model="queryParams.leave"
-          placeholder="请输入请假"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -82,24 +63,19 @@
 
     <el-table v-loading="loading" :data="scbfollowrecordList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" /><el-table-column
-        label=""
+        label="线路"
         align="center"
-        prop="id"
+        prop="lineName"
         :show-overflow-tooltip="true"
       /><el-table-column
-        label="线路id"
+        label="车牌号"
         align="center"
-        prop="lineId"
+        prop="carNo"
         :show-overflow-tooltip="true"
       /><el-table-column
-        label="车辆id"
+        label="跟车员"
         align="center"
-        prop="carId"
-        :show-overflow-tooltip="true"
-      /><el-table-column
-        label="跟车员 关联teachers表的id	"
-        align="center"
-        prop="attendantId"
+        prop="attendantName"
         :show-overflow-tooltip="true"
       /><el-table-column
         label="所有人数"

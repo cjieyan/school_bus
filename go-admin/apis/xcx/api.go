@@ -376,8 +376,7 @@ func (a Api) LineFinish(c *gin.Context) {
 	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
 
 	//打卡总数
-	count, err := tools.RdbHlen(swipeAtKey)
-
+	//count, err := tools.RdbHlen(swipeAtKey)
 
 	tools.RdbDel(swipeAtKey)
 
