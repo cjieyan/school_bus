@@ -87,7 +87,6 @@ func GetScbStudentsList(c *gin.Context) {
 		studentsData = append(studentsData, student)
 	}
 
-
 	app.PageOK(c, studentsData, count, pageIndex, pageSize, "")
 }
 

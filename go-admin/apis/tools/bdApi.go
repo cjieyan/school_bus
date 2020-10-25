@@ -127,3 +127,60 @@ func (b *BdApi) FacesetAdd(userId, image string) (faceToken string) {
 	}
 	return ""
 }
+
+// 多个人脸识别
+func (b *BdApi)MutilSearch(image string) (ret []string){
+	token := b.getToken()
+	urlStr := "https://aip.baidubce.com/rest/2.0/face/v3/multi-search" +
+		"?access_token=" + token
+
+	reqModel := models.BdApiFacesetMutilSearchReq{}
+	reqModel.Image = image
+	reqModel.ImageType = "BASE64"
+	reqModel.GroupIdList = GroupId
+	reqModel.MaxFaceNum = 10
+	reqModel.QualityControl = "NORMAL"
+	reqModel.LivenessControl = "NORMAL"
+	reqModel.MaxUserNum = 10
+
+	requestBody := new(bytes.Buffer)
+
+	json.NewEncoder(requestBody).Encode(reqModel)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60 * time.Second)
+
+	defer cancel()
+	fmt.Println("requestBody", requestBody)
+	req, err := http.NewRequest("POST", urlStr, requestBody)
+	if err != nil {
+		fmt.Println("post req err -> ", err)
+		return
+	}
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req.WithContext(ctx))
+
+	if err != nil {
+		fmt.Println("post req err -> ", err)
+		return
+	}
+
+	defer resp.Body.Close()
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Read failed:", err)
+		return
+	}
+	rsp := models.BdApiFacesetMutilSearchRsp{}
+	err = json.Unmarshal(content, &rsp)
+	fmt.Println("MutilSearch content: ----> ", string(content), rsp.ErrorCode)
+
+	faceTokenArray := []string{}
+	if 0 == rsp.ErrorCode && rsp.Result.FaceNum > 0 {
+		for _, face := range rsp.Result.FaceList{
+			faceTokenArray = append(faceTokenArray, face.FaceToken)
+		}
+		ret = faceTokenArray
+	}
+	return
+
+}

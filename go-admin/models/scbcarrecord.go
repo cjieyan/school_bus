@@ -18,6 +18,7 @@ type ScbCarRecord struct {
 	Longitude  string `json:"longitude" gorm:"size:100;"`
 	Latitude  string `json:"latitude" gorm:"size:100;"`
 	Prop	int `json:"prop" gorm:"prop"`
+	Type   int `json:"type" gorm:"type"` //0刷脸打卡,1手动打卡
 	Params    string `json:"params"  gorm:"-"`
 	BaseModel
 }

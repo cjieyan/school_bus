@@ -9,6 +9,7 @@ type ScbFollowRecord struct {
 	Id            int      `json:"id" gorm:"type:int(11);primary_key"` //
 	LineId        int      `json:"lineId" gorm:"type:int(11);"`        // 线路id
 	CarId         int      `json:"carId" gorm:"type:int(11);"`         // 车辆id
+	Ymd           int      `json:"ymd"  gorm:"type:int(11)"`
 	AttendantId   int      `json:"attendantId" gorm:"type:int(11);"`   // 跟车员 关联teachers表的id
 	AllCount      int      `json:"allCount" gorm:"type:int(11);"`      // 所有人数
 	GetOff        int      `json:"getOff" gorm:"type:int(11);"`        // 已下车数量
@@ -62,12 +63,8 @@ func (e *ScbFollowRecord) Get() (ScbFollowRecord, error) {
 		table = table.Where("attendant_id = ?", e.AttendantId)
 	}
 
-	if e.UnGetOn != 0 {
-		table = table.Where("un_get_on = ?", e.UnGetOn)
-	}
-
-	if e.Leave != 0 {
-		table = table.Where("leave = ?", e.Leave)
+	if e.Ymd != 0 {
+		table = table.Where("ymd = ?", e.Ymd)
 	}
 
 	if err := table.First(&doc).Error; err != nil {

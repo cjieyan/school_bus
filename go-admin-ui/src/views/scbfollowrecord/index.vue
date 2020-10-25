@@ -102,6 +102,11 @@
         align="center"
         prop="leave"
         :show-overflow-tooltip="true"
+      /><el-table-column
+        label="日期"
+        align="center"
+        prop="ymd"
+        :show-overflow-tooltip="true"
       />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">

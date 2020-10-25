@@ -254,3 +254,21 @@ func (e *ScbStudents) GetAllByCarId() ([]ScbStudents, error) {
 	err := table.Find(&doc).Error
 	return doc, err
 }
+
+
+// 获取ScbStudents
+func (e *ScbStudents) GetByFaceTokens(carId int, faceTokens []string) ([]ScbStudents, error) {
+	var doc []ScbStudents
+	table := orm.Eloquent.Table(e.TableName())
+
+	if len(faceTokens ) > 0{
+
+		table = table.Where("site_id in ( ? )", faceTokens)
+		table = table.Where("car_id = ? ", carId)
+		if err := table.Find(&doc).Error; err != nil {
+			return doc, err
+		}
+	}
+
+	return doc, nil
+}

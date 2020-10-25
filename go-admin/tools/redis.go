@@ -12,9 +12,6 @@ import (
 
 var Rdb redis.Conn
 
-
-
-
 /**
 redis 初始化连接
 */

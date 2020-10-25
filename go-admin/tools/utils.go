@@ -6,6 +6,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"math/big"
 	"strconv"
+	"time"
 )
 
 // 不建议使用的方法（即将过时）
@@ -75,4 +76,12 @@ func GenRandomString(len int) string  {
 		container += string(str[randomInt.Int64()])
 	}
 	return container
+}
+
+func Ymd() string {
+	year := time.Now().Year()
+	month := time.Now().Format("01")
+	day := time.Now().Day()
+	ymd := strconv.Itoa(year) + month + strconv.Itoa(day)
+	return ymd
 }

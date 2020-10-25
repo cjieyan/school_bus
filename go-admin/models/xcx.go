@@ -18,15 +18,20 @@ type SwipeReq struct {
 type SwipeRsp struct {
 	Status int `json:"status"`
 }
+
 //刷脸时间
 type SwipeAt struct {
-	Status int `json:"status"`
+	Status int `json:"status"` //-1 未上车 0 上车 1 下车
 	Time int 	`json:"time"`
 }
-
-type LineFinishReq struct {
-	StudentId int `json:"student_id"`
+type LineStartReq struct {
 	LineId int `json:"line_id"`
+}
+type LineFinishReq struct {
+	LineId int `json:"line_id"`
+}
+type LineFinishRsp struct {
+	IsFinished int `json:"is_finished"`
 }
 type LineInfoReq struct {
 	LineId int `json:"line_id"`
@@ -44,4 +49,20 @@ type LineCheckRsp struct{
 type FollowRecordReq struct {
 	PageSize int `json:"page_size"`
 	PageIndex int `json:"page_index"`
+}
+
+type FaceSwipeReq struct {
+	Image string `json:"image"`
+	LineId int `json:"line_id"`
+	SiteId int `json:"site_id"`
+	QqLongitude string `json:"qq_longitude"`
+	QqLatitude string `json:"qq_latitude"`
+}
+type FaceSwipeRsp struct {
+	Num int `json:"num"`
+	StudentStatus []FaceSwipeRspStudentStatus `json:"students"`
+}
+type FaceSwipeRspStudentStatus struct{
+	StudentId int `json:"studentId"`
+	Status int `json:"status"` //-1 未上车 0 上车 1 下车
 }
