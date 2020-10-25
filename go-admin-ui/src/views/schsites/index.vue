@@ -127,131 +127,175 @@
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="800px">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="线路" prop="lineId">
-          <el-cascader
-            v-model="form.lineId"
-            :options="linesOptions"
-            :props="lineIdProps"
-            :style="{width: '100%'}"
-            placeholder="请选择线路"
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="名称" prop="name">
-          <el-input
-            v-model="form.name"
-            placeholder="名称"
-          />
-        </el-form-item>
-        <el-form-item label="用途" prop="purpose">
-          <el-input
-            v-model="form.purpose"
-            placeholder="用途"
-          />
-        </el-form-item>
-        <el-form-item label="排序" prop="sort">
-          <el-input
-            v-model="form.sort"
-            placeholder="排序"
-          />
-        </el-form-item>
-        <el-form-item label="站点属性" prop="prop">
-          <el-select v-model="form.prop" placeholder="选择站点属性" clearable :style="{width: '100%'}">
-            <el-option
-              v-for="(item, index) in attrsOptions"
-              :key="index"
-              :label="item.label"
-              :value="item.value"
-              :disabled="item.disabled"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="到达时间" prop="arriveAt">
-          <el-time-picker
-            v-model="form.arriveAt"
-            format="HH:mm:ss"
-            value-format="HH:mm:ss"
-            :picker-options="{'selectableRange':'00:00:00-23:59:59'}"
-            :style="{width: '100%'}"
-            placeholder="请选择到达时间"
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input
-            v-model="form.remark"
-            placeholder="备注"
-          />
-        </el-form-item>
-
-        <el-form-item label="图片" prop="picture">
-          <el-upload
-            ref="picture"
-            :file-list="picturefileList"
-            :action="pictureAction"
-            :auto-upload="false"
-            :before-upload="pictureBeforeUpload"
-            :on-change="onUploadChange"
-            list-type="picture-card"
-            accept="image/*"
-            name="picture"
-          >
-            <i class="el-icon-plus" />
-            <div slot="tip" class="el-upload__tip">只能上传不超过 2MB 的图片文件</div>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="位置" prop="address">
-          <el-input
-            v-model="addressKeyword"
-            placeholder="搜索地址"
-            clearable
-          />
-          <el-input
-            v-model="form.longitude"
-            placeholder="经度"
-            readonly
-            style="width: 100px"
-          />
-          <el-input
-            v-model="form.latitude"
-            placeholder="经度"
-            readonly
-            style="width: 100px"
-          />
-          <el-input
-            v-model="form.address"
-            placeholder="详细地址"
-            readonly
-            style="width: 300px"
-          />
-          <div class="address">
-            <!-- 给地图加点击事件getLocationPoint，点击地图获取位置相关的信息，经纬度啥的 -->
-            <!-- scroll-wheel-zoom：是否可以用鼠标滚轮控制地图缩放，zoom是视图比例 -->
-            <baidu-map
-              class="bmView"
-              :scroll-wheel-zoom="true"
-              :center="location"
-              :zoom="zoom"
-              @click="getLocationPoint"
-            >
-              <bm-geolocation
-                anchor="BMAP_ANCHOR_BOTTOM_RIGHT"
-                :show-address-bar="true"
-                :auto-location="true"
+        <el-row :gutter="15">
+          <el-col :span="9">
+            <el-form-item label="线路" prop="lineId">
+              <el-cascader
+                v-model="form.lineId"
+                :options="linesOptions"
+                :props="lineIdProps"
+                :style="{width: '100%'}"
+                placeholder="请选择线路"
+                clearable
               />
-              <bm-view style="width: 100%; height:400px; flex: 1" />
-              <bm-local-search
-                :keyword="addressKeyword"
-                :panel="true"
-                :page-capacity="5"
-                :select-first-result="true"
-                :auto-viewport="true"
+            </el-form-item>
+          </el-col>
+          <el-col :span="15" style="position: absolute ;right: 10px;z-index: 5">
+            <el-form-item label="位置" prop="address">
+              <el-input
+                v-model="addressKeyword"
+                placeholder="搜索地址"
+                clearable
               />
-              <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT" />
-            </baidu-map>
-          </div>
-        </el-form-item>
-
+              <div class="address">
+                <!-- 给地图加点击事件getLocationPoint，点击地图获取位置相关的信息，经纬度啥的 -->
+                <!-- scroll-wheel-zoom：是否可以用鼠标滚轮控制地图缩放，zoom是视图比例 -->
+                <baidu-map
+                  class="bmView"
+                  :scroll-wheel-zoom="true"
+                  :center="location"
+                  :zoom="zoom"
+                  @click="getLocationPoint"
+                >
+                  <bm-geolocation
+                    anchor="BMAP_ANCHOR_BOTTOM_RIGHT"
+                    :show-address-bar="true"
+                    :auto-location="true"
+                  />
+                  <bm-view style="width: 100%; height:400px; flex: 1" />
+                  <bm-local-search
+                    :keyword="addressKeyword"
+                    :panel="true"
+                    :page-capacity="5"
+                    :select-first-result="true"
+                    :auto-viewport="true"
+                  />
+                  <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT" />
+                </baidu-map>
+              </div>
+              <el-row :gutter="15">
+                <el-col :span="12">
+                  <el-form-item label="经度" prop="longitude">
+                    <el-input
+                      v-model="form.longitude"
+                      placeholder="经度"
+                      readonly
+                      style="width: 100px"
+                    />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="纬度" prop="latitude">
+                    <el-input
+                      v-model="form.latitude"
+                      placeholder="纬度"
+                      readonly
+                      style="width: 100px"
+                    />
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-form-item label="详细地址" prop="address">
+                <el-input
+                  v-model="form.address"
+                  placeholder="详细地址"
+                  readonly
+                  style="width: 300px"
+                />
+              </el-form-item>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="9">
+            <el-form-item label="名称" prop="name">
+              <el-input
+                v-model="form.name"
+                placeholder="名称"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="9">
+            <el-form-item label="用途" prop="purpose">
+              <el-input
+                v-model="form.purpose"
+                placeholder="用途"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="9">
+            <el-form-item label="排序" prop="sort">
+              <el-input
+                v-model="form.sort"
+                placeholder="排序"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="9">
+            <el-form-item label="站点属性" prop="prop">
+              <el-select v-model="form.prop" placeholder="选择站点属性" clearable :style="{width: '100%'}">
+                <el-option
+                  v-for="(item, index) in attrsOptions"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.value"
+                  :disabled="item.disabled"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="9">
+            <el-form-item label="到达时间" prop="arriveAt">
+              <el-time-picker
+                v-model="form.arriveAt"
+                format="HH:mm:ss"
+                value-format="HH:mm:ss"
+                :picker-options="{'selectableRange':'00:00:00-23:59:59'}"
+                :style="{width: '100%'}"
+                placeholder="请选择到达时间"
+                clearable
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="9">
+            <el-form-item label="备注" prop="remark">
+              <el-input
+                v-model="form.remark"
+                placeholder="备注"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="9">
+            <el-form-item label="图片" prop="picture">
+              <el-upload
+                ref="picture"
+                :file-list="picturefileList"
+                :action="pictureAction"
+                :auto-upload="false"
+                :before-upload="pictureBeforeUpload"
+                :on-change="onUploadChange"
+                list-type="picture-card"
+                accept="image/*"
+                name="picture"
+              >
+                <i class="el-icon-plus" />
+                <div slot="tip" class="el-upload__tip">只能上传不超过 2MB 的图片文件</div>
+              </el-upload>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -452,7 +496,6 @@ export default {
       // local.search(str)
     },
     /***百度地图 end ***/
-
     onUploadChange(file){
       const isIMAGE = (file.raw.type === 'image/jpeg' || file.raw.type === 'image/png' || file.raw.type === 'image/gif');
       // const isLt1M = file.size / 1024 / 1024 < 1;
@@ -645,6 +688,7 @@ export default {
       color: #b4b4b4;
       margin-bottom: 5px;
       height: 200px;
+      margin: 15px 0;
     }
   }
 }

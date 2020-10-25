@@ -5,12 +5,19 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/nfnt/resize"
 	tools2 "go-admin/apis/tools"
 	"go-admin/models"
 	"go-admin/tools"
 	"go-admin/tools/app"
 	"go-admin/tools/app/msg"
+	"image"
+	"image/gif"
+	"image/jpeg"
+	"image/png"
 	"io/ioutil"
+	"log"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -132,6 +139,7 @@ func InsertScbStudents(c *gin.Context) {
 			}
 			ddd, _ := base64.StdEncoding.DecodeString(imageArr[1]) //成图片文件并把文件写入到buffer
 			ioutil.WriteFile("./images/face_" + faceToken + "." + ext, ddd, 0666)   //buffer输出到jpg文件中（不做处理，直接写到文件）
+			saveSmall("./images/face_" + faceToken + "." + ext, ext, "./images/face_" + faceToken + "_small." + ext)
 		}
 	}
 
@@ -154,6 +162,7 @@ func UpdateScbStudents(c *gin.Context) {
 
 	imageArr := strings.Split(data.Picture, ";base64,")
 	ext := "png"
+	fmt.Println("imageArr. len......", len(imageArr))
 	if len(imageArr) > 1 {
 		imageArrTmp := strings.Split(imageArr[0], "/")
 		if len(imageArrTmp) > 1 {
@@ -161,6 +170,7 @@ func UpdateScbStudents(c *gin.Context) {
 		}
 		ddd, _ := base64.StdEncoding.DecodeString(imageArr[1]) //成图片文件并把文件写入到buffer
 		ioutil.WriteFile("./images/face_" + faceToken + "." + ext, ddd, 0666)   //buffer输出到jpg文件中（不做处理，直接写到文件）
+		saveSmall("./images/face_" + faceToken + "." + ext, ext, "./images/face_" + faceToken + "_small." + ext)
 	}
 
 	data.Picture = ""
@@ -177,4 +187,69 @@ func DeleteScbStudents(c *gin.Context) {
 	_, err := data.BatchDelete(IDS)
 	tools.HasError(err, msg.DeletedFail, 500)
 	app.OK(c, nil, msg.DeletedSuccess)
+}
+
+//保存小图
+func saveSmall(filepath, ext, smallPath string){
+	file, err := os.Open(filepath)
+	if err != nil {
+		fmt.Println("saveSmall Open err......", err)
+		return
+	}
+	var img image.Image
+	switch strings.ToLower(ext) {
+		case "png":
+			img, err = png.Decode(file)
+		case "jpg" :
+			img, err = jpeg.Decode(file)
+		case "jpeg":
+			img, err = jpeg.Decode(file)
+		case "gif":
+			img, err = gif.Decode(file)
+		default:
+			return
+	}
+	// decode jpeg into image.Image
+	if err != nil {
+		log.Fatal(err)
+	}
+	file.Close()
+
+	// resize to width 1000 using Lanczos resampling
+	// and preserve aspect ratio
+
+	//newWidth := 200
+	kuan:=img.Bounds().Dx()//
+	gao:=img.Bounds().Dy()//
+	newHeight := uint(kuan * 200 / gao)
+	fmt.Println("newHeight....", newHeight, kuan, gao, 200)
+
+	//m := resize.Resize(200, 200, img, resize.Bilinear)
+	//m := resize.Resize(1000, 0, img, resize.Lanczos3)
+	m := resize.Thumbnail(200, newHeight, img, resize.Lanczos3)
+
+
+	out, err := os.Create(smallPath)
+	if err != nil {
+		fmt.Println("saveSmall Create err......", err)
+		return
+	}
+	defer out.Close()
+	fmt.Println("saveSmall strings.ToLower(ext)......", strings.ToLower(ext) )
+
+	// write new image to file
+	var sErr error
+	switch strings.ToLower(ext) {
+		case "png":
+			sErr = png.Encode(out, m)
+		case "jpg":
+			sErr = jpeg.Encode(out, m, &jpeg.Options{Quality: 100})
+		case "jpeg":
+			sErr = jpeg.Encode(out, m, &jpeg.Options{Quality: 100})
+		case "gif":
+			sErr = gif.Encode(out, m, &gif.Options{})
+		default:
+			return
+	}
+	fmt.Println("saveSmall sErr......", sErr)
 }

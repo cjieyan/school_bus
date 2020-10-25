@@ -90,7 +90,6 @@ func (b *BdApi) FacesetAdd(userId, image string) (faceToken string) {
 	reqModel.UserId = userId
 	reqModel.ActionType = "REPLACE"
 
-
 	requestBody := new(bytes.Buffer)
 
 	json.NewEncoder(requestBody).Encode(reqModel)
@@ -98,7 +97,6 @@ func (b *BdApi) FacesetAdd(userId, image string) (faceToken string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60 * time.Second)
 
 	defer cancel()
-	fmt.Println("requestBody", requestBody)
 	req, err := http.NewRequest("POST", urlStr, requestBody)
 	if err != nil {
 		fmt.Println("post req err -> ", err)

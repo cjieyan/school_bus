@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	tools2 "go-admin/apis/tools"
 	"go-admin/models"
@@ -12,8 +13,6 @@ import (
 	"math"
 	"strconv"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 type Api struct {
