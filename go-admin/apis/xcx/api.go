@@ -163,13 +163,27 @@ func (a Api) LineInfo(c *gin.Context) {
 	key := tools.Keys{}.GetOn(ymd, teacher.Id)
 	students, _ := redis.Values(tools.RdbSMembers(key))
 
-	rsp := make(map[string]interface{})
+	followRecordModel := models.ScbFollowRecord{}
+	followRecordModel.Ymd, err = strconv.Atoi(ymd)
+	followRecordModel.LineId = lineData.Id
+	followRecordModel.AttendantId = userId
+	followRecordData, err := followRecordModel.Get()
+	isFinished := -1
+	if nil != err && followRecordData.IsFinished == 1{
+		isFinished = 1
+	}else if len(students) > 0{
+		isFinished = 0
+	}
+
+
+		rsp := make(map[string]interface{})
 	rsp["teacher"] = teacher                 //跟车员信息
 	rsp["car"] = carData                     //车辆信息
 	rsp["line"] = lineData                   //线路信息
 	rsp["sites"] = sitesData                 //站点信息
 	rsp["studentCount"] = studentCount       //所有學生
 	rsp["studentGetOnCount"] = len(students) //已上車的學生
+	rsp["isFinished"] = isFinished // -1行程尚未开始 0未结束 1 已结束
 	app.OK(c, rsp, "")
 }
 
