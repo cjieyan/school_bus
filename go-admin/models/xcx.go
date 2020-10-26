@@ -66,3 +66,10 @@ type FaceSwipeRspStudentStatus struct{
 	StudentId int `json:"studentId"`
 	Status int `json:"status"` //-1 未上车 0 上车 1 下车
 }
+type StudentInfoReq struct{
+	LineId int `json:"line_id"`
+	StudentId int `json:"studentId"`
+}
+type StudentInfoRsp struct{
+	Student ScbStudents `json:"student"`
+}

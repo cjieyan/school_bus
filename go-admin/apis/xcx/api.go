@@ -2,6 +2,7 @@ package xcx
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
@@ -598,7 +599,7 @@ func (a Api)FaceSwipe(c *gin.Context){
 	if len(studentsStatus) > 0 {
 		app.OK(c, rsp, "")
 	}else{
-		app.Error(c, -1, nil, "未识别到人脸")
+		tools.HasError(errors.New("未识别到人脸"),"未识别到人脸", -1)
 	}
 }
 
@@ -615,10 +616,11 @@ func (a Api) Swipe(c *gin.Context) {
 
 	//获取跟车员信息
 	teacherModel.Id = userId
+	teacherModel.PostId = 1
 	teacher, err := teacherModel.Get()
-	if teacher.PostId != 1 {
-		tools.HasError(err, "您不是跟车员, sch_teachers表的postId = 1", -1)
-	}
+	//if teacher.PostId != 1 {
+	tools.HasError(err, "您不是跟车员", -1)//, sch_teachers表的postId = 1
+	//}
 
 	//获取车辆信息
 	carModel := models.ScbCars{}
@@ -740,4 +742,18 @@ func (a Api) Swipe(c *gin.Context) {
 		ret.Status = 0
 		app.OK(c, ret, "上车刷脸成功")
 	}
+}
+func (a Api)StudentInfo(c *gin.Context){
+	// 人脸token获取用户信息
+
+	var objParams models.StudentInfoReq
+	err := c.ShouldBindJSON(&objParams)
+	tools.HasError(err, "", 500)
+
+    var studentModel models.ScbStudents
+	studentModel.Id = objParams.StudentId
+	studentData, err := studentModel.Get()
+	studentData.HeadImg = ""
+	app.OK(c, studentData, "")
+
 }

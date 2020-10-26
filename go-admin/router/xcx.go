@@ -24,5 +24,6 @@ func registerXcxRouter(v1 *gin.RouterGroup) {
 		authGroup.POST("/line-students", xcx.Api{}.LineStudents) //获取一条线路的所有学生信息
 		authGroup.POST("/follow-record", xcx.Api{}.FollowRecord) //跟车记录
 		authGroup.POST("/face-swipe", xcx.Api{}.FaceSwipe) //人脸打卡
+		authGroup.POST("/student-info", xcx.Api{}.StudentInfo) //学生信息
 	}
 }
