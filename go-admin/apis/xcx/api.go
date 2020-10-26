@@ -2,6 +2,7 @@ package xcx
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
@@ -61,9 +62,10 @@ func (a Api) Sites(c *gin.Context) {
 	tools.HasError(err, "账号异常,请联系管理员", -1)
 	app.OK(c, info, "")
 }
+
 //多线路信息
 //
-func (a Api)Lines(c *gin.Context){
+func (a Api) Lines(c *gin.Context) {
 
 	userId := c.GetInt(models.UserId)
 
@@ -93,17 +95,17 @@ func (a Api)Lines(c *gin.Context){
 
 	tools.HasError(err, "线路不存在", -1)
 	var linesRetData []models.ScbLines
-	for _, line := range linesData{
+	for _, line := range linesData {
 		line.CarNos = carData.CarNo
 		line.CarId = carData.Id
 		siteModel := models.SchSites{}
 		siteModel.LineId = line.Id
 		startSite, err := siteModel.GetStart()
-		if nil == err{
+		if nil == err {
 			line.StartSite = startSite
 		}
 		endSite, err := siteModel.GetEnd()
-		if nil == err{
+		if nil == err {
 			line.EndSite = endSite
 		}
 		linesRetData = append(linesRetData, line)
@@ -171,7 +173,7 @@ func (a Api) LineInfo(c *gin.Context) {
 	app.OK(c, rsp, "")
 }
 
-func (a Api) LineStart(c *gin.Context){
+func (a Api) LineStart(c *gin.Context) {
 
 	objParams := models.LineStartReq{}
 	err := c.ShouldBindJSON(&objParams)
@@ -201,18 +203,18 @@ func (a Api) LineStart(c *gin.Context){
 	followRecordModel.CarId = carData.Id
 	followRecordModel.LineId = carData.LineId
 	followRecordModel.AttendantId = teacher.Id
-	followRecordModel.Ymd, _ = strconv.Atoi( tools.Ymd() )
+	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
 
 	followRecordData, err := followRecordModel.Get()
 	ret := models.LineFinishRsp{}
 	msg := "行程已经开始"
-	if gorm.IsRecordNotFoundError(err){
+	if gorm.IsRecordNotFoundError(err) {
 		followRecordModel.IsFinished = 0
 		followRecordData, err := followRecordModel.Create()
 		fmt.Println("followRecordData, err...", followRecordData, err)
 		ret.IsFinished = 1
 		msg = "操作成功"
-	}else if 1 == followRecordData.IsFinished {
+	} else if 1 == followRecordData.IsFinished {
 		msg = "行程已结束"
 	}
 	tools.HasError(err, "", -1)
@@ -220,7 +222,7 @@ func (a Api) LineStart(c *gin.Context){
 	app.OK(c, nil, msg)
 }
 
-func(a Api)LineCheck(c *gin.Context){
+func (a Api) LineCheck(c *gin.Context) {
 
 	userId := c.GetInt(models.UserId)
 	teacherModel := models.ScbTeachers{}
@@ -235,7 +237,7 @@ func(a Api)LineCheck(c *gin.Context){
 	swipeNowKey := tools.Keys{}.SwipeNow()
 	swipeRecordKey := tools.Keys{}.SwipeNowRecord(teacher.Id)
 
-	lineStartAt, err := redis.Int( tools.RdbHGet(swipeNowKey, swipeRecordKey) )
+	lineStartAt, err := redis.Int(tools.RdbHGet(swipeNowKey, swipeRecordKey))
 	rsp := models.LineCheckRsp{}
 	rsp.StartAt = lineStartAt
 	//rsp.Line =
@@ -277,16 +279,16 @@ func (a Api) LineFinish(c *gin.Context) {
 	fmt.Println("all err ...", all, err)
 	getOff := 0
 	getOn := 0
-	for _, sSwipe := range all{
+	for _, sSwipe := range all {
 		var swipeAtInfo models.SwipeAt
 		err = json.Unmarshal([]byte(sSwipe), &swipeAtInfo)
-		getOn ++
-		if 1 == swipeAtInfo.Status{
-			getOff ++
+		getOn++
+		if 1 == swipeAtInfo.Status {
+			getOff++
 		}
 	}
 
-	if getOn <=0 {
+	if getOn <= 0 {
 		//app.Error(c, 200, errors.New("线路结束失败"), "线路结束失败, 尚未有人上车")
 		tools.HasError(err, "线路结束失败, 尚未有人上车", -1)
 	}
@@ -299,23 +301,23 @@ func (a Api) LineFinish(c *gin.Context) {
 	followRecordModel.CarId = carData.Id
 	followRecordModel.LineId = carData.LineId
 	followRecordModel.AttendantId = teacher.Id
-	followRecordModel.Ymd, _ = strconv.Atoi( tools.Ymd() )
+	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
 
 	followRecord, err := followRecordModel.Get()
 	ret := models.LineFinishRsp{}
 	msg := "操作失败"
-	if gorm.IsRecordNotFoundError(err){
+	if gorm.IsRecordNotFoundError(err) {
 
 		followRecordModel.GetOn = getOn
 		followRecordModel.GetOff = getOff
 		followRecordModel.AllCount = allCount
-		followRecordModel.UnGetOn = allCount- getOn
+		followRecordModel.UnGetOn = allCount - getOn
 		followRecordModel.IsFinished = 0
 		followRecordData, err := followRecordModel.Create()
 		fmt.Println("followRecordData, err...", followRecordData, err)
 		ret.IsFinished = 1
 		msg = "行程结束成功"
-	}else{
+	} else {
 		followRecordModel.IsFinished = 1
 		followRecordModel.Update(followRecord.Id)
 
@@ -370,9 +372,9 @@ func (a Api) LineStudents(c *gin.Context) {
 		err = json.Unmarshal([]byte(sSwipe), &swipeAtInfo)
 		swipesData[studentId] = swipeAtInfo.Status
 	}
-	unGetOn := 0 //未上车数量
-	getOn := 0   //已上车数量
-	getOff := 0  //已下车数量
+	unGetOn := 0                  //未上车数量
+	getOn := 0                    //已上车数量
+	getOff := 0                   //已下车数量
 	allCount := len(studentsData) //此车辆内 学生数量
 	//整理返回数据
 	var studentsDataRet []models.ScbStudents
@@ -380,33 +382,33 @@ func (a Api) LineStudents(c *gin.Context) {
 		status, sErr := swipesData[student.Id]
 		if false == sErr {
 			student.SwipeStatus = -1
-			unGetOn ++
+			unGetOn++
 		} else {
 			student.SwipeStatus = status
-			if 0 == student.SwipeStatus{
-				getOn ++
-			}else{
-				getOff ++
+			if 0 == student.SwipeStatus {
+				getOn++
+			} else {
+				getOff++
 			}
 		}
 		studentsDataRet = append(studentsDataRet, student)
 	}
 	ret := make(map[string]interface{})
-	ret["unGetOn"] = unGetOn //未上车数量
-	ret["getOn"] = getOn //已上车数量
-	ret["getOff"] = getOff //已下车数量
-	ret["allCount"] = allCount //此车辆内 学生数量
+	ret["unGetOn"] = unGetOn                 //未上车数量
+	ret["getOn"] = getOn                     //已上车数量
+	ret["getOff"] = getOff                   //已下车数量
+	ret["allCount"] = allCount               //此车辆内 学生数量
 	ret["studentsDataRet"] = studentsDataRet //所有学生信息
 	app.OK(c, ret, "操作成功")
 }
 
-func (a Api) FollowRecord (c *gin.Context){
+func (a Api) FollowRecord(c *gin.Context) {
 	objParams := models.FollowRecordReq{}
 	err := c.ShouldBindJSON(&objParams)
 	if nil != err {
 		tools.HasError(err, "", -1)
 	}
-	if objParams.PageSize <=0 {
+	if objParams.PageSize <= 0 {
 		objParams.PageSize = 10
 	}
 	if objParams.PageSize > 100 {
@@ -417,7 +419,7 @@ func (a Api) FollowRecord (c *gin.Context){
 
 	ymd := tools.Ymd()
 	swipeAtKey := tools.Keys{}.SwipeAt(ymd, 1)
-	tmpData, err:= tools.RdbHGetAll(swipeAtKey)
+	tmpData, err := tools.RdbHGetAll(swipeAtKey)
 	fmt.Println("swipeData...", tmpData)
 
 	followModel := models.ScbFollowRecord{}
@@ -425,7 +427,7 @@ func (a Api) FollowRecord (c *gin.Context){
 
 	result, count, err := followModel.GetPage(objParams.PageSize, objParams.PageIndex)
 	var followRecordsData []models.ScbFollowRecord
-	for _, follow := range result{
+	for _, follow := range result {
 		carModel := models.ScbCars{}
 		carModel.Id = follow.CarId
 		carData, err := carModel.Get()
@@ -435,7 +437,7 @@ func (a Api) FollowRecord (c *gin.Context){
 		lineModel := models.ScbLines{}
 		lineModel.Id = follow.LineId
 		lineData, err := lineModel.Get()
-		if nil == err{
+		if nil == err {
 			follow.Line = lineData
 		}
 		followRecordsData = append(followRecordsData, follow)
@@ -444,15 +446,16 @@ func (a Api) FollowRecord (c *gin.Context){
 	tools.HasError(err, "暂时没有跟车记录", -1)
 
 	ret := make(map[string]interface{})
-	ret["count"] = count                                              //未上车数量
-	ret["result"] = result                                            //已上车数量
-	ret["page_index"] = objParams.PageIndex                           //已下车数量
-	ret["page_size"] = objParams.PageSize                             //每页数量
+	ret["count"] = count                                                       //未上车数量
+	ret["result"] = result                                                     //已上车数量
+	ret["page_index"] = objParams.PageIndex                                    //已下车数量
+	ret["page_size"] = objParams.PageSize                                      //每页数量
 	ret["totalpage"] = math.Ceil(float64(count) / float64(objParams.PageSize)) //总页数
 	app.OK(c, ret, "操作成功")
 }
+
 // 人脸打卡 支持多脸
-func (a Api)FaceSwipe(c *gin.Context){
+func (a Api) FaceSwipe(c *gin.Context) {
 	objParams := models.FaceSwipeReq{}
 
 	err := c.ShouldBindJSON(&objParams)
@@ -486,30 +489,29 @@ func (a Api)FaceSwipe(c *gin.Context){
 	api := tools2.BdApi{}
 	faceTokens := api.MutilSearch(objParams.Image)
 	studentModel := models.ScbStudents{}
-	if len(faceTokens) <= 0{
+	if len(faceTokens) <= 0 {
 		tools.HasError(err, "扫码失败,我发识别到人脸", 500)
 	}
 
 	//获取到识别的学生列表
-	studentsData, err := studentModel.GetByFaceTokens( carData.Id, faceTokens)
+	studentsData, err := studentModel.GetByFaceTokens(carData.Id, faceTokens)
 	tools.HasError(err, "扫码失败.您上错车了", 500)
-
 
 	//创建跟车记录
 	followRecordModel := models.ScbFollowRecord{}
 	followRecordModel.CarId = carData.Id
 	followRecordModel.LineId = carData.LineId
 	followRecordModel.AttendantId = teacher.Id
-	followRecordModel.Ymd, _ = strconv.Atoi( tools.Ymd() )
+	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
 	_, err = followRecordModel.Get()
-	if gorm.IsRecordNotFoundError(err){
+	if gorm.IsRecordNotFoundError(err) {
 		followRecordModel.IsFinished = 0
 		followRecordData, err := followRecordModel.Create()
 		fmt.Println("followRecordData, err...", followRecordData, err)
 	}
 
 	var studentsStatus []models.FaceSwipeRspStudentStatus
-	for _, studentData := range studentsData{
+	for _, studentData := range studentsData {
 		studentIdStr := strconv.Itoa(studentData.Id)
 
 		//查询学生是否在车上
@@ -532,7 +534,7 @@ func (a Api)FaceSwipe(c *gin.Context){
 			if nil == err {
 				sStatus.StudentId = studentData.Id
 				//距离上次上车刷脸成功大于5分钟
-				if 0 == swipeAtInfo.Status && (now - swipeAtInfo.Time) > 60*1 {
+				if 0 == swipeAtInfo.Status && (now-swipeAtInfo.Time) > 60*1 {
 					//将标记为下车状态
 					swipeAtStruct := models.SwipeAt{
 						Status: 1,
@@ -596,7 +598,6 @@ func (a Api)FaceSwipe(c *gin.Context){
 
 	//获取此车辆的所有学生
 
-
 	getOff, getOn := getSwipeCount(objParams.LineId)
 	isFinished := false
 
@@ -604,18 +605,17 @@ func (a Api)FaceSwipe(c *gin.Context){
 	studentsModel.CarId = carData.Id
 	allStudentsCunt, err := studentsModel.GetCount()
 	tools.HasError(err, "此车辆未绑定任一学生", -1)
-	if len(studentsStatus) > 0 && 0 == studentsStatus[0].Status{
+	if len(studentsStatus) > 0 && 0 == studentsStatus[0].Status {
 		if getOff > 0 {
-			if allStudentsCunt <= getOff{
+			if allStudentsCunt <= getOff {
 				isFinished = true
 			}
-		}else if getOn > 0  {
-			if allStudentsCunt <= getOn{
+		} else if getOn > 0 {
+			if allStudentsCunt <= getOn {
 				isFinished = true
 			}
 		}
 	}
-
 
 	var rsp models.FaceSwipeRsp
 	rsp.StudentStatus = studentsStatus
@@ -623,8 +623,8 @@ func (a Api)FaceSwipe(c *gin.Context){
 	rsp.IsFinished = isFinished
 	if len(studentsStatus) > 0 {
 		app.OK(c, rsp, "")
-	}else{
-		app.Error(c, -1, nil, "未识别到人脸")
+	} else {
+		tools.HasError(errors.New("未识别到人脸"), "未识别到人脸", -1)
 	}
 }
 
@@ -641,10 +641,11 @@ func (a Api) Swipe(c *gin.Context) {
 
 	//获取跟车员信息
 	teacherModel.Id = userId
+	teacherModel.PostId = 1
 	teacher, err := teacherModel.Get()
-	if teacher.PostId != 1 {
-		tools.HasError(err, "您不是跟车员, sch_teachers表的postId = 1", -1)
-	}
+	//if teacher.PostId != 1 {
+	tools.HasError(err, "您不是跟车员", -1) //, sch_teachers表的postId = 1
+	//}
 
 	//获取车辆信息
 	carModel := models.ScbCars{}
@@ -684,10 +685,10 @@ func (a Api) Swipe(c *gin.Context) {
 	followRecordModel.CarId = carData.Id
 	followRecordModel.LineId = carData.LineId
 	followRecordModel.AttendantId = teacher.Id
-	followRecordModel.Ymd, _ = strconv.Atoi( tools.Ymd() )
+	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
 
 	_, err = followRecordModel.Get()
-	if gorm.IsRecordNotFoundError(err){
+	if gorm.IsRecordNotFoundError(err) {
 		followRecordModel.IsFinished = 0
 		followRecordData, err := followRecordModel.Create()
 		fmt.Println("followRecordData, err...", followRecordData, err)
@@ -702,7 +703,7 @@ func (a Api) Swipe(c *gin.Context) {
 		fmt.Println("swipeAtInfo SwipeAt err....", err)
 		if nil == err {
 			//距离上次上车刷脸成功大于5分钟
-			if 0 == swipeAtInfo.Status && (now - swipeAtInfo.Time) > 60*1 {
+			if 0 == swipeAtInfo.Status && (now-swipeAtInfo.Time) > 60*1 {
 				//将标记为下车状态
 				swipeAtStruct := models.SwipeAt{
 					Status: 1,
@@ -768,7 +769,7 @@ func (a Api) Swipe(c *gin.Context) {
 	}
 }
 
-func getSwipeCount(lineId int)(getOff, getOn int){
+func getSwipeCount(lineId int) (getOff, getOn int) {
 	ymd := tools.Ymd()
 	//清除当前行程的刷脸数据
 	swipeAtKey := tools.Keys{}.SwipeAt(ymd, lineId)
@@ -779,13 +780,27 @@ func getSwipeCount(lineId int)(getOff, getOn int){
 	all, err := tools.RdbHGetAll(swipeAtKey)
 	fmt.Println("all err ...", all, err)
 
-	for _, sSwipe := range all{
+	for _, sSwipe := range all {
 		var swipeAtInfo models.SwipeAt
 		err = json.Unmarshal([]byte(sSwipe), &swipeAtInfo)
-		getOn ++
-		if 1 == swipeAtInfo.Status{
-			getOff ++
+		getOn++
+		if 1 == swipeAtInfo.Status {
+			getOff++
 		}
 	}
 	return
+}
+func (a Api) StudentInfo(c *gin.Context) {
+	// 人脸token获取用户信息
+
+	var objParams models.StudentInfoReq
+	err := c.ShouldBindJSON(&objParams)
+	tools.HasError(err, "", 500)
+
+	var studentModel models.ScbStudents
+	studentModel.Id = objParams.StudentId
+	studentData, err := studentModel.Get()
+	studentData.HeadImg = ""
+	app.OK(c, studentData, "")
+
 }

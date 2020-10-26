@@ -15,9 +15,9 @@
 <style lang="scss">
 	@import "uview-ui/index.scss";
 	@import "common/demo.scss";
+
 	/*每个页面公共css */
-	page{
+	page {
 		background-color: #ededed;
 	}
 </style>
- 
