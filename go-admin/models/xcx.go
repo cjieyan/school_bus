@@ -61,6 +61,7 @@ type FaceSwipeReq struct {
 type FaceSwipeRsp struct {
 	Num int `json:"num"`
 	StudentStatus []FaceSwipeRspStudentStatus `json:"students"`
+	IsFinished bool `json:"isFinished"`
 }
 type FaceSwipeRspStudentStatus struct{
 	StudentId int `json:"studentId"`

@@ -494,6 +494,7 @@ func (a Api)FaceSwipe(c *gin.Context){
 	studentsData, err := studentModel.GetByFaceTokens( carData.Id, faceTokens)
 	tools.HasError(err, "扫码失败.您上错车了", 500)
 
+
 	//创建跟车记录
 	followRecordModel := models.ScbFollowRecord{}
 	followRecordModel.CarId = carData.Id
@@ -592,9 +593,34 @@ func (a Api)FaceSwipe(c *gin.Context){
 		}
 		studentsStatus = append(studentsStatus, sStatus)
 	}
+
+	//获取此车辆的所有学生
+
+
+	getOff, getOn := getSwipeCount(objParams.LineId)
+	isFinished := false
+
+	studentsModel := models.ScbStudents{}
+	studentsModel.CarId = carData.Id
+	allStudentsCunt, err := studentsModel.GetCount()
+	tools.HasError(err, "此车辆未绑定任一学生", -1)
+	if len(studentsStatus) > 0 && 0 == studentsStatus[0].Status{
+		if getOff > 0 {
+			if allStudentsCunt <= getOff{
+				isFinished = true
+			}
+		}else if getOn > 0  {
+			if allStudentsCunt <= getOn{
+				isFinished = true
+			}
+		}
+	}
+
+
 	var rsp models.FaceSwipeRsp
 	rsp.StudentStatus = studentsStatus
 	rsp.Num = len(studentsStatus)
+	rsp.IsFinished = isFinished
 	if len(studentsStatus) > 0 {
 		app.OK(c, rsp, "")
 	}else{
@@ -740,4 +766,26 @@ func (a Api) Swipe(c *gin.Context) {
 		ret.Status = 0
 		app.OK(c, ret, "上车刷脸成功")
 	}
+}
+
+func getSwipeCount(lineId int)(getOff, getOn int){
+	ymd := tools.Ymd()
+	//清除当前行程的刷脸数据
+	swipeAtKey := tools.Keys{}.SwipeAt(ymd, lineId)
+
+	//打卡总数
+	//count, err := tools.RdbHlen(swipeAtKey)
+
+	all, err := tools.RdbHGetAll(swipeAtKey)
+	fmt.Println("all err ...", all, err)
+
+	for _, sSwipe := range all{
+		var swipeAtInfo models.SwipeAt
+		err = json.Unmarshal([]byte(sSwipe), &swipeAtInfo)
+		getOn ++
+		if 1 == swipeAtInfo.Status{
+			getOff ++
+		}
+	}
+	return
 }
