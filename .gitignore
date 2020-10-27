@@ -32,3 +32,5 @@ config/settings.dev.b.yml
 temp/logs
 go-admin/config/settings.yml
 go-admin/go.sum
+go-admin/images
+go-admin/temp/logs

@@ -30,7 +30,10 @@ type ScbStudents struct {
 	SiteDownName  string `json:"siteDownName" gorm:"-"`
 	SiteUpName    string `json:"siteUpName" gorm:"-"`
 	ClassName     string `json:"className" gorm:"-"`
-	CarNo     string `json:"carNo" gorm:"-"`
+	CarNo         string `json:"carNo" gorm:"-"`
+	HeadImg       string `json:"headImg" gorm:"-"`
+	HeadImgSmall  string `json:"headImgSmall" gorm:"-"`
+
 	BaseModel
 }
 
@@ -255,13 +258,12 @@ func (e *ScbStudents) GetAllByCarId() ([]ScbStudents, error) {
 	return doc, err
 }
 
-
 // 获取ScbStudents
 func (e *ScbStudents) GetByFaceTokens(carId int, faceTokens []string) ([]ScbStudents, error) {
 	var doc []ScbStudents
 	table := orm.Eloquent.Table(e.TableName())
 
-	if len(faceTokens ) > 0{
+	if len(faceTokens) > 0 {
 
 		table = table.Where("site_id in ( ? )", faceTokens)
 		table = table.Where("car_id = ? ", carId)
