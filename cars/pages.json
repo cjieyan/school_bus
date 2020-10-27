@@ -73,7 +73,8 @@
         }
         ,{
             "path" : "pages/location/index",
-            "style" : {}
+            "style" : {},
+			"enablePullDownRefresh":true
         }
         ,{
             "path" : "pages/my/index",
@@ -87,6 +88,10 @@
             "path" : "pages/face/regist",
             "style" : {}
         }
+        ,{
+            "path" : "pages/face/complete",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -97,32 +102,32 @@
 	},
 	"tabBar": {
 		"color": "#909399",
-		"selectedColor": "#303133",
+		"selectedColor": "#12c497",
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [{
 						"pagePath": "pages/index/index",
 						"text": "首页",
 						"iconPath": "./static/icon/home.png",
-						"selectedIconPath": "static/icon/home.png"
+						"selectedIconPath": "static/icon/home-hover.png"
 					},
 					{
 						"pagePath": "pages/location/index",
 						"text": "位置",
 						"iconPath": "static/icon/position.png",
-						"selectedIconPath": "static/icon/position.png"
+						"selectedIconPath": "static/icon/position-hover.png"
 					},
 					{
 						"pagePath": "pages/student/index",
 						"text": "学生",
 						"iconPath": "static/icon/student.png",
-						"selectedIconPath": "static/icon/student.png"
+						"selectedIconPath": "static/icon/student-hover.png"
 					},
 					{
 						"pagePath": "pages/my/user",
 						"text": "我的",
 						"iconPath": "static/icon/my.png",
-						"selectedIconPath": "static/icon/my.png"
+						"selectedIconPath": "static/icon/my-hover.png"
 					}
 				]
 	}
