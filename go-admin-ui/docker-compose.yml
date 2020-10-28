@@ -15,4 +15,4 @@ services:
     command:
       - -c
       - |
-        npm -g config set user root && npm rebuild node-sass && npm install --registry=https://registry.npm.taobao.org && npm run build:prod
+        cp -f .env.production .env.development && npm -g config set user root && npm rebuild node-sass && npm install --registry=https://registry.npm.taobao.org && npm run dev
