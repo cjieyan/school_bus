@@ -11,8 +11,10 @@ import (
 	"go-admin/models"
 	"go-admin/tools"
 	"go-admin/tools/app"
+	"go-admin/tools/config"
 	"math"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -176,7 +178,7 @@ func (a Api) LineInfo(c *gin.Context) {
 	}
 
 
-		rsp := make(map[string]interface{})
+	rsp := make(map[string]interface{})
 	rsp["teacher"] = teacher                 //跟车员信息
 	rsp["car"] = carData                     //车辆信息
 	rsp["line"] = lineData                   //线路信息
@@ -814,7 +816,8 @@ func (a Api) StudentInfo(c *gin.Context) {
 	var studentModel models.ScbStudents
 	studentModel.Id = objParams.StudentId
 	studentData, err := studentModel.Get()
-	studentData.HeadImg = ""
+	studentData.HeadImg = config.Application{}.ImageUrl + "face_" + studentData.HeadImg
+	studentData.HeadImgSmall = strings.Replace(studentData.HeadImg, ".", "_small.", 1)
 	app.OK(c, studentData, "")
 
 }

@@ -121,14 +121,7 @@ func InsertScbStudents(c *gin.Context) {
 		api := &tools2.BdApi{}
 		studentIdStr := strconv.Itoa(result.Id)
 		faceToken := api.FacesetAdd(studentIdStr, picture)
-		if "" != faceToken {
-			var updateData models.ScbStudents
-			updateData.FaceToken = faceToken
 
-			//更新人脸
-			_, err := data.Update(result.Id)
-			tools.HasError(err, "更换相片失败", -1)
-		}
 
 		imageArr := strings.Split(picture, ";base64,")
 		ext := "png"
@@ -140,6 +133,15 @@ func InsertScbStudents(c *gin.Context) {
 			ddd, _ := base64.StdEncoding.DecodeString(imageArr[1]) //成图片文件并把文件写入到buffer
 			ioutil.WriteFile("./images/face_" + faceToken + "." + ext, ddd, 0666)   //buffer输出到jpg文件中（不做处理，直接写到文件）
 			saveSmall("./images/face_" + faceToken + "." + ext, ext, "./images/face_" + faceToken + "_small." + ext)
+		}
+
+		if "" != faceToken {
+			var updateData models.ScbStudents
+			updateData.FaceToken = faceToken
+			updateData.HeadImg = "face_" + faceToken + "." + ext
+			//更新人脸
+			_, err := data.Update(result.Id)
+			tools.HasError(err, "更换相片失败", -1)
 		}
 	}
 
@@ -155,10 +157,7 @@ func UpdateScbStudents(c *gin.Context) {
 	api := &tools2.BdApi{}
 	studentIdStr := strconv.Itoa(data.Id)
 	faceToken := api.FacesetAdd(studentIdStr, data.Picture)
-	fmt.Println("faceToken...", faceToken)
-	if "" != faceToken {
-		data.FaceToken = faceToken
-	}
+
 
 	imageArr := strings.Split(data.Picture, ";base64,")
 	ext := "png"
@@ -171,6 +170,12 @@ func UpdateScbStudents(c *gin.Context) {
 		ddd, _ := base64.StdEncoding.DecodeString(imageArr[1]) //成图片文件并把文件写入到buffer
 		ioutil.WriteFile("./images/face_" + faceToken + "." + ext, ddd, 0666)   //buffer输出到jpg文件中（不做处理，直接写到文件）
 		saveSmall("./images/face_" + faceToken + "." + ext, ext, "./images/face_" + faceToken + "_small." + ext)
+	}
+
+	fmt.Println("faceToken...", faceToken)
+	if "" != faceToken {
+		data.FaceToken = faceToken
+		data.HeadImg = "face_" + faceToken + "." + ext
 	}
 
 	data.Picture = ""

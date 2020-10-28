@@ -123,6 +123,7 @@ func (b *BdApi) FacesetAdd(userId, image string) (faceToken string) {
 	if 0 == rsp.ErrorCode {
 		return rsp.Result.FaceToken
 	}
+	fmt.Println("FacesetAdd    rsp....", rsp )
 	return ""
 }
 

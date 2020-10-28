@@ -12,6 +12,7 @@ type Application struct {
 	Mode          string
 	DemoMsg       string
 	EnableDP      bool
+	ImageUrl      string
 }
 
 func InitApplication(cfg *viper.Viper) *Application {
@@ -25,6 +26,7 @@ func InitApplication(cfg *viper.Viper) *Application {
 		Mode:          cfg.GetString("mode"),
 		DemoMsg:       cfg.GetString("demoMsg"),
 		EnableDP:      cfg.GetBool("enabledp"),
+		ImageUrl:      cfg.GetString("imageUrl"),
 	}
 }
 

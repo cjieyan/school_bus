@@ -31,7 +31,7 @@ type ScbStudents struct {
 	SiteUpName    string `json:"siteUpName" gorm:"-"`
 	ClassName     string `json:"className" gorm:"-"`
 	CarNo         string `json:"carNo" gorm:"-"`
-	HeadImg       string `json:"headImg" gorm:"-"`
+	HeadImg       string `json:"headImg" gorm:"type:varchar(100);"`
 	HeadImgSmall  string `json:"headImgSmall" gorm:"-"`
 
 	BaseModel
