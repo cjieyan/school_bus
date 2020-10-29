@@ -35,7 +35,6 @@
 				background: {
 					backgroundColor: '#12c497',
 				},
-				list: ['integral', 'kefu-ermai', 'coupon', 'gift', 'scan', 'pause-circle', 'wifi', 'email', 'list'],
 				isSwiper: false,
 				current: 0,
 				border: true,
@@ -70,20 +69,32 @@
 						console.log("--------selectline--------")
 						console.log(this.$store.state.lineid)
 						console.log(res)
-						this.$store.commit('setcarinfo', res.data.data.car)
-						this.$store.commit('setTeacher', res.data.data.teacher)
-						this.$store.commit('setLineinfo', res.data.data.line)
-						this.$store.commit('setSiteinfo', res.data.data.sites)
-						this.$store.commit('setstudent', {
-							"studentCount": res.data.data.studentCount,
-							"studentGetOnCount": res.data.data.studentGetOnCount
-						})
-						uni.switchTab({
-							url:"../location/index",
-							fail: (err) => {
-								console.log(err)
-							}
-						})
+						if(res.data.code == 401){
+							uni.showToast({
+								icon: 'none',
+								title: '会话过期，请重新登录',
+								duration: 1500
+							});
+							uni.redirectTo({
+								url:"../my/login"
+							})
+						}else{
+							this.$store.commit('setcarinfo', res.data.data.car)
+							this.$store.commit('setTeacher', res.data.data.teacher)
+							this.$store.commit('setLineinfo', res.data.data.line)
+							this.$store.commit('setSiteinfo', res.data.data.sites)
+							this.$store.commit('setstudent', {
+								"studentCount": res.data.data.studentCount,
+								"studentGetOnCount": res.data.data.studentGetOnCount
+							})
+							uni.switchTab({
+								url:"../location/index",
+								fail: (err) => {
+									console.log(err)
+								}
+							})
+						}
+						
 					},
 					fail: (err) => {
 						console.log(err)
@@ -145,9 +156,15 @@
 								"studentCount": res.data.data.studentCount,
 								"studentGetOnCount": res.data.data.studentGetOnCount
 							})
-						}else{
-							console.log("-----设置相关信息 学生人数、上车人数、车辆信息、、、res-----")
-							console.log(res)
+						}else if(res.data.code == 401){
+							uni.showToast({
+								icon: 'none',
+								title: '会话过期，请重新登录',
+								duration: 1500
+							});
+							uni.redirectTo({
+								url:"../my/login"
+							})
 						}
 					},
 					fail: (err) => {
@@ -160,6 +177,8 @@
 			},
 			lineInfo() {
 				var token = uni.getStorageSync('token')
+				console.log("lineinfo")
+				console.log(token)
 				uni.request({
 					url: this.$store.state.apihost + "/xcx/auth/lines",
 					method: "post",
@@ -168,8 +187,18 @@
 					},
 					data: {},
 					success: (res) => {
-						this.lines = res.data.data
-						console.log(res)
+						if(res.data.code == 401){
+							uni.showToast({
+								icon: 'none',
+								title: '会话过期，请重新登录',
+								duration: 1500
+							});
+							uni.redirectTo({
+								url:"../my/login"
+							})
+						}else{
+							this.lines = res.data.data
+						}
 					},
 					fail: (err) => {
 						console.log(err)
@@ -177,37 +206,17 @@
 				})
 			}
 		},
-		onShow() {
-			var token = uni.getStorageSync("token")
-			if (token == "" || token == "undefinded") {
-				uni.showLoading({
-					title: "会话已过期"
-				})
-				uni.redirectTo({
-					url: "../my/login"
-				})
-				uni.hideLoading()
-			}
-		},
 		onLoad() {
 			uni.showLoading({
-
+				title:"正在加载"
 			})
-			var token = uni.getStorageSync("token")
-			if (token == "" || token == "undefinded") {
-				uni.showLoading({
-					title: "会话已过期"
-				})
-				uni.redirectTo({
-					url: "../my/login"
-				})
-				uni.hideLoading()
+			var login = this.checkLogin('/pages/index/index',2);
+			if(login != false){
+				this.lineInfo()
 			}
-			// this.setInfo()
-			this.lineInfo()
+			
 			uni.hideLoading()
 		}
-
 	};
 </script>
 
@@ -251,10 +260,10 @@
 
 	.indicator-dots-item {
 		background-color: $u-tips-color;
-		height: 6px;
-		width: 6px;
-		border-radius: 10px;
-		margin: 0 3px;
+		height: 12rpx;
+		width: 12rpx;
+		border-radius: 20rpx;
+		margin: 0 6rpx;
 	}
 
 	.indicator-dots-active {

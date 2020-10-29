@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar title="打卡成功" :is-back="isback" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
+		<u-navbar title="打卡成功" @click="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		<view class="completeFetch">
 			<image src="../../static/complete.png"></image>
 		</view>
@@ -19,6 +19,13 @@
 			}
 		},
 		methods: {
+			back() {
+				uni.navigateBack({
+					success: function() {
+						beforePage.onLoad();
+					}
+				})
+			},
 			finish() {
 				uni.showLoading({
 					
@@ -53,15 +60,17 @@
 			}
 		},
 		onLoad() {
-			if (this.$store.state.student.studentCount > this.$store.state.student.studentGetOnCount) {
-				this.$store.commit('changecantakephone', false)
+			console.log("isfinsh-----------")
+			console.log(this.$store.state.isfinish)
+			if ( this.$store.state.isfinish ) {
+				this.finish()
+				
+			} else {
 				setTimeout(() => {
 					uni.redirectTo({
-						url: "../index/index"
+						url: "./index"
 					})
 				}, 2000)
-			} else {
-				this.finish()
 			}
 		}
 	}

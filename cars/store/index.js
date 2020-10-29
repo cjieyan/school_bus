@@ -19,10 +19,14 @@ const store = new Vuex.Store({
 		lineid:"",
 		token:"",
 		siteinfo: {},
+		isfinish: false,
     },
     mutations: {
 		changecantakephone(state, iscan){
 			state.cantakephone = iscan
+		},
+		isfinish(state, is){
+			state.isfinish = is
 		},
 		setToken(state, token){
 			state.token = token

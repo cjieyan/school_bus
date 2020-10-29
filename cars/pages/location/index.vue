@@ -217,81 +217,81 @@
 	}
 
 	.image-content image {
-		height: 150px;
+		height: 300rpx;
 	}
 
 	.content {
-		padding: 10px 20px 10px 20px;
+		padding: 20rpx 40rpx 20rpx 40rpx;
 		background-color: #fff;
 	}
 
 	.border {
-		border-left: 3px solid rgb(254 194 32);
-		height: 5px;
-		margin-right: 8px;
+		border-left: 6rpx solid rgb(254 194 32);
+		height: 10rpx;
+		margin-right: 16rpx;
 	}
 
 	.teacher {
-		font-size: 16px;
+		font-size: 32rpx;
 		font-weight: bold;
 	}
 
 	.school {
-		font-size: 14px;
+		font-size: 28rpx;
 		color: rgb(148 148 148);
 	}
 
 	.content-info {
-		margin-top: 10px;
+		margin-top: 20rpx;
 		color: rgb(111 111 111);
-		padding-left: 8px;
-		line-height: 25px;
+		padding-left: 16rpx;
+		line-height: 30rpx;
 	}
 
 	.content-hr {
-		border: 0.5px solid rgb(237 237 237);
-		margin: 15px 0;
+		border: 1rpx solid rgb(237 237 237);
+		margin: 30rpx 0;
 	}
 
 	.location-image {
-		width: 36px;
-		height: 31px;
+		width: 72rpx;
+		height: 62rpx;
 	}
 
 	.carinfo {
-		font-size: 12px;
+		font-size: 24rpx;
 	}
 
 	.location {
-		padding: 0 30px;
+		padding: 0 60rpx;
 	}
 
 	.location-info {
 		color: rgb(85 85 85);
-		margin-left: 10px;
-		padding: 5px 0;
+		margin-left: 20rpx;
+		padding: 10rpx 0;
 	}
 
 	.location-d {
-		margin-top: 10px;
-		padding: 0 50px;
+		margin-top: 20rpx;
+		padding: 0 100rpx;
 	}
 
 	/*rgb(255 114 58)*/
 	.uni-steps__column-text {
 		border-bottom: none !important;
-		height: 35px;
+		height: 70rpx;
 	}
 
 	.comfirm {
-		padding: 10px 40px;
+		padding: 20rpx 80rpx;
 	}
 
 	.comfirm-bottom {
 		background: linear-gradient(to right, rgba(8, 189, 175), rgb(247, 218, 99));
 		color: #fff;
 		border: none;
-		border-radius: 25px;
+		border-radius: 50rpx;
 	}
 
 	.comfirm-bottom::after {

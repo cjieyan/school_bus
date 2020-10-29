@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="top">
-			<u-navbar back-text="返回" title="学生列表"></u-navbar>
+			<u-navbar back-text="返回" title="学生信息" @tap="back" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		</view>
 		<view class="student">
 			<view class="student-top">
@@ -9,7 +9,7 @@
 					<image src="../../static/location.png" style="width: 32px; height: 31px;" class="location-image"></image>
 				</span>
 				<span class="location-info">
-					梧桐小学--六约新村
+					{{lineinfo.name}}
 				</span>
 			</view>
 			<view class="student-data">
@@ -18,13 +18,13 @@
 				</view>
 				<view class="student-info">
 					<view class="info-top">
-						<view class="name">张三王五</view>
+						<view class="name">{{studentinfo.name}}</view>
 						<view class="isinboard">请确认该学生是否打卡上车</view>
 					</view>
 					<view class="info-bottom">
 						<view class="tel">家长电话:1233444556</view>
 						<view class="time">考勤时间:2020/09/15 15:11:11</view>
-						<view class="carno">车牌号码:粤B1234</view>
+						<view class="carno">车牌号码:{{carinfo.carNumber}}</view>
 						<view class="is">是否接送:否</view>
 					</view>
 
@@ -33,7 +33,7 @@
 			</view>
 		</view>
 		<view class="comfirm">
-			<button class="comfirm-bottom" @tap="gotoLunBo">上车</button>
+			<button class="comfirm-bottom" @tap="swipe" :loading="loading" :disabled="disabled">{{inboard}}</button>
 		</view>
 	</view>
 </template>
@@ -46,17 +46,63 @@
 		},
 		data() {
 			return {
-
+				studentinfo: {},
+				lineinfo: {},
+				carinfo:{},
+				swipeStatus: "",
+				disabled: true,
+				loading: true,
+				inboard: "",
+				background: {
+					backgroundColor: '#12c497',
+				},
 			}
 		},
 		methods: {
 			back() {
-				uni.navigateBack({
-					success: function() {
-						beforePage.onLoad();
+				uni.switchTab({
+					url:"../index/index",
+					fail: (err) => {
+						console.log(err)
 					}
 				})
 			},
+			swipe(){
+				//手动打卡
+			}
+		},
+		onLoad(options) {
+			uni.showLoading({
+				
+			})
+			uni.request({
+				url: this.$store.state.apihost + "/xcx/auth/student-info",
+				method:"POST",
+				header: {
+					'token': this.$store.state.token,
+				},
+				data:{
+					id: options.id
+				},
+				success: (res) => {
+					console.log(res)
+					this.studentinfo = res.data.data
+					if(this.studentinfo.swipeStatus == '-1'){
+						this.inboard = "未上车"
+					} else if(this.studentinfo.swipeStatus == '0'){
+						this.inboard = "已上车"
+					} else if(this.studentinfo.swipeStatus == '1'){
+						this.inboard = "已下车"
+					}
+					this.loading = false
+				},
+				fail: (err) => {
+					console.log(err)
+				}
+			})
+			this.lineinfo = this.$store.state.liniInfo
+			this.carinfo = this.$store.state.carInfo
+			uni.hideLoading()
 		}
 	}
 </script>
@@ -67,14 +113,14 @@
 	}
 
 	.student {
-		margin-top: 10px;
+		margin-top: 20rpx;
 		padding: 0 10%;
 	}
 
 	.student-img {
-		width: 40px;
-		height: 40px;
-		border-radius: 20px;
+		width: 80rpx;
+		height: 80rpx;
+		border-radius: 40rpx;
 		text-align: center;
 		position: relative;
 		float: left;
@@ -82,9 +128,9 @@
 
 	.student-info {
 		float: left;
-		margin-left: 20px;
-		line-height: 25px;
-		font-size: 12px;
+		margin-left: 40rpx;
+		line-height: 50rpx;
+		font-size: 24rpx;
 	}
 
 	.info-bottom {
@@ -92,30 +138,30 @@
 	}
 
 	.student-top {
-		border-bottom: 1px solid rgb(238 238 238);
-		padding-bottom: 10px;
+		border-bottom: 2rpx solid rgb(238 238 238);
+		padding-bottom: 20rpx;
 	}
 
 	.student-data {
-		margin-top: 20px;
+		margin-top: 40rpx;
 	}
 
 	.location-info {
-		margin-left: 15px;
+		margin-left: 30rpx;
 		color: rgb(89 89 89);
 		font-weight: bold;
 	}
 
 	.comfirm {
-		margin-bottom: 30px;
-		padding: 10px 40px;
+		margin-bottom: 60rpx;
+		padding: 20rpx 80rpx;
 	}
 
 	.comfirm-bottom {
 		background: linear-gradient(to right, rgba(8, 189, 175), rgb(247, 218, 99));
 		color: #fff;
 		border: none;
-		border-radius: 25px;
+		border-radius: 50rpx;
 	}
 
 	.comfirm-bottom::after {

@@ -4,95 +4,47 @@
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
-			"path": "pages/my/login",
-			"style": {}
-		},
-		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "uView-index"
 			}
 		},
 		{
-			"path": "pages/center/index",
-			"style": {
-				"navigationBarTitleText": "uView-center"
-			}
+			"path": "pages/my/login",
+			"style": {}
+		},{
+			"path": "pages/my/user",
+			"style": {}
+		},{
+			"path": "pages/my/follow",
+			"style": {}
+		}, {
+			"path": "pages/my/setting",
+			"style": {}
+		}, {
+			"path": "pages/student/index",
+			"style": {}
+		}, {
+			"path": "pages/student/inboard",
+			"style": {}
+		}, {
+			"path": "pages/student/list",
+			"style": {}
+		}, {
+			"path": "pages/location/index",
+			"style": {},
+			"enablePullDownRefresh": true
+		}, {
+			"path": "pages/my/index",
+			"style": {}
+		}, {
+			"path": "pages/face/index",
+			"style": {}
+		}, {
+			"path": "pages/face/complete",
+			"style": {}
 		}
-	    ,{
-            "path" : "pages/my/binduser",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/my/user",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/my/userinfo",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/my/pickerinfo",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/my/childreninfo",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/my/addpicker",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/my/addchild",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/my/notice",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/my/follow",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/my/setting",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/student/index",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/student/inboard",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/student/list",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/location/index",
-            "style" : {},
-			"enablePullDownRefresh":true
-        }
-        ,{
-            "path" : "pages/my/index",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/face/index",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/face/regist",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/face/complete",
-            "style" : {}
-        }
-    ],
+	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uView",
@@ -106,29 +58,29 @@
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [{
-						"pagePath": "pages/index/index",
-						"text": "首页",
-						"iconPath": "./static/icon/home.png",
-						"selectedIconPath": "static/icon/home-hover.png"
-					},
-					{
-						"pagePath": "pages/location/index",
-						"text": "位置",
-						"iconPath": "static/icon/position.png",
-						"selectedIconPath": "static/icon/position-hover.png"
-					},
-					{
-						"pagePath": "pages/student/index",
-						"text": "学生",
-						"iconPath": "static/icon/student.png",
-						"selectedIconPath": "static/icon/student-hover.png"
-					},
-					{
-						"pagePath": "pages/my/user",
-						"text": "我的",
-						"iconPath": "static/icon/my.png",
-						"selectedIconPath": "static/icon/my-hover.png"
-					}
-				]
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "./static/icon/home.png",
+				"selectedIconPath": "static/icon/home-hover.png"
+			},
+			{
+				"pagePath": "pages/location/index",
+				"text": "位置",
+				"iconPath": "static/icon/position.png",
+				"selectedIconPath": "static/icon/position-hover.png"
+			},
+			{
+				"pagePath": "pages/student/index",
+				"text": "学生",
+				"iconPath": "static/icon/student.png",
+				"selectedIconPath": "static/icon/student-hover.png"
+			},
+			{
+				"pagePath": "pages/my/user",
+				"text": "我的",
+				"iconPath": "static/icon/my.png",
+				"selectedIconPath": "static/icon/my-hover.png"
+			}
+		]
 	}
 }

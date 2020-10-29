@@ -31,6 +31,81 @@
 				</view>
 			</view>
 		</view>
+		<view class="infolist">
+			<view class="info-content">
+				<view class="car-info">
+					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
+				</view>
+				<view class="people-info">
+					<span>乘车人数</span> <span>14人</span>
+				</view>
+				<view class="people-detail">
+					<span>已上车14人</span> <span>未下车14人</span><span>
+						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
+					</span>
+				</view>
+			</view>
+		</view>
+		<view class="infolist">
+			<view class="info-content">
+				<view class="car-info">
+					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
+				</view>
+				<view class="people-info">
+					<span>乘车人数</span> <span>14人</span>
+				</view>
+				<view class="people-detail">
+					<span>已上车14人</span> <span>未下车14人</span><span>
+						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
+					</span>
+				</view>
+			</view>
+		</view>
+		<view class="infolist">
+			<view class="info-content">
+				<view class="car-info">
+					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
+				</view>
+				<view class="people-info">
+					<span>乘车人数</span> <span>14人</span>
+				</view>
+				<view class="people-detail">
+					<span>已上车14人</span> <span>未下车14人</span><span>
+						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
+					</span>
+				</view>
+			</view>
+		</view>
+		<view class="infolist">
+			<view class="info-content">
+				<view class="car-info">
+					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
+				</view>
+				<view class="people-info">
+					<span>乘车人数</span> <span>14人</span>
+				</view>
+				<view class="people-detail">
+					<span>已上车14人</span> <span>未下车14人</span><span>
+						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
+					</span>
+				</view>
+			</view>
+		</view>
+		<view class="infolist">
+			<view class="info-content">
+				<view class="car-info">
+					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
+				</view>
+				<view class="people-info">
+					<span>乘车人数</span> <span>14人</span>
+				</view>
+				<view class="people-detail">
+					<span>已上车14人</span> <span>未下车14人</span><span>
+						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
+					</span>
+				</view>
+			</view>
+		</view>
 		<u-popup v-model="show" mode="bottom" border-radius="18" class="popo">
 			<view class="popo-title">
 				2020/9/13 1号车 (粤B1234)
@@ -43,11 +118,12 @@
 				<u-button type="primary" class="btn" shape="square" size="medium" @click="popo">确定</u-button>
 			</view>
 		</u-popup>
+		<u-loadmore v-if="showLoadMore" :status="status" :icon-type="iconType" :load-text="loadText" />
 	</view>
 </template>
 
 <script>
-	// import faIcon from "@/components/kilvn-fa-icon/fa-icon.vue"
+	import utils from '../../common/utils.js'
 	export default {
 		components: {
 			// faIcon
@@ -57,7 +133,19 @@
 				background: {
 					backgroundColor: '#12c497',
 				},
-				show: false
+				show: false,
+				pagesize: 1,
+				currentPage: 1,
+				pagetotal: 0,
+				pullcount: 0,
+				showLoadMore: false,
+				status: 'loadmore',
+				iconType: 'flower',
+				loadText: {
+					loadmore: '轻轻上拉',
+					loading: '努力加载中',
+					nomore: '实在没有了'
+				}
 			}
 		},
 		methods: {
@@ -68,7 +156,7 @@
 			},
 			back() {
 				uni.switchTab({
-					url:"../index/index",
+					url: "../index/index",
 					success: (res) => {
 						console.log(res)
 					},
@@ -77,7 +165,97 @@
 					}
 				})
 			},
-		}
+			getData() {
+				var token = uni.getStorageSync('token')
+
+				uni.request({
+					url: this.$store.state.apihost + "/xcx/auth/follow-record",
+					method: "POST",
+					header: {
+						'token': token,
+					},
+					data: {
+						"page_index": 1,
+						"page_size": this.pagesize,
+					},
+					success: (res) => {
+						if (res.data.code == 200) {
+							console.log('-totalpage-')
+							console.log(res.data.data.totalpage)
+							this.pagetotal = res.data.data.totalpage
+							console.log("totalpage")
+							console.log(res.data.data.totalpage)
+							if (this.pagetotal > 1) {
+								this.showLoadMore = true
+								this.currentPage++
+							}
+						}
+						console.log(res)
+					},
+					fail: (err) => {
+						console.log(err)
+					}
+				})
+			},
+			getMoreData() {
+				var token = uni.getStorageSync('token')
+				console.log("------getmoredata-----")
+				console.log(this.currentPage)
+				console.log(this.pagesize)
+				console.log(this.pagetotal)
+				if (this.currentPage < this.pagetotal) {
+					uni.request({
+						url: this.$store.state.apihost + "/xcx/auth/follow-record",
+						method: "POST",
+						header: {
+							'token': token,
+						},
+						data: {
+							"page_index": this.currentPage + 1,
+							"page_size": this.pagesize,
+						},
+						success: (res) => {
+							if (res.data.code == 200) {
+								this.pagetotal = res.pagetotal
+								if (this.pagetotal > 1) {
+									this.showLoadMore = true
+									this.currentPage++
+								}else{
+									
+								}
+							}
+							console.log(res)
+						},
+						fail: (err) => {
+							console.log(err)
+						}
+					})
+				}else{
+					return false
+				}
+
+			}
+		},
+		onLoad() {
+			uni.showLoading({
+
+			})
+			this.getData()
+			uni.hideLoading()
+		},
+		onReachBottom() {
+			console.log("-------已到达底部-------")
+			console.log(this.currentPage)
+			console.log(this.pagetotal)
+			utils.throttle(this.getMoreData())
+			if (this.currentPage < this.pagetotal) {
+				console.log("current--page")
+				utils.throttle(this.getMoreData())
+			}
+		},
+		onPullDownRefresh() {
+			console.log("bbbbbbbbbbbbbbb")
+		},
 	}
 </script>
 
@@ -87,27 +265,27 @@
 	}
 
 	.popo-title {
-		margin-top: 10px;
-		padding: 10px 0;
+		margin-top: 20rpx;
+		padding: 20rpx 0;
 		font-weight: bold;
 		text-align: center;
-		font-size: 14px;
+		font-size: 28rpx;
 	}
 
 	.popo-content {
-		padding-bottom: 20px;
-		margin: 20px auto;
+		padding-bottom: 40rpx;
+		margin: 40rpx auto;
 		text-align: center;
 	}
 
 	.popo-content span {
 		display: block;
 		text-align: center;
-		line-height: 25px;
+		line-height: 50rpx;
 	}
 
 	.popo-content span i {
-		font-size: 16px;
+		font-size: 32rpx;
 		font-weight: bold;
 	}
 
@@ -122,43 +300,44 @@
 
 	.infolist {
 		background-image: linear-gradient(-45deg, transparent 80%, rgb(242 237 183), transparent 90%);
-		border-radius: 10px;
-		margin: 0 15px;
+		border-radius: 20rpx;
+		margin: 0 30rpx;
 		background-color: #fff;
-		box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 -2rpx 20rpx rgba(0, 0, 0, 0.1);
 	}
 
 	.info-content {
-		margin: 15px 10px;
-		padding: 5px 10px;
+		margin: 30rpx 20rpx;
+		padding: 10rpx 20rpx;
 	}
 
 	.car-info,
 	.people-info,
 	.people-detail {
-		margin-top: 10px;
-		font-size: 12px;
-		margin-bottom: 10px;
+		margin-top: 20rpx;
+		font-size: 24rpx;
+		margin-bottom: 20rpx;
 	}
 
 	.car-info span,
 	.people-info span,
 	.people-detail span {
-		margin-right: 8px;
+		margin-right: 16rpx;
 	}
 
 	.error-icon {
 		background: #f5baba;
-		padding: 2px;
-		border-radius: 8px;
-		margin-right: 5px;
+		padding: 4rpx;
+		border-radius: 16rpx;
+		margin-right: 10rpx;
 	}
 
 	.btn {
-		margin-top: 20px;
+		margin-top: 40rpx;
 		background: linear-gradient(to right, rgba(8, 189, 175), rgb(247, 218, 99));
 	}
-	.popo-content span i{
+
+	.popo-content span i {
 		display: inline-block;
 	}
 </style>
