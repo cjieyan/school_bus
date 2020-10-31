@@ -7,14 +7,18 @@
 			<image src="../../static/banner.jpg" mode="aspectFill" style="width: 100%;" @error="imageError"></image>
 		</view>
 		<view class="content">
-			<view class="content-header">
-				<view class="content-header-top">
-					<span class="border"></span><span class="teacher">{{teacher.name}}</span> <span class="school">（{{line.name}}）</span>
-				</view>
+			<view v-if="line.name == undefined">
 			</view>
-			<view class="content-info">
-				<view class="carinfo">{{carinfo.carNumber}}{{carinfo.carNo}}（已上车{{students.studentGetOnCount}}人/共{{students.studentCount}}人）</view>
-				<view class="carinfo">{{carinfo.driver}}{{carinfo.phone}}</view>
+			<view v-else>
+				<view class="content-header">
+					<view class="content-header-top">
+						<span class="border"></span><span class="teacher">{{teacher.name}}</span> <span class="school">（{{line.name}}）</span>
+					</view>
+				</view>
+				<view class="content-info">
+					<view class="carinfo">{{carinfo.carNumber}}{{carinfo.carNo}}</view>
+					<view class="carinfo">{{carinfo.driver}}{{carinfo.phone}}</view>
+				</view>
 			</view>
 			<view class="content-hr"></view>
 			<view class="location">
@@ -22,19 +26,26 @@
 					<span class="location-img">
 						<image src="../../static/location.png" class="location-image"></image>
 					</span>
-					<span class="location-info">
+					<span class="location-info" v-if="line.name == undefined" @tap="show = true">
+						请选择路线
+					</span>
+					<span v-else class="location-info" @tap="show = true">
 						{{line.name}}
 					</span>
 				</view>
+
 				<view class="location-d">
 					<u-steps :list="numList" active-color="rgb(255 114 58)" mode="dot" direction="column" :current="current">
 					</u-steps>
 				</view>
 			</view>
-			<view class="comfirm">
+			<view v-if="line.name == undefined">
+			</view>
+			<view v-else class="comfirm">
 				<button class="comfirm-bottom" :loading="loading" :disabled="disabled" @tap="gotoLunBo">开始刷脸打卡</button>
 			</view>
 		</view>
+		<u-action-sheet :list="linelist" @click="setline" v-model="show"></u-action-sheet>
 	</view>
 
 </template>
@@ -63,7 +74,9 @@
 				students: {},
 				disabled: true,
 				loading: true,
-				current:0,
+				current: 0,
+				linelist: [],
+				show: false,
 			};
 		},
 		methods: {
@@ -87,6 +100,104 @@
 					complete: () => {}
 				})
 				uni.hideLoading();
+			},
+			lineInfo() {
+				var token = uni.getStorageSync('token')
+				uni.request({
+					url: this.$store.state.apihost + "/xcx/auth/lines",
+					method: "post",
+					header: {
+						'token': token,
+					},
+					data: {},
+					success: (res) => {
+						var data = []
+						this.linelist = res.data.data
+						for (var i = 0; i < res.data.data.length; i++) {
+							var obj = {
+								text: res.data.data[i].name,
+								color: 'blue',
+								fontSize: 28,
+								id: res.data.data[i].id,
+							}
+							data.push(obj)
+						}
+						console.log(data)
+						this.linelist = data
+					},
+					fail: (err) => {
+						console.log(err)
+					}
+				})
+			},
+			setline(index) {
+				uni.showLoading({
+
+				})
+				var token = uni.getStorageSync('token')
+				new Promise(resolve => {
+
+					uni.request({
+						url: this.$store.state.apihost + "/xcx/auth/line-info",
+						method: "POST",
+						header: {
+							'token': token,
+						},
+						data: {
+							"line_id": this.linelist[index].id
+						},
+						success: (res) => {
+							console.log("--------selectline--------")
+							console.log(this.$store.state.lineid)
+							console.log(res)
+							this.$store.commit('setLineid', this.linelist[index].id)
+							this.$store.commit('setcarinfo', res.data.data.car)
+							this.$store.commit('setTeacher', res.data.data.teacher)
+							this.$store.commit('setLineinfo', res.data.data.line)
+							this.$store.commit('setSiteinfo', res.data.data.sites)
+							this.$store.commit('setstudent', {
+								"studentCount": res.data.data.studentCount,
+								"studentGetOnCount": res.data.data.studentGetOnCount
+							})
+							this.line = res.data.data.line
+							this.carinfo = res.data.data.car
+							this.teacher = res.data.data.teacher
+							this.students = {
+								"studentCount": res.data.data.studentCount,
+								"studentGetOnCount": res.data.data.studentGetOnCount
+							}
+							console.log("this.students")
+							console.log(this.students)
+							resolve(this.line)
+						},
+						fail: (err) => {
+							console.log(err)
+						}
+					})
+				}).then((res) => {
+					console.log("studentList--------")
+					console.log(res)
+					// this.studentList()
+					uni.request({
+						url: this.$store.state.apihost + "/xcx/auth/line-students",
+						method: "POST",
+						header: {
+							'token': token,
+						},
+						data: {
+							"line_id": res.id
+						},
+						success: (res) => {
+							console.log(res)
+							this.students = res.data.data.studentsDataRet
+						},
+						fail: (err) => {
+							console.log(err)
+						}
+					})
+				})
+
+				uni.hideLoading()
 			},
 			getLocation() {
 				new Promise(resolve => {
@@ -155,23 +266,27 @@
 							console.log("--------siteinfo-----")
 							console.log(this.$store.state.siteinfo)
 							var siteList = []
-							for (var i = 0; i < this.$store.state.siteinfo.length; i++) {
-								var distict = utils.getGreatCircleDistance(this.blat, this.blng, this.$store.state.siteinfo[i].latitude, this.$store.state.siteinfo[i].longitude)
-								if(distict <= 100){
-									this.current = i
-									this.$store.state.lat = this.$store.state.siteinfo[i].latitude
-									this.$store.state.lng = this.$store.state.siteinfo[i].longitude
-									this.$store.state.sitename = this.$store.state.siteinfo[i].name
+							if (this.$store.state.siteinfo.length > 0) {
+								for (var i = 0; i < this.$store.state.siteinfo.length; i++) {
+									var distict = utils.getGreatCircleDistance(this.blat, this.blng, this.$store.state.siteinfo[i].latitude,
+										this.$store.state.siteinfo[i].longitude)
+									if (distict <= 100) {
+										this.current = i
+										this.$store.state.lat = this.$store.state.siteinfo[i].latitude
+										this.$store.state.lng = this.$store.state.siteinfo[i].longitude
+										this.$store.state.sitename = this.$store.state.siteinfo[i].name
+									}
+									var resdata = {
+										"name": this.$store.state.siteinfo[i].name + "(" + Math.round(distict) + "米)",
+										"distict": Math.round(distict)
+									}
+									siteList.push(resdata)
+									this.numList = siteList
+									this.disabled = false
+									this.loading = false
 								}
-								var resdata = {
-									"name": this.$store.state.siteinfo[i].name + "(" + Math.round(distict) + "米)",
-									"distict": Math.round(distict)
-								}
-								siteList.push(resdata)
-								this.numList = siteList
-								this.disabled = false
-								this.loading = false
 							}
+
 						})
 					})
 				})
@@ -191,10 +306,28 @@
 			uni.showLoading({
 				title: "正在加载"
 			})
+			this.lineInfo()
+			this.line = this.$store.state.liniInfo
+			console.log("this.line")
+			console.log(this.line)
+			console.log(this.$store.state.liniInfo)
+
+			console.log(this.line.hasOwnProperty("name"))
+			if (this.line.hasOwnProperty("name")) {
+				// this.line = this.$store.state.liniInfo
+				this.carinfo = this.$store.state.carInfo
+				this.teacher = this.$store.state.teacher
+				this.students = this.$store.state.student
+			} else {
+				uni.showToast({
+					icon: 'none',
+					title: '请选择路线',
+					duration: 5000
+				});
+			}
 			this.timer = setInterval(() => {
 				this.getLocation()
 			}, 3000)
-
 			uni.hideLoading()
 		},
 		onLoad() {
