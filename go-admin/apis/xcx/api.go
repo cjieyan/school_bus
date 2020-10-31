@@ -816,7 +816,7 @@ func (a Api) StudentInfo(c *gin.Context) {
 	var studentModel models.ScbStudents
 	studentModel.Id = objParams.StudentId
 	studentData, err := studentModel.Get()
-	studentData.HeadImg = config.Application{}.ImageUrl + "face_" + studentData.HeadImg
+	studentData.HeadImg = config.Application{}.ImageUrl + studentData.HeadImg
 	studentData.HeadImgSmall = strings.Replace(studentData.HeadImg, ".", "_small.", 1)
 	app.OK(c, studentData, "")
 
