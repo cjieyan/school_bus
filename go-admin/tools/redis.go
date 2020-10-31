@@ -7,54 +7,58 @@ import (
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"go-admin/tools/config"
+	"sync"
 	"time"
 )
 
 var Rdb redis.Conn
+
+var once sync.Once
+var redisPool *redis.Pool
 
 /**
 redis 初始化连接
 */
 func GetRedisPool() *redis.Pool {
 	//连接地址
-	RedisConn := config.RedisConfig.RedisConn
 	//db分区
-	RedisDbNum := config.RedisConfig.RedisDbNum
 	//密码
-	RedisPassword := config.RedisConfig.RedisPassword
-	//建立连接池
-	return &redis.Pool{
-		//最大的空闲连接数，表示即使没有redis连接时依然可以保持N个空闲的连接，而不被清除，随时处于待命状态。
-		MaxIdle: config.RedisConfig.RedisMaxIdle,
-		//最大的激活连接数，表示同时最多有N个连接
-		MaxActive: config.RedisConfig.RedisMaxActive,
-		//最大的空闲连接等待时间，超过此时间后，空闲连接将被关闭
-		IdleTimeout: 300 * time.Second,
-		//建立连接
-		Dial: func() (redis.Conn, error) {
-			//logs.Info(RedisConn)
-			c, err := redis.Dial("tcp", RedisConn)
-			if err != nil {
-				return nil, fmt.Errorf("redis connection error: %s", err)
+	once.Do(func() {
+		//建立连接池
+		redisPool = &redis.Pool{
+				//最大的空闲连接数，表示即使没有redis连接时依然可以保持N个空闲的连接，而不被清除，随时处于待命状态。
+				MaxIdle: config.RedisConfig.RedisMaxIdle,
+				//最大的激活连接数，表示同时最多有N个连接
+				MaxActive: config.RedisConfig.RedisMaxActive,
+				//最大的空闲连接等待时间，超过此时间后，空闲连接将被关闭
+				IdleTimeout: 300 * time.Second,
+				//建立连接
+				Dial: func() (redis.Conn, error) {
+					//logs.Info(RedisConn)
+					c, err := redis.Dial("tcp", config.RedisConfig.RedisConn)
+					if err != nil {
+						return nil, fmt.Errorf("redis connection error: %s", err)
+					}
+					if config.RedisConfig.RedisPassword != "" {
+						if _, authErr := c.Do("AUTH", config.RedisConfig.RedisPassword); authErr != nil {
+							return nil, fmt.Errorf("redis auth password error: %s", authErr)
+						}
+					}
+					//选择分区
+					c.Do("SELECT", config.RedisConfig.RedisDbNum)
+					return c, nil
+				},
+				//ping
+				TestOnBorrow: func(c redis.Conn, t time.Time) error {
+					_, err := c.Do("PING")
+					if err != nil {
+						return fmt.Errorf("ping redis error: %s", err)
+					}
+					return nil
+				},
 			}
-			if RedisPassword != "" {
-				if _, authErr := c.Do("AUTH", RedisPassword); authErr != nil {
-					return nil, fmt.Errorf("redis auth password error: %s", authErr)
-				}
-			}
-			//选择分区
-			c.Do("SELECT", RedisDbNum)
-			return c, nil
-		},
-		//ping
-		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			_, err := c.Do("PING")
-			if err != nil {
-				return fmt.Errorf("ping redis error: %s", err)
-			}
-			return nil
-		},
-	}
+	})
+	return redisPool
 
 }
 
