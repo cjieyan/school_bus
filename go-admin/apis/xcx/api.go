@@ -504,11 +504,11 @@ func (a Api) FaceSwipe(c *gin.Context) {
 	// 获取百度接口识别到的人脸
 	api := tools2.BdApi{}
 	faceTokens := api.MutilSearch(objParams.Image)
-	studentModel := models.ScbStudents{}
 	if len(faceTokens) <= 0 {
 		tools.HasError(err, "扫码失败,我发识别到人脸", 500)
 	}
 
+	studentModel := models.ScbStudents{}
 	//获取到识别的学生列表
 	studentsData, err := studentModel.GetByFaceTokens(carData.Id, faceTokens)
 	tools.HasError(err, "扫码失败.您上错车了", 500)
@@ -719,7 +719,7 @@ func (a Api) Swipe(c *gin.Context) {
 		fmt.Println("swipeAtInfo SwipeAt err....", err)
 		if nil == err {
 			//距离上次上车刷脸成功大于5分钟
-			if 0 == swipeAtInfo.Status && (now-swipeAtInfo.Time) > 60*1 {
+			if 0 == swipeAtInfo.Status && (now - swipeAtInfo.Time) > 60*1 {
 				//将标记为下车状态
 				swipeAtStruct := models.SwipeAt{
 					Status: 1,
