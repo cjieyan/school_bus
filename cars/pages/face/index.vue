@@ -6,13 +6,7 @@
 		<!-- <u-mask :show="show" @click="show = false"></u-mask> -->
 
 		<view class="camera">
-
-			<canvas type="2d" class="progress_bg" canvas-id="canvasProgressbg"></canvas>
-			<canvas type="2d" class="progress_canvas" canvas-id="canvasProgress"></canvas>
 			<camera :device-position="camera" flash="off" binderror="error">
-				<cover-view class='cameraGai'>
-					<cover-image src="../../static/circle.png" class='cover-image'></cover-image>
-				</cover-view>
 			</camera>
 		</view>
 		<view :class="tipclass">
@@ -23,9 +17,6 @@
 		<view class="bottom-btn">
 			<view class="iconfont icon-avcameraswitchh camera-switch-left"></view>
 			<button :type="btntype" class="start-facing" @tap="stoptakephone">{{btntxt}}</button>
-			<!-- <view class="camera-border">
-				<u-icon name="av_camera_switchh" class="btn-right" @tap="changeCamera" color="#ccc" size="80"></u-icon>
-			</view> -->
 			<view :class="cameraicon" @tap="changeCamera"></view>
 		</view>
 	</view>
@@ -208,8 +199,8 @@
 	}
 
 	.camera camera {
-		width: 440rpx;
-		height: 440rpx;
+		width: 100%;
+		height: 100vh;
 		position: absolute;
 		display: flex;
 		align-items: center;

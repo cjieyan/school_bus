@@ -327,7 +327,7 @@
 			}
 			this.timer = setInterval(() => {
 				this.getLocation()
-			}, 3000)
+			}, 1000)
 			uni.hideLoading()
 		},
 		onLoad() {
