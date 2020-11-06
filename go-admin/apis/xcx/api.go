@@ -506,7 +506,7 @@ func (a Api) FaceSwipe(c *gin.Context) {
 	faceTokens := api.MutilSearch(objParams.Image)
 	studentModel := models.ScbStudents{}
 	if len(faceTokens) <= 0 {
-		tools.HasError(err, "扫码失败,我发识别到人脸", 500)
+		tools.HasError(err, "扫码失败,未发识别到人脸", 500)
 	}
 
 	//获取到识别的学生列表

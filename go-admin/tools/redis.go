@@ -1,17 +1,17 @@
 package tools
 
-
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/garyburd/redigo/redis"
 	"go-admin/tools/config"
 	"sync"
 	"time"
+
+	"github.com/garyburd/redigo/redis"
 )
 
-var Rdb redis.Conn
+// var Rdb redis.Conn
 
 var once sync.Once
 var redisPool *redis.Pool
@@ -26,51 +26,56 @@ func GetRedisPool() *redis.Pool {
 	once.Do(func() {
 		//建立连接池
 		redisPool = &redis.Pool{
-				//最大的空闲连接数，表示即使没有redis连接时依然可以保持N个空闲的连接，而不被清除，随时处于待命状态。
-				MaxIdle: config.RedisConfig.RedisMaxIdle,
-				//最大的激活连接数，表示同时最多有N个连接
-				MaxActive: config.RedisConfig.RedisMaxActive,
-				//最大的空闲连接等待时间，超过此时间后，空闲连接将被关闭
-				IdleTimeout: 300 * time.Second,
-				//建立连接
-				Dial: func() (redis.Conn, error) {
-					//logs.Info(RedisConn)
-					c, err := redis.Dial("tcp", config.RedisConfig.RedisConn)
-					if err != nil {
-						return nil, fmt.Errorf("redis connection error: %s", err)
+			//最大的空闲连接数，表示即使没有redis连接时依然可以保持N个空闲的连接，而不被清除，随时处于待命状态。
+			MaxIdle: config.RedisConfig.RedisMaxIdle,
+			//最大的激活连接数，表示同时最多有N个连接
+			MaxActive: config.RedisConfig.RedisMaxActive,
+			//最大的空闲连接等待时间，超过此时间后，空闲连接将被关闭
+			IdleTimeout: 300 * time.Second,
+			//建立连接
+			Dial: func() (redis.Conn, error) {
+				//logs.Info(RedisConn)
+				c, err := redis.Dial("tcp", config.RedisConfig.RedisConn)
+				if err != nil {
+					return nil, fmt.Errorf("redis connection error: %s", err)
+				}
+				if config.RedisConfig.RedisPassword != "" {
+					if _, authErr := c.Do("AUTH", config.RedisConfig.RedisPassword); authErr != nil {
+						return nil, fmt.Errorf("redis auth password error: %s", authErr)
 					}
-					if config.RedisConfig.RedisPassword != "" {
-						if _, authErr := c.Do("AUTH", config.RedisConfig.RedisPassword); authErr != nil {
-							return nil, fmt.Errorf("redis auth password error: %s", authErr)
-						}
-					}
-					//选择分区
-					c.Do("SELECT", config.RedisConfig.RedisDbNum)
-					return c, nil
-				},
-				//ping
-				TestOnBorrow: func(c redis.Conn, t time.Time) error {
-					_, err := c.Do("PING")
-					if err != nil {
-						return fmt.Errorf("ping redis error: %s", err)
-					}
-					return nil
-				},
-			}
+				}
+				//选择分区
+				c.Do("SELECT", config.RedisConfig.RedisDbNum)
+				return c, nil
+			},
+			//ping
+			TestOnBorrow: func(c redis.Conn, t time.Time) error {
+				_, err := c.Do("PING")
+				if err != nil {
+					return fmt.Errorf("ping redis error: %s", err)
+				}
+				return nil
+			},
+		}
 	})
 	return redisPool
 
 }
 
-func Redisinit() {
-	Rdb = GetRedisPool().Get()
+func Redisinit() redis.Conn {
+	con := GetRedisPool().Get()
+	if err := con.Err(); err != nil {
+		panic("redis err")
+	}
+	return con
 }
 
 /**
 redis  SET
 */
 func RdbSet(key, v string) (bool, error) {
-	_, err := Rdb.Do("SET", key, v)
+	rdb := Redisinit()
+	_, err := rdb.Do("SET", key, v)
 	if err != nil {
 		return false, err
 	}
@@ -81,7 +86,8 @@ func RdbSet(key, v string) (bool, error) {
 redis  GET
 */
 func RdbGet(key string) (string, error) {
-	val, err := redis.String(Rdb.Do("GET", key))
+	rdb := Redisinit()
+	val, err := redis.String(rdb.Do("GET", key))
 	fmt.Println("RdbGet.....", val, err)
 	if err != nil {
 		//logs.Error("get error", err.Error())
@@ -95,7 +101,8 @@ func RdbGet(key string) (string, error) {
 redis EXPIRE
 */
 func RdbSetKeyExp(key string, ex int) error {
-	_, err := Rdb.Do("EXPIRE", key, ex)
+	rdb := Redisinit()
+	_, err := rdb.Do("EXPIRE", key, ex)
 	if err != nil {
 		//logs.Error("set error", err.Error())
 		return err
@@ -104,7 +111,8 @@ func RdbSetKeyExp(key string, ex int) error {
 }
 
 func RdbSetExp(key, v string, ex int) error {
-	_, err := Rdb.Do("SET", key, v, "EX", ex)
+	rdb := Redisinit()
+	_, err := rdb.Do("SET", key, v, "EX", ex)
 	if err != nil {
 		//logs.Error("set error", err.Error())
 		return err
@@ -116,7 +124,8 @@ func RdbSetExp(key, v string, ex int) error {
 redis EXISTS
 */
 func RdbCheck(key string) bool {
-	b, err := redis.Bool(Rdb.Do("EXISTS", key))
+	rdb := Redisinit()
+	b, err := redis.Bool(rdb.Do("EXISTS", key))
 	if err != nil {
 		//fmt.Println(err)
 		return false
@@ -128,7 +137,8 @@ func RdbCheck(key string) bool {
 redis DEL
 */
 func RdbDel(key string) error {
-	_, err := Rdb.Do("DEL", key)
+	rdb := Redisinit()
+	_, err := rdb.Do("DEL", key)
 	if err != nil {
 		//fmt.Println(err)
 		return err
@@ -140,8 +150,9 @@ func RdbDel(key string) error {
 redis SETNX
 */
 func RdbSetJson(key string, data interface{}) error {
+	rdb := Redisinit()
 	value, _ := json.Marshal(data)
-	n, _ := Rdb.Do("SETNX", key, value)
+	n, _ := rdb.Do("SETNX", key, value)
 	if n != int64(1) {
 		return errors.New("set failed")
 	}
@@ -153,8 +164,9 @@ redis GET
 return map
 */
 func RdbGetJson(key string) (map[string]string, error) {
+	rdb := Redisinit()
 	var jsonData map[string]string
-	bv, err := redis.Bytes(Rdb.Do("GET", key))
+	bv, err := redis.Bytes(rdb.Do("GET", key))
 	if err != nil {
 		//logs.Error("get json error", err.Error())
 		return nil, err
@@ -171,7 +183,8 @@ func RdbGetJson(key string) (map[string]string, error) {
 redis hSet 注意 设置什么类型 取的时候需要获取对应类型
 */
 func RdbHSet(key string, field string, data interface{}) error {
-	_, err := Rdb.Do("HSET", key, field, data)
+	rdb := Redisinit()
+	_, err := rdb.Do("HSET", key, field, data)
 	if err != nil {
 		//logs.Error("hSet error", err.Error())
 		return err
@@ -183,7 +196,8 @@ func RdbHSet(key string, field string, data interface{}) error {
 redis hGet 注意 设置什么类型 取的时候需要获取对应类型
 */
 func RdbHGet(key, field string) (interface{}, error) {
-	data, err := Rdb.Do("HGET", key, field)
+	rdb := Redisinit()
+	data, err := rdb.Do("HGET", key, field)
 	if err != nil {
 		//logs.Error("hGet error", err.Error())
 		return nil, err
@@ -195,7 +209,8 @@ func RdbHGet(key, field string) (interface{}, error) {
 redis HDEL
 */
 func RdbHDel(key string, field string) error {
-	_, err := Rdb.Do("DEL", key, field)
+	rdb := Redisinit()
+	_, err := rdb.Do("DEL", key, field)
 	if err != nil {
 		//fmt.Println(err)
 		return err
@@ -203,8 +218,9 @@ func RdbHDel(key string, field string) error {
 	return nil
 }
 
-func RdbHlen(key string)(int, error){
-	return redis.Int(Rdb.Do("HLEN", key))
+func RdbHlen(key string) (int, error) {
+	rdb := Redisinit()
+	return redis.Int(rdb.Do("HLEN", key))
 }
 
 /**
@@ -212,7 +228,8 @@ redis hGetAll
 return map
 */
 func RdbHGetAll(key string) (map[string]string, error) {
-	data, err2 := redis.StringMap(Rdb.Do("HGETALL", key))
+	rdb := Redisinit()
+	data, err2 := redis.StringMap(rdb.Do("HGETALL", key))
 	_, err := data, err2
 	if err != nil {
 		//logs.Error("hGetAll error", err.Error())
@@ -225,7 +242,8 @@ func RdbHGetAll(key string) (map[string]string, error) {
 redis HEXISTS
 */
 func RdbHExists(key string, field string) bool {
-	b, err := redis.Bool(Rdb.Do("HEXISTS", key, field))
+	rdb := Redisinit()
+	b, err := redis.Bool(rdb.Do("HEXISTS", key, field))
 	if err != nil {
 		//fmt.Println(err)
 		return false
@@ -237,7 +255,8 @@ func RdbHExists(key string, field string) bool {
 redis INCR 将 key 中储存的数字值增一
 */
 func RdbIncr(key string) error {
-	_, err := Rdb.Do("INCR", key)
+	rdb := Redisinit()
+	_, err := rdb.Do("INCR", key)
 	if err != nil {
 		//logs.Error("INCR error", err.Error())
 		return err
@@ -250,7 +269,8 @@ func RdbIncr(key string) error {
 redis INCRBY 将 key 所储存的值加上增量 n
 */
 func RdbIncrBy(key string, n int) error {
-	_, err := Rdb.Do("INCRBY", key, n)
+	rdb := Redisinit()
+	_, err := rdb.Do("INCRBY", key, n)
 	if err != nil {
 		//logs.Error("INCRBY error", err.Error())
 		return err
@@ -262,7 +282,8 @@ func RdbIncrBy(key string, n int) error {
 redis DECR 将 key 中储存的数字值减一。
 */
 func RdbDecr(key string) error {
-	_, err := Rdb.Do("DECR", key)
+	rdb := Redisinit()
+	_, err := rdb.Do("DECR", key)
 	if err != nil {
 		//logs.Error("DECR error", err.Error())
 		return err
@@ -274,7 +295,8 @@ func RdbDecr(key string) error {
 redis DECRBY 将 key 所储存的值减去减量 n
 */
 func RdbDecrBy(key string, n int) error {
-	_, err := Rdb.Do("DECRBY", key, n)
+	rdb := Redisinit()
+	_, err := rdb.Do("DECRBY", key, n)
 	if err != nil {
 		//logs.Error("DECRBY error", err.Error())
 		return err
@@ -286,7 +308,8 @@ func RdbDecrBy(key string, n int) error {
 redis SADD 将一个或多个 member 元素加入到集合 key 当中，已经存在于集合的 member 元素将被忽略。
 */
 func RdbSAdd(key, v string) error {
-	_, err := Rdb.Do("SADD", key, v)
+	rdb := Redisinit()
+	_, err := rdb.Do("SADD", key, v)
 	if err != nil {
 		//logs.Error("SADD error", err.Error())
 		return err
@@ -299,7 +322,8 @@ redis SMEMBERS 返回集合 key 中的所有成员。
 return map
 */
 func RdbSMembers(key string) (interface{}, error) {
-	data, err := redis.Strings(Rdb.Do("SMEMBERS", key))
+	rdb := Redisinit()
+	data, err := redis.Strings(rdb.Do("SMEMBERS", key))
 	if err != nil {
 		//logs.Error("json nil", err)
 		return nil, err
@@ -312,7 +336,8 @@ redis SISMEMBER 判断 member 元素是否集合 key 的成员。
 return bool
 */
 func RdbSISMembers(key, v string) bool {
-	b, err := redis.Bool(Rdb.Do("SISMEMBER", key, v))
+	rdb := Redisinit()
+	b, err := redis.Bool(rdb.Do("SISMEMBER", key, v))
 	if err != nil {
 		//logs.Error("SISMEMBER error", err.Error())
 		return false
@@ -320,8 +345,9 @@ func RdbSISMembers(key, v string) bool {
 	return b
 }
 
-func RdbZAdd(key, v string) error{
-	_, err := Rdb.Do("ZADD", key, v)
+func RdbZAdd(key, v string) error {
+	rdb := Redisinit()
+	_, err := rdb.Do("ZADD", key, v)
 	if err != nil {
 		return err
 	}
