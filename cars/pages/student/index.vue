@@ -9,7 +9,7 @@
 					<image src="../../static/location.png" style="width: 32px; height: 31px;" class="location-image"></image>
 				</span>
 				<span v-if="line.name == undefined" class="location-info" @tap="show = true">请选择路线</span>
-				<span v-else class="location-info" @tap="show = true">{{line.name}}</span>
+				<span v-else class="location-info" @tap="show = true">{{line.name}}  (切换)</span>
 			</view>
 			<view class="student-list">
 				<view class="student-list-info" v-for="(item, index) in students" :key="index">

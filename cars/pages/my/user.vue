@@ -54,8 +54,16 @@
 			},
 			loginout() {
 				console.log(this)
-				this.$store.commit("setToken", "")
+				this.$store.commit("setToken", null)
+				this.$store.commit("setstudent", null)
+				this.$store.commit("setcarinfo", null)
+				this.$store.commit("setLineinfo", null)
+				this.$store.commit("setSiteinfo", null)
+				this.$store.commit("setTeacher", null)
+				this.$store.commit("setLineid", null)
+				
 				uni.setStorageSync("token", null)
+				console.log(this)
 				uni.redirectTo({
 					url: "./login",
 					success: (res) => {

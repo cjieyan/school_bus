@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar :is-back="isback" title="登录"></u-navbar>
+		<u-navbar :is-back="isback" title="登录" :background="background"></u-navbar>
 		<image mode="aspectFill" style="width: 100%;" src="../../static/login-banner.jpg"></image>
 		<view class="page-content">
 			<!-- <u-input class="login-input" v-model="phone" type="number" value="17620323840" placeholder="请输入手机号码" /> -->
@@ -26,6 +26,9 @@
 				password: "123456",
 				backpage: '',
 				backtype: '',
+				background: {
+					backgroundColor: '#12c497',
+				},
 			}
 		},
 		methods: {
