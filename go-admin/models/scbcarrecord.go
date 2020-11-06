@@ -9,7 +9,7 @@ type ScbCarRecord struct {
 	Id        int    `json:"id" gorm:"type:int(11);primary_key"` //
 	StudentId int `json:"studentId" gorm:"type:int(11);"`     // 学生id
 	CarId     int `json:"carId" gorm:"type:int(11);"`         // 车辆id
-	SiteId    string `json:"siteId" gorm:"type:int(11);"`        // 线路id
+	SiteId    int `json:"siteId" gorm:"type:int(11);"`        // 线路id
 	DataScope string `json:"dataScope" gorm:"-"`
 	CreateBy  string `json:"createBy" gorm:"size:64;"`
 	UpdateBy  string `json:"updateBy" gorm:"size:64;"`
