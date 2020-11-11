@@ -368,7 +368,6 @@ export default {
                 [
                   {
                     required: true,
-                    type: 'array',
                     message: '请至少选择一个班级',
                     trigger: 'change'
                   }

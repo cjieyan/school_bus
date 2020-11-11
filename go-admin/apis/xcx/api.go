@@ -4,9 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/garyburd/redigo/redis"
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	tools2 "go-admin/apis/tools"
 	"go-admin/models"
 	"go-admin/tools"
@@ -16,6 +13,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/garyburd/redigo/redis"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 type Api struct {
@@ -171,12 +172,11 @@ func (a Api) LineInfo(c *gin.Context) {
 	followRecordModel.AttendantId = userId
 	followRecordData, err := followRecordModel.Get()
 	isFinished := -1
-	if nil != err && followRecordData.IsFinished == 1{
+	if nil != err && followRecordData.IsFinished == 1 {
 		isFinished = 1
-	}else if len(students) > 0{
+	} else if len(students) > 0 {
 		isFinished = 0
 	}
-
 
 	rsp := make(map[string]interface{})
 	rsp["teacher"] = teacher                 //跟车员信息
@@ -185,7 +185,7 @@ func (a Api) LineInfo(c *gin.Context) {
 	rsp["sites"] = sitesData                 //站点信息
 	rsp["studentCount"] = studentCount       //所有學生
 	rsp["studentGetOnCount"] = len(students) //已上車的學生
-	rsp["isFinished"] = isFinished // -1行程尚未开始 0未结束 1 已结束
+	rsp["isFinished"] = isFinished           // -1行程尚未开始 0未结束 1 已结束
 	app.OK(c, rsp, "")
 }
 
@@ -719,7 +719,7 @@ func (a Api) Swipe(c *gin.Context) {
 		fmt.Println("swipeAtInfo SwipeAt err....", err)
 		if nil == err {
 			//距离上次上车刷脸成功大于5分钟
-			if 0 == swipeAtInfo.Status && (now - swipeAtInfo.Time) > 60*1 {
+			if 0 == swipeAtInfo.Status && (now-swipeAtInfo.Time) > 60*1 {
 				//将标记为下车状态
 				swipeAtStruct := models.SwipeAt{
 					Status: 1,
@@ -816,7 +816,7 @@ func (a Api) StudentInfo(c *gin.Context) {
 	var studentModel models.ScbStudents
 	studentModel.Id = objParams.StudentId
 	studentData, err := studentModel.Get()
-	studentData.HeadImg = config.Application{}.ImageUrl + studentData.HeadImg
+	studentData.HeadImg = config.ApplicationConfig.ImageUrl + studentData.HeadImg
 	studentData.HeadImgSmall = strings.Replace(studentData.HeadImg, ".", "_small.", 1)
 	app.OK(c, studentData, "")
 
