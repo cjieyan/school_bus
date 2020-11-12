@@ -571,11 +571,18 @@ export default {
       this.getLinesSelect('update')
       const id = row.id || this.ids
       this.picture = undefined
+
       getScbStudents(id).then(response => {
         this.form = response.data
         this.open = true
         this.title = '修改学生信息表'
         this.isEdit = true
+        this.picturefileList = [
+          {
+            'name': response.data.name,
+            'url': response.data.headImg
+          }
+        ]
       })
     },
     /** 提交按钮 */

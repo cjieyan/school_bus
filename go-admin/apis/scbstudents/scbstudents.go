@@ -159,6 +159,8 @@ func UpdateScbStudents(c *gin.Context) {
 	fmt.Println("err...", err)
 	tools.HasError(err, "数据解析失败", -1)
 
+	student, err := data.Get()
+
 	api := &tools2.BdApi{}
 	studentIdStr := strconv.Itoa(data.Id)
 	faceToken := api.FacesetAdd(studentIdStr, data.Picture)
@@ -180,6 +182,8 @@ func UpdateScbStudents(c *gin.Context) {
 	if "" != faceToken {
 		data.FaceToken = faceToken
 		data.HeadImg = "face_" + faceToken + "." + ext
+	} else {
+		data.HeadImg = student.HeadImg
 	}
 
 	data.Picture = ""
