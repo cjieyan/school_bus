@@ -143,7 +143,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="15" style="position: absolute ;right: 10px;z-index: 5">
-            <el-form-item label="图片" prop="picture">
+            <el-form-item label="图片" prop="picture" required>
               <el-upload
                 ref="picture"
                 :file-list="picturefileList"
@@ -262,6 +262,29 @@
                 placeholder="家长电话"
               />
             </el-form-item>
+            <el-button type="primary" @click="addItem">增加</el-button>
+
+            <!-- 动态增加项目 -->
+            <!-- 不止一个项目，用div包裹起来 -->
+            <div v-for="(item, index) in form.dynamicItem" :key="index">
+              <el-form-item
+                label="姓名"
+                :prop="'dynamicItem.' + index + '.name'"
+                :rules="{required: true, message: '姓名不能为空', trigger: 'blur'}"
+              >
+                <el-input v-model="item.name" />
+              </el-form-item>
+              <el-form-item
+                label="手机号"
+                :prop="'dynamicItem.' + index + '.phone'"
+                :rules="[{required: true, message: '手机号不能为空', trigger: 'blur'},{ pattern: /^1\d{10}$/, message: '目前只支持中国大陆的手机号码' }]"
+              >
+                <el-input v-model="item.phone" />
+              </el-form-item>
+              <el-form-item>
+                <i class="el-icon-delete" @click="deleteItem(item, index)" />
+              </el-form-item>
+            </div>
           </el-col>
         </el-row>
       </el-form>
@@ -349,7 +372,8 @@ export default {
       },
       // 表单参数
       form: {
-        picture: ''
+        picture: '',
+        dynamicItem: []
       },
       // 表单校验
       rules: { id:
@@ -390,7 +414,8 @@ export default {
                 ],
       parentPhone:
                 [
-                  { required: true, message: '家长电话不能为空', trigger: 'blur' }
+                  { required: true, message: '家长电话不能为空', trigger: 'blur' },
+                  { pattern: /^1\d{10}$/, message: '目前只支持中国大陆的手机号码' }
                 ],
       picture:
                 [
