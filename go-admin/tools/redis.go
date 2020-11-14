@@ -67,6 +67,7 @@ func Redisinit() redis.Conn {
 	if err := con.Err(); err != nil {
 		panic("redis err")
 	}
+	defer con.Close()
 	return con
 }
 
