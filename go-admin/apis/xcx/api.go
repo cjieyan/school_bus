@@ -146,7 +146,7 @@ func (a Api) LineInfo(c *gin.Context) {
 	tools.HasError(err, "车辆信息不存在", -1)
 
 	//获取线路
-	lineModel.Id = carData.LineId
+	lineModel.Id = objParams.LineId
 	lineData, err := lineModel.GetCarIds()
 
 	tools.HasError(err, "尚未个给您分配路线", -1)
@@ -217,7 +217,7 @@ func (a Api) LineStart(c *gin.Context) {
 
 	followRecordModel := models.ScbFollowRecord{}
 	followRecordModel.CarId = carData.Id
-	followRecordModel.LineId = carData.LineId
+	followRecordModel.LineId = objParams.LineId
 	followRecordModel.AttendantId = teacher.Id
 	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
 
