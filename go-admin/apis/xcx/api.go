@@ -139,7 +139,7 @@ func (a Api) LineInfo(c *gin.Context) {
 
 	//获取车辆信息
 	carModel := models.ScbCars{}
-	carModel.LineId = objParams.LineId
+	//carModel.LineId = objParams.LineId
 	carModel.AttendantId = teacher.Id
 	carData, err := carModel.Get()
 
@@ -147,13 +147,13 @@ func (a Api) LineInfo(c *gin.Context) {
 
 	//获取线路
 	lineModel.Id = objParams.LineId
-	lineData, err := lineModel.GetCarIds()
+	lineData, err := lineModel.Get()
 
 	tools.HasError(err, "尚未个给您分配路线", -1)
 
 	//获取所有站点
 	siteModel := models.SchSites{}
-	siteModel.LineId = lineData.Id
+	siteModel.LineId = objParams.LineId
 	sitesData, err := siteModel.GetAll()
 
 	tools.HasError(err, "尚未个给您分配站点", -1)

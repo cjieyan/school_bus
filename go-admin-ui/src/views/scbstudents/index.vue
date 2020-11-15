@@ -392,7 +392,7 @@ export default {
                 [
                   {
                     required: true,
-                    message: '请至少选择一个班级',
+                    message: '请选择一个班级',
                     trigger: 'change'
                   }
                 ],
