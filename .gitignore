@@ -1,6 +1,5 @@
 .DS_Store
 node_modules/
-dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -34,3 +33,4 @@ go-admin/config/settings.yml
 go-admin/go.sum
 go-admin/images
 go-admin/temp/logs
+cars/
