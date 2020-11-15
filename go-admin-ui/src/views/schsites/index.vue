@@ -547,11 +547,7 @@ export default {
         this.linesOptions = []
         for (var i = 0; i < response.data.length; i++) {
           const d = response.data[i]
-          const formatData = {
-            'label': d.name,
-            'value': d.id
-          }
-          this.linesOptions.push(formatData)
+          this.linesOptions.push(d)
         }
       })
     },
