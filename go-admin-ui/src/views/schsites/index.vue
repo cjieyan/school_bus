@@ -629,7 +629,7 @@ export default {
       this.$refs['form'].validate(valid => {
         if (valid) {
           if (this.form.lineId.length > 0) {
-            this.form.lineId = this.form.classId[this.form.lineId.length - 1]
+            this.form.lineId = this.form.lineId[this.form.lineId.length - 1]
           }
           if (this.form.id !== undefined) {
             updateSchSites(this.form).then(response => {
