@@ -29,41 +29,6 @@
 					</view>
 				</view>
 				<u-action-sheet :list="linelist" @click="setline" v-model="show"></u-action-sheet>
-				<!-- <view class="student-list-info">
-					<view class="student-img">
-						<image src="../../static/location.png" style="width: 30px; height: 30px;" class="location-image"></image>
-						<view class="outboard">
-							<span>未上车</span>
-						</view>
-					</view>
-					<view class="student-name">
-						张三
-					</view>
-				</view>
-				<view class="student-list-info">
-					<view class="student-img">
-						<image src="../../static/location.png" style="width: 30px; height: 30px;" class="location-image"></image>
-					</view>
-					<view class="student-name">
-						张三
-					</view>
-				</view>
-				<view class="student-list-info">
-					<view class="student-img">
-						<image src="../../static/location.png" style="width: 30px; height: 30px;" class="location-image"></image>
-					</view>
-					<view class="student-name">
-						张三
-					</view>
-				</view>
-				<view class="student-list-info">
-					<view class="student-img">
-						<image src="../../static/location.png" style="width: 30px; height: 30px;" class="location-image"></image>
-					</view>
-					<view class="student-name">
-						张三
-					</view>
-				</view> -->
 				<view style="clear:both;height:0"></view>
 			</view>
 		</view>
@@ -74,7 +39,6 @@
 </template>
 
 <script>
-	// import faIcon from "@/components/kilvn-fa-icon/fa-icon.vue"
 	export default {
 		components: {
 			// faIcon
@@ -85,16 +49,6 @@
 				line: {},
 				linelist: [],
 				linename: "",
-				// list: [{
-				// 	text: '点赞',
-				// 	color: 'blue',
-				// 	fontSize: 28,
-				// 	subText: '感谢您的点赞'
-				// }, {
-				// 	text: '分享'
-				// }, {
-				// 	text: '评论'
-				// }],
 				show: false,
 				background: {
 					backgroundColor: '#12c497',
@@ -225,9 +179,16 @@
 							"line_id": this.linelist[index].id
 						},
 						success: (res) => {
-							console.log("--------selectline--------")
-							console.log(this.$store.state.lineid)
-							console.log(res)
+							if(res.data.code == 401){
+								uni.showToast({
+									icon: 'none',
+									title: '会话过期，请重新登录',
+									duration: 1500
+								});
+								uni.redirectTo({
+									url:"../my/login"
+								})
+							}
 							this.$store.commit('setcarinfo', res.data.data.car)
 							this.$store.commit('setTeacher', res.data.data.teacher)
 							this.$store.commit('setLineinfo', res.data.data.line)
@@ -257,7 +218,16 @@
 							"line_id": res.id
 						},
 						success: (res) => {
-							console.log(res)
+							if(res.data.code == 401){
+								uni.showToast({
+									icon: 'none',
+									title: '会话过期，请重新登录',
+									duration: 1500
+								});
+								uni.redirectTo({
+									url:"../my/login"
+								})
+							}
 							this.students = res.data.data.studentsDataRet
 						},
 						fail: (err) => {
@@ -270,11 +240,13 @@
 			}
 		},
 		onShow() {
+			this.students = {}
 			this.lineInfo()
 			this.line = this.$store.state.liniInfo
 			this.studentList()
 		},
 		onLoad() {
+			this.students = {}
 			this.studentList()
 		}
 	}

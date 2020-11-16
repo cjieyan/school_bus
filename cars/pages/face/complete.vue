@@ -38,7 +38,16 @@
 						'token': token,
 					},
 					success: (res) => {
-						console.log(res)
+						if(res.data.code == 401){
+							uni.showToast({
+								icon: 'none',
+								title: '会话过期，请重新登录',
+								duration: 1500
+							});
+							uni.redirectTo({
+								url:"../my/login"
+							})
+						}
 						setTimeout(() => {
 							uni.switchTab({
 								url: "../student/index",
@@ -60,8 +69,6 @@
 			}
 		},
 		onLoad() {
-			console.log("isfinsh-----------")
-			console.log(this.$store.state.isfinish)
 			if ( this.$store.state.isfinish ) {
 				this.finish()
 				

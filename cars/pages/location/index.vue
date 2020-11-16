@@ -34,7 +34,10 @@
 					</span>
 				</view>
 
-				<view class="location-d">
+				<view class="location-d"  v-if="numList.length == 0">
+					<u-loading mode="circle"></u-loading>
+				</view>
+				<view class="location-d"  v-else>
 					<u-steps :list="numList" active-color="rgb(255 114 58)" mode="dot" direction="column" :current="current">
 					</u-steps>
 				</view>
@@ -111,6 +114,16 @@
 					},
 					data: {},
 					success: (res) => {
+						if(res.data.code == 401){
+							uni.showToast({
+								icon: 'none',
+								title: '会话过期，请重新登录',
+								duration: 1500
+							});
+							uni.redirectTo({
+								url:"../my/login"
+							})
+						}
 						var data = []
 						this.linelist = res.data.data
 						for (var i = 0; i < res.data.data.length; i++) {
@@ -147,9 +160,16 @@
 							"line_id": this.linelist[index].id
 						},
 						success: (res) => {
-							console.log("--------selectline--------")
-							console.log(this.$store.state.lineid)
-							console.log(res)
+							if(res.data.code == 401){
+								uni.showToast({
+									icon: 'none',
+									title: '会话过期，请重新登录',
+									duration: 1500
+								});
+								uni.redirectTo({
+									url:"../my/login"
+								})
+							}
 							this.$store.commit('setLineid', this.linelist[index].id)
 							this.$store.commit('setcarinfo', res.data.data.car)
 							this.$store.commit('setTeacher', res.data.data.teacher)
@@ -175,9 +195,6 @@
 						}
 					})
 				}).then((res) => {
-					console.log("studentList--------")
-					console.log(res)
-					// this.studentList()
 					uni.request({
 						url: this.$store.state.apihost + "/xcx/auth/line-students",
 						method: "POST",
@@ -188,7 +205,16 @@
 							"line_id": res.id
 						},
 						success: (res) => {
-							console.log(res)
+							if(res.data.code == 401){
+								uni.showToast({
+									icon: 'none',
+									title: '会话过期，请重新登录',
+									duration: 1500
+								});
+								uni.redirectTo({
+									url:"../my/login"
+								})
+							}
 							this.students = res.data.data.studentsDataRet
 						},
 						fail: (err) => {
@@ -233,17 +259,6 @@
 							}
 						})
 					}).then((res) => {
-						console.log("res-----------------")
-						console.log(res)
-						// const blat = res.y
-						// const blng = res.x
-						console.log("this.blat")
-						console.log(res.blat)
-						console.log("this.blng")
-						console.log(res.blng)
-						console.log("this.latitude")
-						console.log(this.latitude)
-						console.log(this.longitude)
 						new Promise(resolve => {
 							var token = uni.getStorageSync('token')
 							uni.request({
@@ -254,8 +269,6 @@
 									pois: 1,
 								},
 								success: (res) => {
-									console.log("-----百度地图----")
-									console.log(res)
 									resolve(res)
 								},
 								fail: (err) => {
@@ -263,8 +276,6 @@
 								}
 							})
 						}).then((res) => {
-							console.log("--------siteinfo-----")
-							console.log(this.$store.state.siteinfo)
 							var siteList = []
 							if (this.$store.state.siteinfo.length > 0) {
 								for (var i = 0; i < this.$store.state.siteinfo.length; i++) {
@@ -294,7 +305,6 @@
 			},
 		},
 		onHide() {
-			console.log('this.ifOnShow=true')
 			this.ifOnShow = true
 			if (this.timer) {
 				clearInterval(this.timer)
@@ -306,13 +316,9 @@
 			uni.showLoading({
 				title: "正在加载"
 			})
+			this.numList = []
 			this.lineInfo()
 			this.line = this.$store.state.liniInfo
-			console.log("this.line")
-			console.log(this.line)
-			console.log(this.$store.state.liniInfo)
-
-			console.log(this.line.hasOwnProperty("name"))
 			if (this.line.hasOwnProperty("name")) {
 				// this.line = this.$store.state.liniInfo
 				this.carinfo = this.$store.state.carInfo
@@ -334,6 +340,7 @@
 			uni.showLoading({
 
 			})
+			this.numList = []
 			this.getLocation()
 			this.line = this.$store.state.liniInfo
 			this.carinfo = this.$store.state.carInfo

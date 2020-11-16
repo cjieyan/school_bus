@@ -111,6 +111,16 @@
 								"line_id": this.$store.state.lineid
 							},
 							success: (res) => {
+								if(res.data.code == 401){
+									uni.showToast({
+										icon: 'none',
+										title: '会话过期，请重新登录',
+										duration: 1500
+									});
+									uni.redirectTo({
+										url:"../my/login"
+									})
+								}
 								if (res.data.code == 200) {
 									if (res.data.isFinished == true) {
 										this.$store.commit("isfinish", true)

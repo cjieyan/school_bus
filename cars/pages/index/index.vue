@@ -9,7 +9,7 @@
 		</view>
 		<view class="wrap">
 			<view v-for="(item, index) in lines" :key="index">
-				<u-card :title="item.carIds+'号线'" :sub-title="'发车 '+item.departed_at+'——到达 '+item.arrivedAt">
+				<u-card :title="item.name" :sub-title="'发车 '+item.departed_at+'——到达 '+item.arrivedAt">
 					<view class="" slot="body"  @tap="selectline(item)" :value="item.id" >
 						<view class="u-body-item u-flex u-col-between u-p-t-0">
 							<view class="u-body-item-title">
@@ -51,10 +51,10 @@
 				})
 			},
 			selectline(item){
-				console.log("----item--------")
-				console.log(item)
 				const lineid = item.id
-				console.log(lineid)
+				//初始化数据
+				this.$store.commit('setSiteinfo', {})
+				this.$store.commit('setLineinfo', {})
 				this.$store.commit('setLineid', lineid)
 				uni.request({
 					url: this.$store.state.apihost + "/xcx/auth/line-info",
@@ -66,9 +66,6 @@
 						"line_id": lineid
 					},
 					success: (res) => {
-						console.log("--------selectline--------")
-						console.log(this.$store.state.lineid)
-						console.log(res)
 						if(res.data.code == 401){
 							uni.showToast({
 								icon: 'none',
@@ -97,7 +94,11 @@
 						
 					},
 					fail: (err) => {
-						console.log(err)
+						uni.showToast({
+							icon: 'none',
+							title: '服务异常，请稍后重试',
+							duration: 1500
+						});
 					}
 				})
 			},
@@ -112,9 +113,6 @@
 
 						})
 					},
-					fail: function(e) {
-						console.log(e)
-					}
 				})
 			},
 			carinfo() {
@@ -169,7 +167,7 @@
 					},
 					fail: (err) => {
 						uni.showModal({
-							title:"网络异常,请重试"
+							title:"服务异常,请联系管理员"
 						})
 						return
 					}
@@ -177,8 +175,6 @@
 			},
 			lineInfo() {
 				var token = uni.getStorageSync('token')
-				console.log("lineinfo")
-				console.log(token)
 				uni.request({
 					url: this.$store.state.apihost + "/xcx/auth/lines",
 					method: "post",
@@ -201,7 +197,9 @@
 						}
 					},
 					fail: (err) => {
-						console.log(err)
+						uni.showModal({
+							title:"服务异常,请联系管理员"
+						})
 					}
 				})
 			}
