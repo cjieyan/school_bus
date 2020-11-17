@@ -134,7 +134,7 @@ func (a Api) LineInfo(c *gin.Context) {
 	teacherModel.Id = userId
 	teacher, err := teacherModel.Get()
 	if teacher.PostId != 1 {
-		tools.HasError(err, "您不是跟车员, sch_teachers表的postId = 1", -1)
+		tools.HasError(err, "您不是跟车员", -1)
 	}
 
 	//获取车辆信息
@@ -668,7 +668,7 @@ func (a Api) Swipe(c *gin.Context) {
 	//获取车辆信息
 	carModel := models.ScbCars{}
 	carModel.AttendantId = teacher.Id
-	carModel.LineId = objParams.LineId
+	//carModel.LineId = objParams.LineId
 	carData, err := carModel.Get()
 
 	tools.HasError(err, "无法查询正常线路信息", 500)
