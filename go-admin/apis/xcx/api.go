@@ -407,6 +407,8 @@ func (a Api) LineStudents(c *gin.Context) {
 				getOff++
 			}
 		}
+		student.HeadImg = config.ApplicationConfig.ImageUrl + student.HeadImg
+		student.HeadImgSmall = strings.Replace(student.HeadImg, ".", "_small.", 1)
 		studentsDataRet = append(studentsDataRet, student)
 	}
 	ret := make(map[string]interface{})
@@ -463,7 +465,7 @@ func (a Api) FollowRecord(c *gin.Context) {
 
 	ret := make(map[string]interface{})
 	ret["count"] = count                                                       //未上车数量
-	ret["result"] = result                                                     //已上车数量
+	ret["result"] = followRecordsData                                                     //已上车数量
 	ret["page_index"] = objParams.PageIndex                                    //已下车数量
 	ret["page_size"] = objParams.PageSize                                      //每页数量
 	ret["totalpage"] = math.Ceil(float64(count) / float64(objParams.PageSize)) //总页数
