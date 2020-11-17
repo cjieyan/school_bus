@@ -445,7 +445,7 @@ export default {
     // 线路切换
     curLineChange(val) {
       // 获取上下车站点
-      getLineCars().then(response => {
+      getLineCars(val).then(response => {
         this.carIdsOptions = []
         for (var i = 0; i < response.data.length; i++) {
           const d = response.data[i]
@@ -455,7 +455,7 @@ export default {
           })
         }
       })
-      getLineSites().then(response => {
+      getLineSites(val).then(response => {
         this.siteIdsOptions = []
         for (var i = 0; i < response.data.length; i++) {
           const d = response.data[i]
