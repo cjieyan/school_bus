@@ -407,7 +407,7 @@ func (a Api) LineStudents(c *gin.Context) {
 				getOff++
 			}
 		}
-		student.HeadImgSmall = strings.Replace(student.HeadImg, ".", "_small.", 1)
+		student.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(student.HeadImg, ".", "_small.", 1)
 		student.HeadImg = config.ApplicationConfig.ImageUrl + student.HeadImg
 		studentsDataRet = append(studentsDataRet, student)
 	}
@@ -818,7 +818,7 @@ func (a Api) StudentInfo(c *gin.Context) {
 	var studentModel models.ScbStudents
 	studentModel.Id = objParams.StudentId
 	studentData, err := studentModel.Get()
-	studentData.HeadImgSmall = strings.Replace(studentData.HeadImg, ".", "_small.", 1)
+	studentData.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(studentData.HeadImg, ".", "_small.", 1)
 	studentData.HeadImg = config.ApplicationConfig.ImageUrl + studentData.HeadImg
 	app.OK(c, studentData, "")
 

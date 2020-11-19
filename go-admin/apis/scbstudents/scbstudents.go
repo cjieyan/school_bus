@@ -105,7 +105,7 @@ func GetScbStudents(c *gin.Context) {
 	result, err := data.Get()
 	tools.HasError(err, "抱歉未找到相关信息", -1)
 
-	result.HeadImgSmall = strings.Replace(result.HeadImg, ".", "_small.", 1)
+	result.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(result.HeadImg, ".", "_small.", 1)
 	result.HeadImg = config.ApplicationConfig.ImageUrl + result.HeadImg
 
 	app.OK(c, result, "")
