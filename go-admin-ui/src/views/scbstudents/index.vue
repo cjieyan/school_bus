@@ -143,7 +143,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="15" style="position: absolute ;right: 10px;z-index: 5">
-            <el-form-item label="图片" prop="picture" required>
+            <el-form-item label="图片" prop="picture" :required="isHaveTo">
               <el-upload
                 ref="picture"
                 :file-list="picturefileList"
@@ -262,8 +262,6 @@
                 placeholder="家长电话"
               />
             </el-form-item>
-            <el-button type="primary" @click="addItem">增加</el-button>
-
             <!-- 动态增加项目 -->
             <!-- 不止一个项目，用div包裹起来 -->
             <div v-for="(item, index) in form.dynamicItem" :key="index">
@@ -305,7 +303,16 @@ import { getAllLines, getLineCars, getLineSites } from '@/api/scblines'
 export default {
   name: 'Scbstudents',
   data() {
+    const validatePicture = (rule, value, callback) => {
+      console.log('validatePicture...', this.form.headImg)
+      // 当活动名称为空值且为必填时，抛出错误，反之通过校验
+      if (this.form.headImg === '' || typeof this.form.headImg === 'undefined') {
+        callback(new Error('请先上传照片'))
+      }
+    }
     return {
+      items: [],
+      item: {},
       showdisabled: false,
       // 遮罩层
       loading: true,
@@ -373,22 +380,24 @@ export default {
       // 表单参数
       form: {
         picture: '',
+        headImg: '',
         dynamicItem: []
       },
       // 表单校验
-      rules: { id:
+      rules: {
+        id:
                 [
                   { required: true, message: '不能为空', trigger: 'blur' }
                 ],
-      name:
+        name:
                 [
                   { required: true, message: '名称不能为空', trigger: 'blur' }
                 ],
-      number:
+        number:
                 [
                   { required: true, message: '学号不能为空', trigger: 'blur' }
                 ],
-      classId:
+        classId:
                 [
                   {
                     required: true,
@@ -396,32 +405,33 @@ export default {
                     trigger: 'change'
                   }
                 ],
-      lineId:
+        lineId:
                 [
                   { required: true, message: '线路不能为空', trigger: 'blur' }
                 ],
-      siteIdUp:
+        siteIdUp:
                 [
                   { required: true, message: '上车站点不能为空', trigger: 'blur' }
                 ],
-      siteIdDown:
+        siteIdDown:
                 [
                   { required: true, message: '下车站点不能为空', trigger: 'blur' }
                 ],
-      carId:
+        carId:
                 [
                   { required: true, message: '车辆id不能为空', trigger: 'blur' }
                 ],
-      parentPhone:
+        parentPhone:
                 [
                   { required: true, message: '家长电话不能为空', trigger: 'blur' },
                   { pattern: /^1\d{10}$/, message: '目前只支持中国大陆的手机号码' }
                 ],
-      picture:
+        picture:
                 [
+                  { validator: validatePicture }
                   // { required: true, message: '图片不能为空', trigger: 'blur' }
                 ],
-      isDeleted:
+        isDeleted:
                 [
                   { required: true, message: '0未删除 1已删除不能为空', trigger: 'blur' }
                 ]
@@ -434,6 +444,12 @@ export default {
       }
     }
   },
+  computed: {
+    isHaveTo: function() {
+      console.log('this.form.headImg...', this.form.headImg)
+      return this.form.headImg !== ``
+    }
+  },
   watch: {
     // 监听deptId
     'form.lineId': 'curLineChange'
@@ -442,6 +458,9 @@ export default {
     this.getList()
   },
   methods: {
+    addItem: function() {
+      this.items.push(this.item)
+    },
     // 线路切换
     curLineChange(val) {
       // 获取上下车站点
@@ -599,6 +618,7 @@ export default {
 
       getScbStudents(id).then(response => {
         this.form = response.data
+        console.log('this.form.headImg........', this.form.headImg)
         this.open = true
         this.title = '修改学生信息表'
         this.isEdit = true

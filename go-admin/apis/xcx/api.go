@@ -362,7 +362,7 @@ func (a Api) LineStudents(c *gin.Context) {
 	//获取车辆信息
 	carModel := models.ScbCars{}
 	carModel.AttendantId = teacher.Id
-	carModel.LineId = objParams.LineId
+	//carModel.LineId = objParams.LineId
 	carData, err := carModel.Get()
 
 	tools.HasError(err, "车辆信息不存在", -1)
