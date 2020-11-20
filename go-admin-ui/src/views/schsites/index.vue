@@ -390,7 +390,9 @@ export default {
                 ],
       lineId:
                 [
-                  { required: true, message: '线路id不能为空', trigger: 'blur' }
+                  {
+                    required: true, message: '请选择一条线路', trigger: 'change'
+                  }
                 ],
       name:
                 [
@@ -545,10 +547,6 @@ export default {
         this.linesOptions = []
         for (var i = 0; i < response.data.length; i++) {
           const d = response.data[i]
-          const formatData = {
-            'label': d.name,
-            'value': d.id
-          }
           this.linesOptions.push(d)
         }
       })
@@ -589,7 +587,6 @@ export default {
       }
       this.resetForm('form')
     },
-
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageIndex = 1
@@ -631,6 +628,9 @@ export default {
     submitForm: function() {
       this.$refs['form'].validate(valid => {
         if (valid) {
+          if (this.form.lineId.length > 0) {
+            this.form.lineId = this.form.lineId[this.form.lineId.length - 1]
+          }
           if (this.form.id !== undefined) {
             updateSchSites(this.form).then(response => {
               if (response.code === 200) {

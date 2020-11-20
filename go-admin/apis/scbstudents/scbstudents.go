@@ -3,14 +3,12 @@ package scbstudents
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/nfnt/resize"
 	tools2 "go-admin/apis/tools"
 	"go-admin/models"
 	"go-admin/tools"
 	"go-admin/tools/app"
 	"go-admin/tools/app/msg"
+	"go-admin/tools/config"
 	"image"
 	"image/gif"
 	"image/jpeg"
@@ -20,6 +18,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/nfnt/resize"
 )
 
 func GetScbStudentsList(c *gin.Context) {
@@ -53,7 +55,7 @@ func GetScbStudentsList(c *gin.Context) {
 	tools.HasError(err, "", -1)
 
 	var studentsData []models.ScbStudents
-	for _, student := range result{
+	for _, student := range result {
 		//线路
 		lineModel := models.ScbLines{}
 		lineModel.Id = student.LineId
@@ -88,7 +90,7 @@ func GetScbStudentsList(c *gin.Context) {
 		carModel := models.ScbCars{}
 		carModel.Id = student.CarId
 		carData, err := carModel.Get()
-		if nil == err{
+		if nil == err {
 			student.CarNo = carData.CarNo
 		}
 		studentsData = append(studentsData, student)
@@ -102,6 +104,9 @@ func GetScbStudents(c *gin.Context) {
 	data.Id, _ = tools.StringToInt(c.Param("id"))
 	result, err := data.Get()
 	tools.HasError(err, "抱歉未找到相关信息", -1)
+
+	result.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(result.HeadImg, ".", "_small.", 1)
+	result.HeadImg = config.ApplicationConfig.ImageUrl + result.HeadImg
 
 	app.OK(c, result, "")
 }
@@ -122,7 +127,6 @@ func InsertScbStudents(c *gin.Context) {
 		studentIdStr := strconv.Itoa(result.Id)
 		faceToken := api.FacesetAdd(studentIdStr, picture)
 
-
 		imageArr := strings.Split(picture, ";base64,")
 		ext := "png"
 		if len(imageArr) > 1 {
@@ -130,9 +134,9 @@ func InsertScbStudents(c *gin.Context) {
 			if len(imageArrTmp) > 1 {
 				ext = imageArrTmp[1]
 			}
-			ddd, _ := base64.StdEncoding.DecodeString(imageArr[1]) //成图片文件并把文件写入到buffer
-			ioutil.WriteFile("./images/face_" + faceToken + "." + ext, ddd, 0666)   //buffer输出到jpg文件中（不做处理，直接写到文件）
-			saveSmall("./images/face_" + faceToken + "." + ext, ext, "./images/face_" + faceToken + "_small." + ext)
+			ddd, _ := base64.StdEncoding.DecodeString(imageArr[1])          //成图片文件并把文件写入到buffer
+			ioutil.WriteFile("./images/face_"+faceToken+"."+ext, ddd, 0666) //buffer输出到jpg文件中（不做处理，直接写到文件）
+			saveSmall("./images/face_"+faceToken+"."+ext, ext, "./images/face_"+faceToken+"_small."+ext)
 		}
 
 		if "" != faceToken {
@@ -147,6 +151,7 @@ func InsertScbStudents(c *gin.Context) {
 
 	app.OK(c, nil, "")
 }
+
 // 更新学生信息
 func UpdateScbStudents(c *gin.Context) {
 	var data models.ScbStudents
@@ -154,10 +159,11 @@ func UpdateScbStudents(c *gin.Context) {
 	fmt.Println("err...", err)
 	tools.HasError(err, "数据解析失败", -1)
 
+	student, err := data.Get()
+
 	api := &tools2.BdApi{}
 	studentIdStr := strconv.Itoa(data.Id)
 	faceToken := api.FacesetAdd(studentIdStr, data.Picture)
-
 
 	imageArr := strings.Split(data.Picture, ";base64,")
 	ext := "png"
@@ -167,15 +173,17 @@ func UpdateScbStudents(c *gin.Context) {
 		if len(imageArrTmp) > 1 {
 			ext = imageArrTmp[1]
 		}
-		ddd, _ := base64.StdEncoding.DecodeString(imageArr[1]) //成图片文件并把文件写入到buffer
-		ioutil.WriteFile("./images/face_" + faceToken + "." + ext, ddd, 0666)   //buffer输出到jpg文件中（不做处理，直接写到文件）
-		saveSmall("./images/face_" + faceToken + "." + ext, ext, "./images/face_" + faceToken + "_small." + ext)
+		ddd, _ := base64.StdEncoding.DecodeString(imageArr[1])          //成图片文件并把文件写入到buffer
+		ioutil.WriteFile("./images/face_"+faceToken+"."+ext, ddd, 0666) //buffer输出到jpg文件中（不做处理，直接写到文件）
+		saveSmall("./images/face_"+faceToken+"."+ext, ext, "./images/face_"+faceToken+"_small."+ext)
 	}
 
 	fmt.Println("faceToken...", faceToken)
 	if "" != faceToken {
 		data.FaceToken = faceToken
 		data.HeadImg = "face_" + faceToken + "." + ext
+	} else {
+		data.HeadImg = student.HeadImg
 	}
 
 	data.Picture = ""
@@ -195,7 +203,7 @@ func DeleteScbStudents(c *gin.Context) {
 }
 
 //保存小图
-func saveSmall(filepath, ext, smallPath string){
+func saveSmall(filepath, ext, smallPath string) {
 	file, err := os.Open(filepath)
 	if err != nil {
 		fmt.Println("saveSmall Open err......", err)
@@ -203,16 +211,16 @@ func saveSmall(filepath, ext, smallPath string){
 	}
 	var img image.Image
 	switch strings.ToLower(ext) {
-		case "png":
-			img, err = png.Decode(file)
-		case "jpg" :
-			img, err = jpeg.Decode(file)
-		case "jpeg":
-			img, err = jpeg.Decode(file)
-		case "gif":
-			img, err = gif.Decode(file)
-		default:
-			return
+	case "png":
+		img, err = png.Decode(file)
+	case "jpg":
+		img, err = jpeg.Decode(file)
+	case "jpeg":
+		img, err = jpeg.Decode(file)
+	case "gif":
+		img, err = gif.Decode(file)
+	default:
+		return
 	}
 	// decode jpeg into image.Image
 	if err != nil {
@@ -224,8 +232,8 @@ func saveSmall(filepath, ext, smallPath string){
 	// and preserve aspect ratio
 
 	//newWidth := 200
-	kuan:=img.Bounds().Dx()//
-	gao:=img.Bounds().Dy()//
+	kuan := img.Bounds().Dx() //
+	gao := img.Bounds().Dy()  //
 	newHeight := uint(kuan * 200 / gao)
 	fmt.Println("newHeight....", newHeight, kuan, gao, 200)
 
@@ -233,28 +241,27 @@ func saveSmall(filepath, ext, smallPath string){
 	//m := resize.Resize(1000, 0, img, resize.Lanczos3)
 	m := resize.Thumbnail(200, newHeight, img, resize.Lanczos3)
 
-
 	out, err := os.Create(smallPath)
 	if err != nil {
 		fmt.Println("saveSmall Create err......", err)
 		return
 	}
 	defer out.Close()
-	fmt.Println("saveSmall strings.ToLower(ext)......", strings.ToLower(ext) )
+	fmt.Println("saveSmall strings.ToLower(ext)......", strings.ToLower(ext))
 
 	// write new image to file
 	var sErr error
 	switch strings.ToLower(ext) {
-		case "png":
-			sErr = png.Encode(out, m)
-		case "jpg":
-			sErr = jpeg.Encode(out, m, &jpeg.Options{Quality: 100})
-		case "jpeg":
-			sErr = jpeg.Encode(out, m, &jpeg.Options{Quality: 100})
-		case "gif":
-			sErr = gif.Encode(out, m, &gif.Options{})
-		default:
-			return
+	case "png":
+		sErr = png.Encode(out, m)
+	case "jpg":
+		sErr = jpeg.Encode(out, m, &jpeg.Options{Quality: 100})
+	case "jpeg":
+		sErr = jpeg.Encode(out, m, &jpeg.Options{Quality: 100})
+	case "gif":
+		sErr = gif.Encode(out, m, &gif.Options{})
+	default:
+		return
 	}
 	fmt.Println("saveSmall sErr......", sErr)
 }

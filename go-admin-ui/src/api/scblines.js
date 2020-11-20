@@ -57,16 +57,16 @@ export function getAllLines() {
   })
 }
 // 获取线路的所有车辆
-export function getLineCars() {
+export function getLineCars(lineId) {
   return request({
-    url: '/api/v1/getLines/cars',
+    url: '/api/v1/getLines/cars?id=' + lineId,
     method: 'get'
   })
 }
 // 获取线路的所有站点
-export function getLineSites() {
+export function getLineSites(lineId) {
   return request({
-    url: '/api/v1/getLines/sites',
+    url: '/api/v1/getLines/sites?id=' + lineId,
     method: 'get'
   })
 }

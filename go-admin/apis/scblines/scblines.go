@@ -1,6 +1,7 @@
 package scblines
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-admin/models"
 	"go-admin/tools"
@@ -132,7 +133,7 @@ func GetAllLines(c *gin.Context) {
 //获取站点的所有车辆
 func GetCars(c *gin.Context){
 	var data models.ScbLines
-	data.Id, _ = tools.StringToInt(c.Param("id"))
+	data.Id, _ = tools.StringToInt(c.Query("id"))
 
 	lineData, err := data.Get()
 	tools.HasError(err, "线路找不到", -1)
@@ -150,13 +151,13 @@ func GetCars(c *gin.Context){
 //获取线路下的所有站点
 func GetSites(c *gin.Context){
 	var data models.ScbLines
-	data.Id, _ = tools.StringToInt(c.Param("id"))
-
+	data.Id, _ = tools.StringToInt(c.Query("id"))
 	lineData, err := data.Get()
 	tools.HasError(err, "线路找不到", -1)
 
 	var siteModel models.SchSites
 	siteModel.LineId = lineData.Id
+	fmt.Println(" lineData.Id...",  lineData.Id)
 	sitesData, err := siteModel.GetAll()
 	app.OK(c, sitesData,"")
 }

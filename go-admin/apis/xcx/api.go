@@ -4,9 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/garyburd/redigo/redis"
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	tools2 "go-admin/apis/tools"
 	"go-admin/models"
 	"go-admin/tools"
@@ -16,6 +13,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/garyburd/redigo/redis"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 type Api struct {
@@ -65,6 +66,51 @@ func (a Api) Sites(c *gin.Context) {
 	app.OK(c, info, "")
 }
 
+//车辆列表
+func (a Api) Cars(c *gin.Context){
+
+	userId := c.GetInt(models.UserId)
+
+	teacherModel := models.ScbTeachers{}
+
+	//获取跟车员信息
+	teacherModel.Id = userId
+	teacherModel.PostId = 1
+	teacher, err := teacherModel.Get()
+
+	tools.HasError(err, "暂无权限", -1)
+
+	//获取车辆
+	carModel := models.ScbCars{}
+	carModel.AttendantId = teacher.Id
+	carsData, err := carModel.GetAllByAttendantId()
+	tools.HasError(err, "车辆信息不存在", -1)
+
+	var carsRetData []models.ScbLines
+	for _, car := range carsData{
+
+		lineModel := models.ScbLines{}
+		lineModel.CarId = car.Id
+		line, err := lineModel.Get()
+		if nil != err{
+			continue
+		}
+
+		line.CarNos = car.CarNo
+		line.CarId = car.Id
+		siteModel := models.SchSites{}
+		siteModel.LineId = line.Id
+		startSite, err := siteModel.GetStart()
+		if nil == err {
+			line.StartSite = startSite
+		}
+		endSite, err := siteModel.GetEnd()
+		if nil == err {
+			line.EndSite = endSite
+		}
+		carsRetData = append(carsRetData, line)
+	}
+}
 //多线路信息
 //
 func (a Api) Lines(c *gin.Context) {
@@ -126,39 +172,19 @@ func (a Api) LineInfo(c *gin.Context) {
 
 	userId := c.GetInt(models.UserId)
 
-	lineModel := models.ScbLines{}
-	teacherModel := models.ScbTeachers{}
-
-	//获取跟车员信息
-	teacherModel.Id = userId
-	teacher, err := teacherModel.Get()
-	if teacher.PostId != 1 {
-		tools.HasError(err, "您不是跟车员, sch_teachers表的postId = 1", -1)
-	}
-
-	//获取车辆信息
-	carModel := models.ScbCars{}
-	carModel.LineId = objParams.LineId
-	carModel.AttendantId = teacher.Id
-	carData, err := carModel.Get()
-
-	tools.HasError(err, "车辆信息不存在", -1)
-
-	//获取线路
-	lineModel.Id = carData.LineId
-	lineData, err := lineModel.GetCarIds()
-
-	tools.HasError(err, "尚未个给您分配路线", -1)
+	teacher, car, line, err := a.teacherCarLine(userId, objParams.CarId, objParams.LineId)
+	tools.HasError(err, "", -1)
 
 	//获取所有站点
 	siteModel := models.SchSites{}
-	siteModel.LineId = lineData.Id
+	siteModel.LineId = objParams.LineId
 	sitesData, err := siteModel.GetAll()
 
 	tools.HasError(err, "尚未个给您分配站点", -1)
+
 	//获取乘车的学生总数
 	studentModel := models.ScbStudents{}
-	studentModel.CarId = carData.Id
+	studentModel.CarId = car.Id
 	studentCount, err := studentModel.GetCount()
 
 	ymd := tools.Ymd()
@@ -167,25 +193,24 @@ func (a Api) LineInfo(c *gin.Context) {
 
 	followRecordModel := models.ScbFollowRecord{}
 	followRecordModel.Ymd, err = strconv.Atoi(ymd)
-	followRecordModel.LineId = lineData.Id
+	followRecordModel.LineId = line.Id
 	followRecordModel.AttendantId = userId
 	followRecordData, err := followRecordModel.Get()
 	isFinished := -1
-	if nil != err && followRecordData.IsFinished == 1{
+	if nil != err && followRecordData.IsFinished == 1 {
 		isFinished = 1
-	}else if len(students) > 0{
+	} else if len(students) > 0 {
 		isFinished = 0
 	}
 
-
 	rsp := make(map[string]interface{})
 	rsp["teacher"] = teacher                 //跟车员信息
-	rsp["car"] = carData                     //车辆信息
-	rsp["line"] = lineData                   //线路信息
+	rsp["car"] = car                     //车辆信息
+	rsp["line"] = line                   //线路信息
 	rsp["sites"] = sitesData                 //站点信息
 	rsp["studentCount"] = studentCount       //所有學生
 	rsp["studentGetOnCount"] = len(students) //已上車的學生
-	rsp["isFinished"] = isFinished // -1行程尚未开始 0未结束 1 已结束
+	rsp["isFinished"] = isFinished           // -1行程尚未开始 0未结束 1 已结束
 	app.OK(c, rsp, "")
 }
 
@@ -198,26 +223,14 @@ func (a Api) LineStart(c *gin.Context) {
 	}
 
 	userId := c.GetInt(models.UserId)
-	teacherModel := models.ScbTeachers{}
 
 	//获取跟车员信息
-	teacherModel.Id = userId
-	teacher, err := teacherModel.Get()
-	if teacher.PostId != 1 {
-		tools.HasError(err, "您不是跟车员", -1)
-	}
-
-	//获取车辆信息
-	carModel := models.ScbCars{}
-	carModel.AttendantId = teacher.Id
-	carModel.LineId = objParams.LineId
-	carData, err := carModel.Get()
-
-	tools.HasError(err, "无法查询正常线路信息", 500)
+	teacher, car, _, err := a.teacherCarLine(userId, objParams.CarId, objParams.LineId)
+	tools.HasError(err, "", -1)
 
 	followRecordModel := models.ScbFollowRecord{}
-	followRecordModel.CarId = carData.Id
-	followRecordModel.LineId = carData.LineId
+	followRecordModel.CarId = car.Id
+	followRecordModel.LineId = objParams.LineId
 	followRecordModel.AttendantId = teacher.Id
 	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
 
@@ -230,11 +243,11 @@ func (a Api) LineStart(c *gin.Context) {
 		fmt.Println("followRecordData, err...", followRecordData, err)
 		ret.IsFinished = 1
 		msg = "操作成功"
+	}else if nil != err {
+		tools.HasError(err, "", -1)
 	} else if 1 == followRecordData.IsFinished {
 		msg = "行程已结束"
 	}
-	tools.HasError(err, "", -1)
-
 	app.OK(c, nil, msg)
 }
 
@@ -268,21 +281,9 @@ func (a Api) LineFinish(c *gin.Context) {
 	err := c.ShouldBindJSON(&objParams)
 	userId := c.GetInt(models.UserId)
 
-	teacherModel := models.ScbTeachers{}
-
 	//获取跟车员信息
-	teacherModel.Id = userId
-	teacher, err := teacherModel.Get()
-	if teacher.PostId != 1 {
-		tools.HasError(err, "您不是跟车员", -1)
-	}
-
-	//获取车辆信息
-	carModel := models.ScbCars{}
-	carModel.AttendantId = teacher.Id
-	carModel.LineId = objParams.LineId
-	carData, err := carModel.Get()
-	tools.HasError(err, "无法查询正常线路信息", 500)
+	teacher, car, _, err := a.teacherCarLine(userId, objParams.CarId, objParams.LineId)
+	tools.HasError(err, "", -1)
 
 	ymd := tools.Ymd()
 	//清除当前行程的刷脸数据
@@ -310,12 +311,12 @@ func (a Api) LineFinish(c *gin.Context) {
 	}
 
 	studentModel := models.ScbStudents{}
-	studentModel.CarId = carData.Id
+	studentModel.CarId = car.Id
 	allCount, err := studentModel.GetCount()
 
 	followRecordModel := models.ScbFollowRecord{}
-	followRecordModel.CarId = carData.Id
-	followRecordModel.LineId = carData.LineId
+	followRecordModel.CarId = car.Id
+	followRecordModel.LineId = car.LineId
 	followRecordModel.AttendantId = teacher.Id
 	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
 
@@ -333,6 +334,8 @@ func (a Api) LineFinish(c *gin.Context) {
 		fmt.Println("followRecordData, err...", followRecordData, err)
 		ret.IsFinished = 1
 		msg = "行程结束成功"
+	}else if nil != err {
+		tools.HasError(err, "", -1)
 	} else {
 		followRecordModel.IsFinished = 1
 		followRecordModel.Update(followRecord.Id)
@@ -360,16 +363,12 @@ func (a Api) LineStudents(c *gin.Context) {
 	}
 
 	//获取车辆信息
-	carModel := models.ScbCars{}
-	carModel.AttendantId = teacher.Id
-	carModel.LineId = objParams.LineId
-	carData, err := carModel.Get()
-
-	tools.HasError(err, "车辆信息不存在", -1)
+	teacher, car, _, err := a.teacherCarLine(userId, objParams.CarId, objParams.LineId)
+	tools.HasError(err, "", -1)
 
 	//获取搭乘此辆车的所有学生
 	studentModel := models.ScbStudents{}
-	studentModel.CarId = carData.Id
+	studentModel.CarId = car.Id
 	studentsData, err := studentModel.GetAllByCarId()
 
 	//年月日
@@ -407,6 +406,8 @@ func (a Api) LineStudents(c *gin.Context) {
 				getOff++
 			}
 		}
+		student.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(student.HeadImg, ".", "_small.", 1)
+		student.HeadImg = config.ApplicationConfig.ImageUrl + student.HeadImg
 		studentsDataRet = append(studentsDataRet, student)
 	}
 	ret := make(map[string]interface{})
@@ -463,7 +464,7 @@ func (a Api) FollowRecord(c *gin.Context) {
 
 	ret := make(map[string]interface{})
 	ret["count"] = count                                                       //未上车数量
-	ret["result"] = result                                                     //已上车数量
+	ret["result"] = followRecordsData                                                     //已上车数量
 	ret["page_index"] = objParams.PageIndex                                    //已下车数量
 	ret["page_size"] = objParams.PageSize                                      //每页数量
 	ret["totalpage"] = math.Ceil(float64(count) / float64(objParams.PageSize)) //总页数
@@ -481,22 +482,9 @@ func (a Api) FaceSwipe(c *gin.Context) {
 
 	userId := c.GetInt(models.UserId)
 
-	teacherModel := models.ScbTeachers{}
 
-	//获取跟车员信息
-	teacherModel.Id = userId
-	teacher, err := teacherModel.Get()
-	if teacher.PostId != 1 {
-		tools.HasError(err, "您不是跟车员, sch_teachers表的postId = 1", -1)
-	}
-
-	//获取车辆信息
-	carModel := models.ScbCars{}
-	carModel.AttendantId = teacher.Id
-	carModel.LineId = objParams.LineId
-	carData, err := carModel.Get()
-
-	tools.HasError(err, "无法查询正常线路信息", 500)
+	teacher, car, _, err := a.teacherCarLine(userId, objParams.CarId, objParams.LineId)
+	tools.HasError(err, "", -1)
 
 	//年月日
 	ymd := tools.Ymd()
@@ -505,18 +493,18 @@ func (a Api) FaceSwipe(c *gin.Context) {
 	api := tools2.BdApi{}
 	faceTokens := api.MutilSearch(objParams.Image)
 	if len(faceTokens) <= 0 {
-		tools.HasError(err, "扫码失败,我发识别到人脸", 500)
+		tools.HasError(err, "扫码失败,未发识别到人脸", 500)
 	}
 
 	studentModel := models.ScbStudents{}
 	//获取到识别的学生列表
-	studentsData, err := studentModel.GetByFaceTokens(carData.Id, faceTokens)
+	studentsData, err := studentModel.GetByFaceTokens(car.Id, faceTokens)
 	tools.HasError(err, "扫码失败.您上错车了", 500)
 
 	//创建跟车记录
 	followRecordModel := models.ScbFollowRecord{}
-	followRecordModel.CarId = carData.Id
-	followRecordModel.LineId = carData.LineId
+	followRecordModel.CarId = car.Id
+	followRecordModel.LineId = car.LineId
 	followRecordModel.AttendantId = teacher.Id
 	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
 	_, err = followRecordModel.Get()
@@ -536,8 +524,6 @@ func (a Api) FaceSwipe(c *gin.Context) {
 		//记录学生刷脸时间  用于标记上/下车状态 以及上/下车时间
 		swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
 		swipeData, err := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
-
-		fmt.Println("carData.Id.......", carData.Id, carData.LineId, teacher.Id)
 
 		var sStatus models.FaceSwipeRspStudentStatus
 		exist := true
@@ -567,7 +553,7 @@ func (a Api) FaceSwipe(c *gin.Context) {
 
 					//记录下车日志
 					carRecordModel := models.ScbCarRecord{}
-					carRecordModel.CarId = carData.Id
+					carRecordModel.CarId = car.Id
 					carRecordModel.QqLongitude = objParams.QqLongitude
 					carRecordModel.QqLatitude = objParams.QqLatitude
 					carRecordModel.StudentId = studentData.Id
@@ -596,7 +582,7 @@ func (a Api) FaceSwipe(c *gin.Context) {
 
 			//记录上车日志
 			carRecordModel := models.ScbCarRecord{}
-			carRecordModel.CarId = carData.Id
+			carRecordModel.CarId = car.Id
 			carRecordModel.QqLongitude = objParams.QqLongitude
 			carRecordModel.QqLatitude = objParams.QqLatitude
 			carRecordModel.StudentId = studentData.Id
@@ -618,7 +604,7 @@ func (a Api) FaceSwipe(c *gin.Context) {
 	isFinished := false
 
 	studentsModel := models.ScbStudents{}
-	studentsModel.CarId = carData.Id
+	studentsModel.CarId = car.Id
 	allStudentsCunt, err := studentsModel.GetCount()
 	tools.HasError(err, "此车辆未绑定任一学生", -1)
 	if len(studentsStatus) > 0 && 0 == studentsStatus[0].Status {
@@ -653,23 +639,8 @@ func (a Api) Swipe(c *gin.Context) {
 	err := c.ShouldBindJSON(&objParams)
 	userId := c.GetInt(models.UserId)
 
-	teacherModel := models.ScbTeachers{}
-
-	//获取跟车员信息
-	teacherModel.Id = userId
-	teacherModel.PostId = 1
-	teacher, err := teacherModel.Get()
-	//if teacher.PostId != 1 {
-	tools.HasError(err, "您不是跟车员", -1) //, sch_teachers表的postId = 1
-	//}
-
-	//获取车辆信息
-	carModel := models.ScbCars{}
-	carModel.AttendantId = teacher.Id
-	carModel.LineId = objParams.LineId
-	carData, err := carModel.Get()
-
-	tools.HasError(err, "无法查询正常线路信息", 500)
+	teacher, car, _, err := a.teacherCarLine(userId, objParams.CarId, objParams.LineId)
+	tools.HasError(err, "", -1)
 
 	//年月日
 	ymd := tools.Ymd()
@@ -686,7 +657,7 @@ func (a Api) Swipe(c *gin.Context) {
 		tools.HasError(err, "您尚未分配车辆", 500)
 	}
 
-	if studentData.CarId != carData.Id {
+	if studentData.CarId != car.Id {
 		tools.HasError(err, "您搭错车了", 500)
 	}
 	//查询学生是否在车上
@@ -696,10 +667,10 @@ func (a Api) Swipe(c *gin.Context) {
 	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
 	swipeData, err := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
 
-	fmt.Println("carData.Id.......", carData.Id, carData.LineId, teacher.Id)
+	fmt.Println("carData.Id.......", car.Id, car.LineId, teacher.Id)
 	followRecordModel := models.ScbFollowRecord{}
-	followRecordModel.CarId = carData.Id
-	followRecordModel.LineId = carData.LineId
+	followRecordModel.CarId = car.Id
+	followRecordModel.LineId = car.LineId
 	followRecordModel.AttendantId = teacher.Id
 	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
 
@@ -719,7 +690,7 @@ func (a Api) Swipe(c *gin.Context) {
 		fmt.Println("swipeAtInfo SwipeAt err....", err)
 		if nil == err {
 			//距离上次上车刷脸成功大于5分钟
-			if 0 == swipeAtInfo.Status && (now - swipeAtInfo.Time) > 60*1 {
+			if 0 == swipeAtInfo.Status && (now-swipeAtInfo.Time) > 60*1 {
 				//将标记为下车状态
 				swipeAtStruct := models.SwipeAt{
 					Status: 1,
@@ -736,7 +707,7 @@ func (a Api) Swipe(c *gin.Context) {
 
 				//记录下车日志
 				carRecordModel := models.ScbCarRecord{}
-				carRecordModel.CarId = carData.Id
+				carRecordModel.CarId = car.Id
 				carRecordModel.QqLongitude = objParams.QqLongitude
 				carRecordModel.QqLatitude = objParams.QqLatitude
 				carRecordModel.StudentId = objParams.StudentId
@@ -768,7 +739,7 @@ func (a Api) Swipe(c *gin.Context) {
 
 		//记录上车日志
 		carRecordModel := models.ScbCarRecord{}
-		carRecordModel.CarId = carData.Id
+		carRecordModel.CarId = car.Id
 		carRecordModel.QqLongitude = objParams.QqLongitude
 		carRecordModel.QqLatitude = objParams.QqLatitude
 		carRecordModel.StudentId = objParams.StudentId
@@ -816,8 +787,43 @@ func (a Api) StudentInfo(c *gin.Context) {
 	var studentModel models.ScbStudents
 	studentModel.Id = objParams.StudentId
 	studentData, err := studentModel.Get()
-	studentData.HeadImg = config.Application{}.ImageUrl + studentData.HeadImg
-	studentData.HeadImgSmall = strings.Replace(studentData.HeadImg, ".", "_small.", 1)
+	studentData.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(studentData.HeadImg, ".", "_small.", 1)
+	studentData.HeadImg = config.ApplicationConfig.ImageUrl + studentData.HeadImg
 	app.OK(c, studentData, "")
 
+}
+//教师车辆线路
+func (a Api) teacherCarLine(userId, carId, lineId int)(teacher models.ScbTeachers, car models.ScbCars, line models.ScbLines, err error ){
+	lineModel := models.ScbLines{}
+	teacherModel := models.ScbTeachers{}
+
+	//获取跟车员信息
+	teacherModel.Id = userId
+	teacher, err = teacherModel.Get()
+	if err != nil || teacher.PostId != 1 {
+		//tools.HasError(err, "您不是跟车员", -1)
+		err = errors.New("您不是跟车员")
+		return
+	}
+
+	//获取车辆信息
+	carModel := models.ScbCars{}
+	carModel.AttendantId = teacher.Id
+	carModel.Id = carId
+	car, err = carModel.Get()
+
+	if nil != err {
+		err = errors.New("车辆信息不存在")
+		return
+	}
+
+	//获取线路id 车辆id查找线路
+	lineModel.Id = lineId
+	lineModel.CarId = carId
+	line, err = lineModel.Get()
+	if nil != err{
+		err = errors.New("尚未个给您分配路线")
+		return
+	}
+	return
 }

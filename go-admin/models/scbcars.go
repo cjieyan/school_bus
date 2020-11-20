@@ -178,6 +178,33 @@ func (e *ScbCars) BatchDelete(id []int) (Result bool, err error) {
 	return
 }
 
+func (e * ScbCars) GetAllByAttendantId()([]ScbCars, error){
+	var doc []ScbCars
+
+	table := orm.Eloquent.Select("*").Table(e.TableName())
+
+	if e.LineId != 0 {
+		table = table.Where("attendant_id = ?", e.AttendantId)
+	}
+	table = table.Where("is_delete = ?", 0)
+
+	if err := table.Limit(100).Find(&doc).Error; err != nil {
+		return nil, err
+	}
+
+	var carsData []ScbCars
+	for _, car := range doc {
+		teacherModel := ScbTeachers{}
+		teacherModel.Id = car.AttendantId
+		teacherData, err := teacherModel.Get()
+		if nil == err{
+			car.AttendantName = teacherData.Name
+		}
+		carsData = append(carsData, car)
+	}
+	return carsData, nil
+}
+
 func (e *ScbCars) GetAll() ([]MenuLable, error) {
 	var doc []ScbCars
 	table := orm.Eloquent.Select("*").Table(e.TableName())

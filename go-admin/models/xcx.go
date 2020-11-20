@@ -12,6 +12,7 @@ type XcxLoginRsp struct {
 type SwipeReq struct {
 	StudentId   int    `json:"student_id"`
 	LineId      int    `json:"line_id"`
+	CarId      int    `json:"car_id"`
 	SiteId      int    `json:"site_id"`
 	QqLongitude string `json:"qq_longitude"`
 	QqLatitude  string `json:"qq_latitude"`
@@ -27,21 +28,26 @@ type SwipeAt struct {
 }
 type LineStartReq struct {
 	LineId int `json:"line_id"`
+	CarId      int    `json:"car_id"`
 }
 type LineFinishReq struct {
 	LineId int `json:"line_id"`
+	CarId      int    `json:"car_id"`
 }
 type LineFinishRsp struct {
 	IsFinished int `json:"is_finished"`
 }
 type LineInfoReq struct {
 	LineId int `json:"line_id"`
+	CarId      int    `json:"car_id"`
 }
 type LineStudentsReq struct {
 	LineId int `json:"line_id"`
+	CarId      int    `json:"car_id"`
 }
 type LineCheckReq struct {
 	LineId int `json:"line_id"`
+	CarId      int    `json:"car_id"`
 }
 type LineCheckRsp struct {
 	StartAt int      `json:"start_at"`
@@ -55,6 +61,7 @@ type FollowRecordReq struct {
 type FaceSwipeReq struct {
 	Image       string `json:"image"`
 	LineId      int    `json:"line_id"`
+	CarId      int    `json:"car_id"`
 	SiteId      int    `json:"site_id"`
 	QqLongitude string `json:"qq_longitude"`
 	QqLatitude  string `json:"qq_latitude"`
