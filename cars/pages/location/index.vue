@@ -215,7 +215,10 @@
 									url:"../my/login"
 								})
 							}
-							this.students = res.data.data.studentsDataRet
+							if( res.data.code == 200 ){
+								this.students = res.data.data.studentsDataRet
+							}
+							
 						},
 						fail: (err) => {
 							console.log(err)

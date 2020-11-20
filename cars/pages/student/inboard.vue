@@ -14,7 +14,7 @@
 			</view>
 			<view class="student-data">
 				<view class="student-img">
-					<image src="../../static/location.png" style="width: 30px; height: 30px;" class="location-image"></image>
+					<image :src="studentinfo.headImg" style="width: 30px; height: 30px;" class="headImg"></image>
 				</view>
 				<view class="student-info">
 					<view class="info-top">
@@ -22,10 +22,11 @@
 						<view class="isinboard">请确认该学生是否打卡上车</view>
 					</view>
 					<view class="info-bottom">
-						<view class="tel">家长电话:1233444556</view>
-						<view class="time">考勤时间:2020/09/15 15:11:11</view>
+						<view class="tel">家长电话:{{studentinfo.parentPhone}}</view>
+						<view class="time">考勤时间:{{studentinfo.createdAt}}</view>
 						<view class="carno">车牌号码:{{carinfo.carNumber}}</view>
-						<view class="is">是否接送:否</view>
+						<view class="isPickUp" v-if="studentinfo.isPickUp == '0'">是否接送:否</view>
+						<view class="isPickUp" v-else>是否接送:是</view>
 					</view>
 
 				</view>
@@ -166,5 +167,8 @@
 
 	.comfirm-bottom::after {
 		border: none;
+	}
+	image.headImg {
+		border-radius: 50rpx;
 	}
 </style>

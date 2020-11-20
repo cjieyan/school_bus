@@ -8,20 +8,19 @@
 				<span class="location-img">
 					<image src="../../static/location.png" style="width: 32px; height: 31px;" class="location-image"></image>
 				</span>
-				<span v-if="line.name == undefined" class="location-info" @tap="show = true">请选择路线</span>
-				<span v-else class="location-info" @tap="show = true">{{line.name}}  (切换)</span>
+				<span v-if="line.name == undefined || lineid == ''" class="location-info" @tap="show = true">请选择路线</span>
+				<span v-else class="location-info" @tap="show = true">{{line.name}} (切换)</span>
 			</view>
 			<view class="student-list">
 				<view class="student-list-info" v-for="(item, index) in students" :key="index">
-					<view class="student-img"  @tap="inboard(item)" :value="item.id">
-						<image src="../../static/location.png" style="width: 30px; height: 30px;" class="location-image"></image>
+					<view class="student-img" @tap="inboard(item)" :value="item.id">
+						<image :src="item.headImg" style="width: 30px; height: 30px;" class="headImg"></image>
 						<view class="inboard">
 							<span v-if="item.swipeStatus == '-1'">未上车</span>
 							<span v-else-if="item.swipeStatus == '0'">已上车</span>
 							<span v-else-if="item.swipeStatus == '1'">已下车</span>
 							<span v-else>未上车</span>
-							<!-- <fa-icon type="check" size="14" color="white" class="font-icon inboard-check"></fa-icon> -->
-							<u-icon name="checkbox-mark" color="#fff" size="14" class="inboard-check"></u-icon>
+							<icon v-if="item.swipeStatus == '1'" type="success" size="13" />
 						</view>
 					</view>
 					<view class="student-name">
@@ -48,6 +47,7 @@
 				students: {},
 				line: {},
 				linelist: [],
+				lineid: "",
 				linename: "",
 				show: false,
 				background: {
@@ -67,12 +67,12 @@
 					}
 				})
 			},
-			inboard(item){
+			inboard(item) {
 				uni.showLoading({
-					
+
 				})
 				uni.redirectTo({
-					url:"./inboard?id="+item.id,
+					url: "./inboard?id=" + item.id,
 					fail: (err) => {
 						console.log(err)
 					}
@@ -111,8 +111,6 @@
 				uni.hideLoading()
 			},
 			studentList() {
-				console.log("this.$store.state.lineid-----")
-				console.log(this.$store.state.lineid)
 				const token = uni.getStorageSync('token')
 				if (this.$store.state.lineid) {
 					uni.request({
@@ -125,8 +123,25 @@
 							"line_id": this.$store.state.lineid
 						},
 						success: (res) => {
-							console.log(res)
-							this.students = res.data.data.studentsDataRet
+							if (res.data.code == 401) {
+								uni.showToast({
+									icon: 'none',
+									title: '会话过期，请重新登录',
+									duration: 1500
+								});
+								uni.redirectTo({
+									url: "../my/login"
+								})
+							}
+							if (res.data.code == 200 && res.data.data.hasOwnProperty('studentsDataRet')) {
+								this.students = res.data.data.studentsDataRet
+							} else {
+								this.students = {}
+								uni.showToast({
+									title: "无查询记录",
+									icon: "none"
+								})
+							}
 						},
 						fail: (err) => {
 							console.log(err)
@@ -144,6 +159,16 @@
 					},
 					data: {},
 					success: (res) => {
+						if (res.data.code == 401) {
+							uni.showToast({
+								icon: 'none',
+								title: '会话过期，请重新登录',
+								duration: 1500
+							});
+							uni.redirectTo({
+								url: "../my/login"
+							})
+						}
 						var data = []
 						this.linelist = res.data.data
 						for (var i = 0; i < res.data.data.length; i++) {
@@ -151,11 +176,10 @@
 								text: res.data.data[i].name,
 								color: 'blue',
 								fontSize: 28,
-								id : res.data.data[i].id,
+								id: res.data.data[i].id,
 							}
 							data.push(obj)
 						}
-						console.log(data)
 						this.linelist = data
 					},
 					fail: (err) => {
@@ -163,30 +187,30 @@
 					}
 				})
 			},
-			setline(index){
+			setline(index) {
 				uni.showLoading({
-					
+
 				})
 				var token = uni.getStorageSync('token')
 				new Promise(resolve => {
 					uni.request({
-						url:this.$store.state.apihost + "/xcx/auth/line-info",
-						method:"POST",
+						url: this.$store.state.apihost + "/xcx/auth/line-info",
+						method: "POST",
 						header: {
 							'token': token,
 						},
-						data:{
+						data: {
 							"line_id": this.linelist[index].id
 						},
 						success: (res) => {
-							if(res.data.code == 401){
+							if (res.data.code == 401) {
 								uni.showToast({
 									icon: 'none',
 									title: '会话过期，请重新登录',
 									duration: 1500
 								});
 								uni.redirectTo({
-									url:"../my/login"
+									url: "../my/login"
 								})
 							}
 							this.$store.commit('setcarinfo', res.data.data.car)
@@ -197,6 +221,7 @@
 								"studentCount": res.data.data.studentCount,
 								"studentGetOnCount": res.data.data.studentGetOnCount
 							})
+							this.lineid = this.linelist[index].id
 							this.line = res.data.data.line
 							resolve(this.line)
 						},
@@ -204,10 +229,7 @@
 							console.log(err)
 						}
 					})
-				}).then((res)=> {
-					console.log("studentList--------")
-					console.log(res)
-					// this.studentList()
+				}).then((res) => {
 					uni.request({
 						url: this.$store.state.apihost + "/xcx/auth/line-students",
 						method: "POST",
@@ -215,38 +237,53 @@
 							'token': token,
 						},
 						data: {
-							"line_id": res.id
+							"line_id": res.id,
+							"car_id": this.$store.state.carInfo.id
 						},
 						success: (res) => {
-							if(res.data.code == 401){
+							if (res.data.code == 401) {
 								uni.showToast({
 									icon: 'none',
 									title: '会话过期，请重新登录',
 									duration: 1500
 								});
 								uni.redirectTo({
-									url:"../my/login"
+									url: "../my/login",
+									icon: "none"
 								})
 							}
-							this.students = res.data.data.studentsDataRet
+							if (res.data.code == 200 && res.data.data.hasOwnProperty('studentsDataRet')) {
+								this.students = res.data.data.studentsDataRet
+							} else {
+								this.students = {}
+								uni.showToast({
+									icon: "none",
+									title: "无查询记录"
+								})
+							}
+
 						},
 						fail: (err) => {
 							console.log(err)
 						}
 					})
 				})
-				
+
 				uni.hideLoading()
 			}
 		},
 		onShow() {
+			this.linelist = {}
 			this.students = {}
+			this.lineid = this.$store.state.lineid
 			this.lineInfo()
 			this.line = this.$store.state.liniInfo
 			this.studentList()
 		},
 		onLoad() {
+			this.linelist = {}
 			this.students = {}
+			this.lineid = this.$store.state.lineid
 			this.studentList()
 		}
 	}
@@ -336,5 +373,14 @@
 
 	.comfirm-bottom::after {
 		border: none;
+	}
+
+	image.headImg {
+		border-radius: 50rpx;
+	}
+
+	icon {
+		top: 70rpx;
+		position: relative;
 	}
 </style>

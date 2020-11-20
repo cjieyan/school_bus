@@ -8,7 +8,10 @@
 			<image src="../../static/banner.jpg" mode="aspectFill" style="width: 100%;" @error="imageError"></image>
 		</view>
 		<view class="wrap">
-			<view v-for="(item, index) in lines" :key="index">
+			<view v-if="lines.length == 0">
+				<u-loading mode="circle"></u-loading>
+			</view>
+			<view v-else v-for="(item, index) in lines" :key="index">
 				<u-card :title="item.name" :sub-title="'发车 '+item.departed_at+'——到达 '+item.arrivedAt">
 					<view class="" slot="body"  @tap="selectline(item)" :value="item.id" >
 						<view class="u-body-item u-flex u-col-between u-p-t-0">

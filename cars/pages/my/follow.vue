@@ -1,106 +1,16 @@
 <template class="container">
 	<view class="page-content">
 		<u-navbar title="跟车记录" @tap="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
-		<view class="infolist" @click="popo">
+		<view class="infolist" @click="popo" v-for="(item, index) in datalist" :key="index">
 			<view class="info-content">
 				<view class="car-info">
-					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
+					<span>2020/9/13  (id：{{item.id}})</span> <span>1号车</span> <span>(粤B1234)</span>
 				</view>
 				<view class="people-info">
-					<span>乘车人数</span> <span>14人</span>
+					<span>乘车人数</span> <span>{{item.allCount}}人</span>
 				</view>
 				<view class="people-detail">
-					<span>已上车14人</span> <span>未下车14人</span><span>
-						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
-					</span>
-				</view>
-			</view>
-		</view>
-		<view class="infolist">
-			<view class="info-content">
-				<view class="car-info">
-					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
-				</view>
-				<view class="people-info">
-					<span>乘车人数</span> <span>14人</span>
-				</view>
-				<view class="people-detail">
-					<span>已上车14人</span> <span>未下车14人</span><span>
-						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
-					</span>
-				</view>
-			</view>
-		</view>
-		<view class="infolist">
-			<view class="info-content">
-				<view class="car-info">
-					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
-				</view>
-				<view class="people-info">
-					<span>乘车人数</span> <span>14人</span>
-				</view>
-				<view class="people-detail">
-					<span>已上车14人</span> <span>未下车14人</span><span>
-						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
-					</span>
-				</view>
-			</view>
-		</view>
-		<view class="infolist">
-			<view class="info-content">
-				<view class="car-info">
-					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
-				</view>
-				<view class="people-info">
-					<span>乘车人数</span> <span>14人</span>
-				</view>
-				<view class="people-detail">
-					<span>已上车14人</span> <span>未下车14人</span><span>
-						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
-					</span>
-				</view>
-			</view>
-		</view>
-		<view class="infolist">
-			<view class="info-content">
-				<view class="car-info">
-					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
-				</view>
-				<view class="people-info">
-					<span>乘车人数</span> <span>14人</span>
-				</view>
-				<view class="people-detail">
-					<span>已上车14人</span> <span>未下车14人</span><span>
-						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
-					</span>
-				</view>
-			</view>
-		</view>
-		<view class="infolist">
-			<view class="info-content">
-				<view class="car-info">
-					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
-				</view>
-				<view class="people-info">
-					<span>乘车人数</span> <span>14人</span>
-				</view>
-				<view class="people-detail">
-					<span>已上车14人</span> <span>未下车14人</span><span>
-						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
-					</span>
-				</view>
-			</view>
-		</view>
-		<view class="infolist">
-			<view class="info-content">
-				<view class="car-info">
-					<span>2020/9/13</span> <span>1号车</span> <span>(粤B1234)</span>
-				</view>
-				<view class="people-info">
-					<span>乘车人数</span> <span>14人</span>
-				</view>
-				<view class="people-detail">
-					<span>已上车14人</span> <span>未下车14人</span><span>
+					<span>已上车{{item.getOn}}人</span> <span>未下车{{item.getOff}}人</span><span>
 						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
 					</span>
 				</view>
@@ -133,8 +43,9 @@
 				background: {
 					backgroundColor: '#12c497',
 				},
+				datalist: {},
 				show: false,
-				pagesize: 1,
+				pagesize: 10,
 				currentPage: 1,
 				pagetotal: 0,
 				pullcount: 0,
@@ -189,7 +100,9 @@
 								this.showLoadMore = true
 								this.currentPage++
 							}
+							this.datalist = res.data.data.result
 						}
+						console.log("--res--")
 						console.log(res)
 					},
 					fail: (err) => {
@@ -203,7 +116,7 @@
 				console.log(this.currentPage)
 				console.log(this.pagesize)
 				console.log(this.pagetotal)
-				if (this.currentPage < this.pagetotal) {
+				if (this.currentPage <= this.pagetotal) {
 					uni.request({
 						url: this.$store.state.apihost + "/xcx/auth/follow-record",
 						method: "POST",
@@ -211,20 +124,21 @@
 							'token': token,
 						},
 						data: {
-							"page_index": this.currentPage + 1,
+							"page_index": this.currentPage,
 							"page_size": this.pagesize,
 						},
 						success: (res) => {
+							console.log("-----getmore ---- res-----")
 							if (res.data.code == 200) {
-								this.pagetotal = res.pagetotal
-								if (this.pagetotal > 1) {
-									this.showLoadMore = true
-									this.currentPage++
-								}else{
-									
+								this.pagetotal = res.data.data.totalpage
+								this.showLoadMore = true
+								this.currentPage++
+								if( this.currentPage >= this.pagetotal)
+								{
+									this.showLoadMore = false
 								}
+								this.datalist = this.datalist.concat(res.data.data.result)
 							}
-							console.log(res)
 						},
 						fail: (err) => {
 							console.log(err)
@@ -245,17 +159,10 @@
 		},
 		onReachBottom() {
 			console.log("-------已到达底部-------")
-			console.log(this.currentPage)
-			console.log(this.pagetotal)
-			utils.throttle(this.getMoreData())
-			if (this.currentPage < this.pagetotal) {
-				console.log("current--page")
+			if (this.currentPage <= this.pagetotal) {
 				utils.throttle(this.getMoreData())
 			}
-		},
-		onPullDownRefresh() {
-			console.log("bbbbbbbbbbbbbbb")
-		},
+		}
 	}
 </script>
 

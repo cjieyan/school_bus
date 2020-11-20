@@ -10,7 +10,8 @@
 			</camera>
 		</view>
 		<view :class="tipclass">
-			<u-icon name="checkbox-mark" color="#fff" size="60" class="inboard-check"></u-icon>
+<!-- 			<u-icon name="checkbox-mark" color="#fff" size="60" class="inboard-check"></u-icon> -->
+			<icon :type="icon" size="26"/>
 			<text>{{tip}}</text>
 		</view>
 
@@ -44,6 +45,7 @@
 				ifOnShow: false,
 				stauts: "",
 				tip: "",
+				icon: "",
 				camera: "front",
 				cameraicon: "iconfont icon-avcameraswitch camera-switch-right",
 			}
@@ -92,6 +94,7 @@
 				}
 			},
 			takephone() {
+				this.icon = "waiting"
 				this.tip = "正在识别"
 				const ctx = wx.createCameraContext()
 				var that = this
@@ -108,7 +111,8 @@
 							},
 							data: {
 								"image": imgbase64Url,
-								"line_id": this.$store.state.lineid
+								"line_id": this.$store.state.lineid,
+								"car_id": this.$store.state.carInfo.id
 							},
 							success: (res) => {
 								if(res.data.code == 401){
@@ -122,6 +126,7 @@
 									})
 								}
 								if (res.data.code == 200) {
+									this.icon = "success"
 									if (res.data.isFinished == true) {
 										this.$store.commit("isfinish", true)
 									}
@@ -129,6 +134,7 @@
 										url: "complete"
 									})
 								} else {
+									this.icon = "warn"
 									this.tip = res.data.msg
 								}
 							},
@@ -330,5 +336,8 @@
 	.camera-switch-left:before{
 		color:#fff;
 		background-color: #fff;
+	}
+	icon{
+		margin-top: 10rpx;
 	}
 </style>
