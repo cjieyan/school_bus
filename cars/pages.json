@@ -19,9 +19,6 @@
 			"path": "pages/my/follow",
 			"style": {}
 		}, {
-			"path": "pages/my/setting",
-			"style": {}
-		}, {
 			"path": "pages/student/index",
 			"style": {}
 		}, {
@@ -34,9 +31,6 @@
 			"path": "pages/location/index",
 			"style": {},
 			"enablePullDownRefresh": true
-		}, {
-			"path": "pages/my/index",
-			"style": {}
 		}, {
 			"path": "pages/face/index",
 			"style": {}

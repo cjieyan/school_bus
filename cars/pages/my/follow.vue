@@ -1,30 +1,30 @@
 <template class="container">
 	<view class="page-content">
 		<u-navbar title="跟车记录" @tap="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
-		<view class="infolist" @click="popo" v-for="(item, index) in datalist" :key="index">
+		<view class="infolist" @click="popo(index)" v-for="(item, index) in datalist" :key="index">
 			<view class="info-content">
 				<view class="car-info">
-					<span>2020/9/13  (id：{{item.id}})</span> <span>1号车</span> <span>(粤B1234)</span>
+					<span>{{item.createdAt}} </span> <span>{{item.car.carNumber}}</span> <span>({{item.car.carNo}})</span>
 				</view>
 				<view class="people-info">
 					<span>乘车人数</span> <span>{{item.allCount}}人</span>
 				</view>
 				<view class="people-detail">
 					<span>已上车{{item.getOn}}人</span> <span>未下车{{item.getOff}}人</span><span>
-						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车14人
+						<u-icon name="error" color="red" class="error-icon"></u-icon>未上车{{item.unGetOn}}人
 					</span>
 				</view>
 			</view>
 		</view>
 		<u-popup v-model="show" mode="bottom" border-radius="18" class="popo">
 			<view class="popo-title">
-				2020/9/13 1号车 (粤B1234)
+				{{popinfo.date}} {{popinfo.carNo}} ({{popinfo.carNumber}})
 			</view>
 			<u-line color="gray" length="95%" style="margin: 0 auto;"></u-line>
 			<view class="popo-content">
-				<span>已上车<i>15</i>人</span>
-				<span>已上车<i>15</i>人</span>
-				<span>已上车<i>15</i>人</span>
+				<span>已上车<i>{{popinfo.getOn}}</i>人</span>
+				<span>已上车<i>{{popinfo.getOff}}</i>人</span>
+				<span>已上车<i>{{popinfo.unGetOn}}</i>人</span>
 				<u-button type="primary" class="btn" shape="square" size="medium" @click="popo">确定</u-button>
 			</view>
 		</u-popup>
@@ -56,14 +56,33 @@
 					loadmore: '轻轻上拉',
 					loading: '努力加载中',
 					nomore: '实在没有了'
+				},
+				popinfo: {
+					date: "",
+					carNo: "",
+					carNumber: "",
+					getOn: "",
+					getOff: "",
+					unGetOn: "",
 				}
 			}
 		},
 		methods: {
-			popo() {
-				console.log(this.show)
+			popo(index) {
+				if(!this.show)
+				{
+					this.popinfo = {}
+					this.popinfo = {
+						date: this.datalist[index].createdAt,
+						carNo: this.datalist[index].car.carNo,
+						carNumber: this.datalist[index].car.carNumber,
+						getOn: this.datalist[index].getOn,
+						getOff: this.datalist[index].getOff,
+						unGetOn: this.datalist[index].unGetOn,
+					}
+				}
 				this.show = this.show == false ? true : false;
-				console.log(this.show)
+			
 			},
 			back() {
 				uni.switchTab({
@@ -91,19 +110,13 @@
 					},
 					success: (res) => {
 						if (res.data.code == 200) {
-							console.log('-totalpage-')
-							console.log(res.data.data.totalpage)
 							this.pagetotal = res.data.data.totalpage
-							console.log("totalpage")
-							console.log(res.data.data.totalpage)
 							if (this.pagetotal > 1) {
 								this.showLoadMore = true
 								this.currentPage++
 							}
 							this.datalist = res.data.data.result
 						}
-						console.log("--res--")
-						console.log(res)
 					},
 					fail: (err) => {
 						console.log(err)
@@ -112,10 +125,6 @@
 			},
 			getMoreData() {
 				var token = uni.getStorageSync('token')
-				console.log("------getmoredata-----")
-				console.log(this.currentPage)
-				console.log(this.pagesize)
-				console.log(this.pagetotal)
 				if (this.currentPage <= this.pagetotal) {
 					uni.request({
 						url: this.$store.state.apihost + "/xcx/auth/follow-record",
@@ -128,7 +137,6 @@
 							"page_size": this.pagesize,
 						},
 						success: (res) => {
-							console.log("-----getmore ---- res-----")
 							if (res.data.code == 200) {
 								this.pagetotal = res.data.data.totalpage
 								this.showLoadMore = true
