@@ -86,7 +86,7 @@ func (a Api) Cars(c *gin.Context){
 	carsData, err := carModel.GetAllByAttendantId()
 	tools.HasError(err, "车辆信息不存在", -1)
 
-	var carsRetData []models.ScbLines
+	var linesRetData []models.ScbLines
 	for _, car := range carsData{
 
 		lineModel := models.ScbLines{}
@@ -108,8 +108,9 @@ func (a Api) Cars(c *gin.Context){
 		if nil == err {
 			line.EndSite = endSite
 		}
-		carsRetData = append(carsRetData, line)
+		linesRetData = append(linesRetData, line)
 	}
+	app.OK(c, linesRetData, "")
 }
 //多线路信息
 //
