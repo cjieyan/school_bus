@@ -17,16 +17,19 @@
 			</view>
 		</view>
 		<u-popup v-model="show" mode="bottom" border-radius="18" class="popo">
-			<view class="popo-title">
-				{{popinfo.date}} {{popinfo.carNo}} ({{popinfo.carNumber}})
+			<view class="popo-wrap">
+				<view class="popo-title">
+					{{popinfo.date}} {{popinfo.carNo}} ({{popinfo.carNumber}})
+				</view>
+				<u-line color="gray"></u-line>
+				<view class="popo-content">
+					<span>已上车<i>{{popinfo.getOn}}</i>人</span>
+					<span>已上车<i>{{popinfo.getOff}}</i>人</span>
+					<span>已上车<i>{{popinfo.unGetOn}}</i>人</span>
+					<button class="comfirm-bottom btn"  @tap="popo">确定</button>
+				</view>
 			</view>
-			<u-line color="gray" length="95%" style="margin: 0 auto;"></u-line>
-			<view class="popo-content">
-				<span>已上车<i>{{popinfo.getOn}}</i>人</span>
-				<span>已上车<i>{{popinfo.getOff}}</i>人</span>
-				<span>已上车<i>{{popinfo.unGetOn}}</i>人</span>
-				<u-button type="primary" class="btn" shape="square" size="medium" @click="popo">确定</u-button>
-			</view>
+			
 		</u-popup>
 		<u-loadmore v-if="showLoadMore" :status="status" :icon-type="iconType" :load-text="loadText" />
 	</view>
@@ -109,6 +112,16 @@
 						"page_size": this.pagesize,
 					},
 					success: (res) => {
+						if(res.data.code == 401){
+							uni.showToast({
+								icon: 'none',
+								title: '会话过期，请重新登录',
+								duration: 1500
+							});
+							uni.redirectTo({
+								url:"../my/login"
+							})
+						}
 						if (res.data.code == 200) {
 							this.pagetotal = res.data.data.totalpage
 							if (this.pagetotal > 1) {
@@ -119,7 +132,10 @@
 						}
 					},
 					fail: (err) => {
-						console.log(err)
+						uni.showToast({
+							title:"请求失败",
+							icon:"none"
+						})
 					}
 				})
 			},
@@ -137,6 +153,16 @@
 							"page_size": this.pagesize,
 						},
 						success: (res) => {
+							if(res.data.code == 401){
+								uni.showToast({
+									icon: 'none',
+									title: '会话过期，请重新登录',
+									duration: 1500
+								});
+								uni.redirectTo({
+									url:"../my/login"
+								})
+							}
 							if (res.data.code == 200) {
 								this.pagetotal = res.data.data.totalpage
 								this.showLoadMore = true
@@ -166,7 +192,6 @@
 			uni.hideLoading()
 		},
 		onReachBottom() {
-			console.log("-------已到达底部-------")
 			if (this.currentPage <= this.pagetotal) {
 				utils.throttle(this.getMoreData())
 			}
@@ -247,12 +272,23 @@
 		margin-right: 10rpx;
 	}
 
-	.btn {
-		margin-top: 40rpx;
-		background: linear-gradient(to right, rgba(8, 189, 175), rgb(247, 218, 99));
-	}
-
 	.popo-content span i {
 		display: inline-block;
+	}
+	
+	.comfirm-bottom {
+		margin: 0 40rpx;
+		margin-top: 40rpx;
+		background: linear-gradient(to right, rgba(8, 189, 175), rgb(247, 218, 99));
+		color: #fff;
+		border: none;
+		border-radius: 50rpx;
+	}
+	
+	.comfirm-bottom::after {
+		border: none;
+	}
+	.popo-wrap{
+		padding: 0 40rpx;
 	}
 </style>
