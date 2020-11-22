@@ -790,6 +790,9 @@ func (a Api) StudentInfo(c *gin.Context) {
 	studentData, err := studentModel.Get()
 	studentData.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(studentData.HeadImg, ".", "_small.", 1)
 	studentData.HeadImg = config.ApplicationConfig.ImageUrl + studentData.HeadImg
+
+	studentData.TimeString = studentData.CreatedAt.Format("2006-01-02 15:04:05") //tt.String()
+
 	app.OK(c, studentData, "")
 
 }
