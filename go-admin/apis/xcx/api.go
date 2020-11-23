@@ -458,6 +458,7 @@ func (a Api) FollowRecord(c *gin.Context) {
 		if nil == err {
 			follow.Line = lineData
 		}
+		follow.TimeString = follow.CreatedAt.Format("2006-01-02 15:04:05")
 		followRecordsData = append(followRecordsData, follow)
 	}
 
@@ -791,7 +792,7 @@ func (a Api) StudentInfo(c *gin.Context) {
 	studentData.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(studentData.HeadImg, ".", "_small.", 1)
 	studentData.HeadImg = config.ApplicationConfig.ImageUrl + studentData.HeadImg
 
-	studentData.TimeString = studentData.CreatedAt.Format("2006-01-02 15:04:05") //tt.String()
+	studentData.TimeString = studentData.CreatedAt.Format("2006-01-02 15:04:05")
 
 	app.OK(c, studentData, "")
 
