@@ -33,6 +33,7 @@ type LineStartReq struct {
 type LineFinishReq struct {
 	LineId int `json:"line_id"`
 	CarId      int    `json:"car_id"`
+	Force	int `json:"force"`
 }
 type LineFinishRsp struct {
 	IsFinished int `json:"is_finished"`
