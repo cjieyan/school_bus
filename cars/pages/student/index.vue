@@ -48,6 +48,7 @@
 				line: {},
 				linelist: [],
 				lineid: "",
+				carid: "",
 				linename: "",
 				show: false,
 				background: {
@@ -80,6 +81,13 @@
 				uni.hideLoading()
 			},
 			finish() {
+				if (this.lineid == "" || this.lineid == undefined) {
+					uni.showToast({
+						title: "请选择线路",
+						icon: "none"
+					})
+					return false
+				}
 				uni.showLoading({
 
 				})
@@ -90,24 +98,51 @@
 						'token': this.$store.state.token,
 					},
 					data: {
-						"line_id": this.$store.state.lineid
+						"line_id": this.$store.state.lineid,
+						"car_id": this.$store.state.carid,
 					},
 					success: (res) => {
-						console.log(res)
+						if (res.data.code == -1) {
+							// uni.showToast({
+							// 	title:res.data.msg,
+							// 	icon:"none"
+							// })
+							// return false;
+							uni.showModal({
+								title: res.data.msg,
+								icon: "none",
+								success: (res) => {
+									if (res.confirm) {
+										console.log('用户点击确定');
+									} else if (res.cancel) {
+										console.log('用户点击取消');
+									}
+								}
+							})
+							return false;
+						}
+						if (res.data.code == 200) {
+							uni.showToast({
+								title: "打卡结束",
+								icon: "none"
+							})
+							uni.switchTab({
+								url: "../index/index",
+								success: (res) => {
+									console.log(res)
+								},
+								fail: (err) => {
+									console.log(err)
+								}
+							})
+						}
+
 					},
 					fail: (err) => {
 						console.log(err)
 					}
 				})
-				uni.switchTab({
-					url: "../index/index",
-					success: (res) => {
-						console.log(res)
-					},
-					fail: (err) => {
-						console.log(err)
-					}
-				})
+
 				uni.hideLoading()
 			},
 			studentList() {
@@ -177,6 +212,7 @@
 								color: 'blue',
 								fontSize: 28,
 								id: res.data.data[i].id,
+								carid: res.data.data[i].carId,
 							}
 							data.push(obj)
 						}
@@ -200,7 +236,8 @@
 							'token': token,
 						},
 						data: {
-							"line_id": this.linelist[index].id
+							"line_id": this.linelist[index].id,
+							"car_id": this.linelist[index].carid
 						},
 						success: (res) => {
 							if (res.data.code == 401) {
@@ -213,6 +250,8 @@
 									url: "../my/login"
 								})
 							}
+							this.$store.commit('setLineid', this.linelist[index].id)
+							this.$store.commit('setCarid', this.linelist[index].carid)
 							this.$store.commit('setcarinfo', res.data.data.car)
 							this.$store.commit('setTeacher', res.data.data.teacher)
 							this.$store.commit('setLineinfo', res.data.data.line)
@@ -222,6 +261,7 @@
 								"studentGetOnCount": res.data.data.studentGetOnCount
 							})
 							this.lineid = this.linelist[index].id
+							this.carid = this.linelist[index].carid
 							this.line = res.data.data.line
 							resolve(this.line)
 						},

@@ -23,7 +23,7 @@
 					</view>
 					<view class="info-bottom">
 						<view class="tel">家长电话:{{studentinfo.parentPhone}}</view>
-						<view class="time">考勤时间:{{studentinfo.createdAt}}</view>
+						<view class="time">考勤时间:{{studentinfo.timeString}}</view>
 						<view class="carno">车牌号码:{{carinfo.carNumber}}</view>
 						<view class="isPickUp" v-if="studentinfo.isPickUp == '0'">是否接送:否</view>
 						<view class="isPickUp" v-else>是否接送:是</view>

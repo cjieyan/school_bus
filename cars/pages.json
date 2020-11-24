@@ -25,9 +25,6 @@
 			"path": "pages/student/inboard",
 			"style": {}
 		}, {
-			"path": "pages/student/list",
-			"style": {}
-		}, {
 			"path": "pages/location/index",
 			"style": {},
 			"enablePullDownRefresh": true

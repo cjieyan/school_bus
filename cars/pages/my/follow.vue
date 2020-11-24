@@ -4,7 +4,7 @@
 		<view class="infolist" @click="popo(index)" v-for="(item, index) in datalist" :key="index">
 			<view class="info-content">
 				<view class="car-info">
-					<span>{{item.createdAt}} </span> <span>{{item.car.carNumber}}</span> <span>({{item.car.carNo}})</span>
+					<span>{{item.timeString}} </span> <span>{{item.car.carNumber}}</span> <span>({{item.car.carNo}})</span>
 				</view>
 				<view class="people-info">
 					<span>乘车人数</span> <span>{{item.allCount}}人</span>

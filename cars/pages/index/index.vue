@@ -12,7 +12,7 @@
 				<u-loading mode="circle"></u-loading>
 			</view>
 			<view v-else v-for="(item, index) in lines" :key="index">
-				<u-card :title="item.name" :sub-title="'发车 '+item.departed_at+'——到达 '+item.arrivedAt">
+				<u-card :title="item.name+'('+item.carNos+')'" :sub-title="'发车 '+item.departed_at">
 					<view class="" slot="body"  @tap="selectline(item)" :value="item.id" >
 						<view class="u-body-item u-flex u-col-between u-p-t-0">
 							<view class="u-body-item-title">
@@ -55,10 +55,12 @@
 			},
 			selectline(item){
 				const lineid = item.id
+				const carid = item.carId
 				//初始化数据
 				this.$store.commit('setSiteinfo', {})
 				this.$store.commit('setLineinfo', {})
 				this.$store.commit('setLineid', lineid)
+				this.$store.commit('setCarid', carid)
 				uni.request({
 					url: this.$store.state.apihost + "/xcx/auth/line-info",
 					method:"POST",
@@ -66,7 +68,8 @@
 						'token': this.$store.state.token,
 					},
 					data:{
-						"line_id": lineid
+						"line_id": lineid,
+						"car_id": carid,
 					},
 					success: (res) => {
 						if(res.data.code == 401){
@@ -78,7 +81,9 @@
 							uni.redirectTo({
 								url:"../my/login"
 							})
-						}else{
+						}
+						if(res.data.code == 200)
+						{
 							this.$store.commit('setcarinfo', res.data.data.car)
 							this.$store.commit('setTeacher', res.data.data.teacher)
 							this.$store.commit('setLineinfo', res.data.data.line)
@@ -89,12 +94,8 @@
 							})
 							uni.switchTab({
 								url:"../location/index",
-								fail: (err) => {
-									console.log(err)
-								}
 							})
 						}
-						
 					},
 					fail: (err) => {
 						uni.showToast({
@@ -137,49 +138,10 @@
 				})
 				uni.hideLoading()
 			},
-			//设置相关信息 学生人数、上车人数、车辆信息、、、
-			setInfo() {
-				var token = uni.getStorageSync('token')
-				uni.request({
-					url: this.$store.state.apihost + "/xcx/auth/line-info",
-					method: "POST",
-					header: {
-						'token': token,
-					},
-					data: {},
-					success: (res) => {
-						if (res.data.code == 200) {
-							console.log(res)
-							this.$store.commit('setcarinfo', res.data.data.car)
-							this.$store.commit('setTeacher', res.data.data.teacher)
-							this.$store.commit('setLineinfo', res.data.data.line)
-							this.$store.commit('setstudent', {
-								"studentCount": res.data.data.studentCount,
-								"studentGetOnCount": res.data.data.studentGetOnCount
-							})
-						}else if(res.data.code == 401){
-							uni.showToast({
-								icon: 'none',
-								title: '会话过期，请重新登录',
-								duration: 1500
-							});
-							uni.redirectTo({
-								url:"../my/login"
-							})
-						}
-					},
-					fail: (err) => {
-						uni.showModal({
-							title:"服务异常,请联系管理员"
-						})
-						return
-					}
-				})
-			},
 			lineInfo() {
 				var token = uni.getStorageSync('token')
 				uni.request({
-					url: this.$store.state.apihost + "/xcx/auth/lines",
+					url: this.$store.state.apihost + "/xcx/auth/cars",
 					method: "post",
 					header: {
 						'token': token,
