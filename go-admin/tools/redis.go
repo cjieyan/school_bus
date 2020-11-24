@@ -110,7 +110,7 @@ func RdbGet(key string) (string, error) {
 redis EXPIRE
 */
 func RdbSetKeyExp(key string, ex int) error {
-	_, err := RedisExec("EXPIRE", key)
+	_, err := RedisExec("EXPIRE", key, ex)
 	if err != nil {
 		//logs.Error("set error", err.Error())
 		return err
@@ -186,7 +186,7 @@ func RdbGetJson(key string) (map[string]string, error) {
 redis hSet 注意 设置什么类型 取的时候需要获取对应类型
 */
 func RdbHSet(key string, field string, data interface{}) error {
-	_, err := RedisExec("HSET", key)
+	_, err := RedisExec("HSET", key, field, data)
 	if err != nil {
 		//logs.Error("hSet error", err.Error())
 		return err
@@ -210,7 +210,7 @@ func RdbHGet(key, field string) (interface{}, error) {
 redis HDEL
 */
 func RdbHDel(key string, field string) error {
-	_, err := RedisExec("DEL", key)
+	_, err := RedisExec("HDEL", key, field)
 	if err != nil {
 		//fmt.Println(err)
 		return err
@@ -240,7 +240,7 @@ func RdbHGetAll(key string) (map[string]string, error) {
 redis HEXISTS
 */
 func RdbHExists(key string, field string) bool {
-	b, err := redis.Bool( RedisExec("HEXISTS", key) )
+	b, err := redis.Bool( RedisExec("HEXISTS", key, field) )
 	if err != nil {
 		//fmt.Println(err)
 		return false
@@ -265,7 +265,7 @@ func RdbIncr(key string) error {
 redis INCRBY 将 key 所储存的值加上增量 n
 */
 func RdbIncrBy(key string, n int) error {
-	_, err := RedisExec("INCRBY", key)
+	_, err := RedisExec("INCRBY", key, n)
 	if err != nil {
 		//logs.Error("INCRBY error", err.Error())
 		return err
@@ -289,7 +289,7 @@ func RdbDecr(key string) error {
 redis DECRBY 将 key 所储存的值减去减量 n
 */
 func RdbDecrBy(key string, n int) error {
-	_, err := RedisExec("DECRBY", key)
+	_, err := RedisExec("DECRBY", key, n)
 	if err != nil {
 		//logs.Error("DECRBY error", err.Error())
 		return err
@@ -301,7 +301,7 @@ func RdbDecrBy(key string, n int) error {
 redis SADD 将一个或多个 member 元素加入到集合 key 当中，已经存在于集合的 member 元素将被忽略。
 */
 func RdbSAdd(key, v string) error {
-	_, err := RedisExec("SADD", key)
+	_, err := RedisExec("SADD", key, v)
 	if err != nil {
 		//logs.Error("SADD error", err.Error())
 		return err
@@ -327,7 +327,7 @@ redis SISMEMBER 判断 member 元素是否集合 key 的成员。
 return bool
 */
 func RdbSISMembers(key, v string) bool {
-	b, err := redis.Bool( RedisExec("SISMEMBER", key))
+	b, err := redis.Bool( RedisExec("SISMEMBER", key, v))
 	if err != nil {
 		//logs.Error("SISMEMBER error", err.Error())
 		return false
@@ -336,7 +336,7 @@ func RdbSISMembers(key, v string) bool {
 }
 
 func RdbZAdd(key, v string) error {
-	_, err := RedisExec("ZADD", key)
+	_, err := RedisExec("ZADD", key, v)
 	if err != nil {
 		return err
 	}
