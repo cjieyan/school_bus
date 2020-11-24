@@ -17,6 +17,7 @@ const store = new Vuex.Store({
 		lng:"",
 		sitename:"",
 		lineid:"",
+		carid: "",
 		token:"",
 		siteinfo: {},
 		isfinish: false,
@@ -48,6 +49,9 @@ const store = new Vuex.Store({
 		},
 		setLineid(state, lineid){
 			state.lineid = lineid
+		},
+		setCarid(state, carid){
+			state.carid = carid
 		},
 	},
     actions: {}

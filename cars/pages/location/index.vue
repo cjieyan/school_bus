@@ -125,17 +125,19 @@
 							})
 						}
 						var data = []
-						this.linelist = res.data.data
+						// this.linelist = res.data.data
 						for (var i = 0; i < res.data.data.length; i++) {
+							console.log("res.data.data[i]")
+							console.log(res.data.data[i])
 							var obj = {
 								text: res.data.data[i].name,
 								color: 'blue',
 								fontSize: 28,
 								id: res.data.data[i].id,
+								carid: res.data.data[i].carId,
 							}
 							data.push(obj)
 						}
-						console.log(data)
 						this.linelist = data
 					},
 					fail: (err) => {
@@ -149,7 +151,8 @@
 				})
 				var token = uni.getStorageSync('token')
 				new Promise(resolve => {
-
+					console.log("this.linelist[index]")
+					console.log(this.linelist[index])
 					uni.request({
 						url: this.$store.state.apihost + "/xcx/auth/line-info",
 						method: "POST",
@@ -157,7 +160,8 @@
 							'token': token,
 						},
 						data: {
-							"line_id": this.linelist[index].id
+							"line_id": this.linelist[index].id,
+							"car_id": this.linelist[index].carid
 						},
 						success: (res) => {
 							if(res.data.code == 401){
@@ -171,6 +175,7 @@
 								})
 							}
 							this.$store.commit('setLineid', this.linelist[index].id)
+							this.$store.commit('setCarid', this.linelist[index].carid)
 							this.$store.commit('setcarinfo', res.data.data.car)
 							this.$store.commit('setTeacher', res.data.data.teacher)
 							this.$store.commit('setLineinfo', res.data.data.line)
