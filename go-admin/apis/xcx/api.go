@@ -541,6 +541,7 @@ func (a Api) FaceSwipe(c *gin.Context) {
 			exist = false
 		} else {
 			var swipeAtInfo models.SwipeAt
+			fmt.Println("swipeData....", swipeData, err)
 			err = json.Unmarshal([]byte(swipeData), &swipeAtInfo)
 			fmt.Println("swipeAtInfo SwipeAt err....", err)
 			if nil == err {
@@ -559,7 +560,7 @@ func (a Api) FaceSwipe(c *gin.Context) {
 					//记录学生刷脸时间
 					tools.RdbHSet(swipeAtKey, studentIdStr, string(jsonBytes))
 					tools.RdbSetKeyExp(swipeAtKey, 86400)
-					sStatus.Status = 1
+					sStatus.Status = 1 //标记为已下车
 
 					//记录下车日志
 					carRecordModel := models.ScbCarRecord{}
@@ -571,9 +572,9 @@ func (a Api) FaceSwipe(c *gin.Context) {
 					_, err = carRecordModel.Create()
 					fmt.Println("carRecordModel.Create err........", err)
 				} else if 1 == swipeAtInfo.Status {
-					sStatus.Status = 1
+					sStatus.Status = 1 //标记为已下车
 				} else {
-					sStatus.Status = 0
+					sStatus.Status = 0 //标记为已上车
 				}
 			}
 		}
@@ -675,7 +676,6 @@ func (a Api) Swipe(c *gin.Context) {
 
 	//记录学生刷脸时间  用于标记上/下车状态 以及上/下车时间
 	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
-	swipeData, err := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
 
 	fmt.Println("carData.Id.......", car.Id, car.LineId, teacher.Id)
 	followRecordModel := models.ScbFollowRecord{}
@@ -691,6 +691,8 @@ func (a Api) Swipe(c *gin.Context) {
 		fmt.Println("followRecordData, err...", followRecordData, err)
 	}
 
+	swipeData, err := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
+	fmt.Println("err...", err,  redis.ErrNil )
 	exist := true
 	if redis.ErrNil == err { //redis无数据
 		exist = false
@@ -799,9 +801,26 @@ func (a Api) StudentInfo(c *gin.Context) {
 	studentData, err := studentModel.Get()
 	studentData.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(studentData.HeadImg, ".", "_small.", 1)
 	studentData.HeadImg = config.ApplicationConfig.ImageUrl + studentData.HeadImg
-
 	studentData.TimeString = studentData.CreatedAt.Format("2006-01-02 15:04:05")
 
+	studentIdStr := strconv.Itoa( studentData.Id )
+	//记录学生刷脸时间  用于标记上/下车状态 以及上/下车时间
+	ymd := tools.Ymd()
+	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
+	swipeData, err := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
+
+	var swipeAtInfo models.SwipeAt
+	err = json.Unmarshal([]byte(swipeData), &swipeAtInfo)
+	fmt.Println("swipeAtInfo SwipeAt err....", err)
+	status := -1//未上车
+	if nil == err {
+		if 1 == swipeAtInfo.Status {
+			status = 1//已下车
+		} else {
+			status = 0//已上车
+		}
+	}
+	studentData.SwipeStatus = status
 	app.OK(c, studentData, "")
 
 }
