@@ -37,6 +37,7 @@ type LineFinishReq struct {
 }
 type LineFinishRsp struct {
 	IsFinished int `json:"is_finished"`
+	GetOn int `json:"get_on"`
 }
 type LineInfoReq struct {
 	LineId int `json:"line_id"`

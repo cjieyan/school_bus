@@ -214,43 +214,43 @@ func (a Api) LineInfo(c *gin.Context) {
 	rsp["isFinished"] = isFinished           // -1行程尚未开始 0未结束 1 已结束
 	app.OK(c, rsp, "")
 }
-
-func (a Api) LineStart(c *gin.Context) {
-
-	objParams := models.LineStartReq{}
-	err := c.ShouldBindJSON(&objParams)
-	if nil != err {
-		tools.HasError(err, "", -1)
-	}
-
-	userId := c.GetInt(models.UserId)
-
-	//获取跟车员信息
-	teacher, car, _, err := a.teacherCarLine(userId, objParams.CarId, objParams.LineId)
-	tools.HasError(err, "", -1)
-
-	followRecordModel := models.ScbFollowRecord{}
-	followRecordModel.CarId = car.Id
-	followRecordModel.LineId = objParams.LineId
-	followRecordModel.AttendantId = teacher.Id
-	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
-
-	followRecordData, err := followRecordModel.Get()
-	ret := models.LineFinishRsp{}
-	msg := "行程已经开始"
-	if gorm.IsRecordNotFoundError(err) {
-		followRecordModel.IsFinished = 0
-		followRecordData, err := followRecordModel.Create()
-		fmt.Println("followRecordData, err...", followRecordData, err)
-		ret.IsFinished = 1
-		msg = "操作成功"
-	}else if nil != err {
-		tools.HasError(err, "", -1)
-	} else if 1 == followRecordData.IsFinished {
-		msg = "行程已结束"
-	}
-	app.OK(c, nil, msg)
-}
+//
+//func (a Api) LineStart(c *gin.Context) {
+//
+//	objParams := models.LineStartReq{}
+//	err := c.ShouldBindJSON(&objParams)
+//	if nil != err {
+//		tools.HasError(err, "", -1)
+//	}
+//
+//	userId := c.GetInt(models.UserId)
+//
+//	//获取跟车员信息
+//	teacher, car, _, err := a.teacherCarLine(userId, objParams.CarId, objParams.LineId)
+//	tools.HasError(err, "", -1)
+//
+//	followRecordModel := models.ScbFollowRecord{}
+//	followRecordModel.CarId = car.Id
+//	followRecordModel.LineId = objParams.LineId
+//	followRecordModel.AttendantId = teacher.Id
+//	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
+//
+//	followRecordData, err := followRecordModel.Get()
+//	ret := models.LineFinishRsp{}
+//	msg := "行程已经开始"
+//	if gorm.IsRecordNotFoundError(err) {
+//		followRecordModel.IsFinished = 0
+//		followRecordData, err := followRecordModel.Create()
+//		fmt.Println("followRecordData, err...", followRecordData, err)
+//		ret.IsFinished = 1
+//		msg = "操作成功"
+//	}else if nil != err {
+//		tools.HasError(err, "", -1)
+//	} else if 1 == followRecordData.IsFinished {
+//		msg = "行程已结束"
+//	}
+//	app.OK(c, nil, msg)
+//}
 
 func (a Api) LineCheck(c *gin.Context) {
 
@@ -306,9 +306,16 @@ func (a Api) LineFinish(c *gin.Context) {
 		}
 	}
 
-	if getOn <= 0 {
+	if getOn <= 0 && objParams.Force == 0 {
 		//app.Error(c, 200, errors.New("线路结束失败"), "线路结束失败, 尚未有人上车")
 		tools.HasError(err, "线路结束失败, 尚未有人上车", -1)
+		data := models.LineFinishRsp{}
+		data.GetOn = getOn
+		app.Custum(c, gin.H{
+			"code":        -1,
+			"data":		   data,
+		})
+		return
 	}
 
 	studentModel := models.ScbStudents{}
@@ -344,6 +351,7 @@ func (a Api) LineFinish(c *gin.Context) {
 		ret.IsFinished = 1
 		msg = "行程已结束"
 	}
+	ret.GetOn = getOn
 	app.OK(c, nil, msg)
 }
 
