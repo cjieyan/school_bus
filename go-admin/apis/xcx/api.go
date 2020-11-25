@@ -726,13 +726,13 @@ func (a Api) Swipe(c *gin.Context) {
 				carRecordModel.Prop = 2
 				carRecordModel.Create()
 
-				app.OK(c, ret, "下车刷脸成功..")
+				app.OK(c, ret, "下车打卡成功..")
 			} else if 1 == swipeAtInfo.Status {
 				ret.Status = 1
 				app.OK(c, ret, "您已下车了..")
 			} else {
 				ret.Status = 0
-				app.OK(c, ret, "您已刷脸上车了..")
+				app.OK(c, ret, "您已打卡上车了..")
 			}
 		}
 	}
@@ -764,7 +764,7 @@ func (a Api) Swipe(c *gin.Context) {
 		tools.RdbHSet(swipeAtKey, studentIdStr, string(jsonBytes))
 		tools.RdbSetKeyExp(swipeAtKey, 86400)
 		ret.Status = 0
-		app.OK(c, ret, "上车刷脸成功")
+		app.OK(c, ret, "上车打卡成功")
 	}
 }
 
