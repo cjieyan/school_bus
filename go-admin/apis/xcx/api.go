@@ -807,17 +807,20 @@ func (a Api) StudentInfo(c *gin.Context) {
 	//记录学生刷脸时间  用于标记上/下车状态 以及上/下车时间
 	ymd := tools.Ymd()
 	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
-	swipeData, err := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
+	swipeData, rErr := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
 
 	var swipeAtInfo models.SwipeAt
 	err = json.Unmarshal([]byte(swipeData), &swipeAtInfo)
 	fmt.Println("swipeAtInfo SwipeAt err....", err)
 	status := -1//未上车
-	if nil == err {
-		if 1 == swipeAtInfo.Status {
-			status = 1//已下车
-		} else {
-			status = 0//已上车
+	if redis.ErrNil == rErr{
+	}else if rErr == nil {
+		if nil == err {
+			if 1 == swipeAtInfo.Status {
+				status = 1 //已下车
+			} else {
+				status = 0 //已上车
+			}
 		}
 	}
 	studentData.SwipeStatus = status
