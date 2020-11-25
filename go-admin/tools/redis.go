@@ -67,9 +67,7 @@ func RedisExec(cmd string, key interface{}, args ...interface{}) (interface{}, e
 	if err := con.Err(); err != nil {
 		panic("redis err")
 	}
-	//defer con.Close()
-
-
+	defer con.Close()
 	parmas := make([]interface{}, 0)
 	parmas = append(parmas, key)
 
