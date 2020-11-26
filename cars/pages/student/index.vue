@@ -32,7 +32,7 @@
 			</view>
 		</view>
 		<view class="comfirm">
-			<button class="comfirm-bottom" @tap="finish">确认结束</button>
+			<button class="comfirm-bottom" @tap="finish" :disabled="disabled">{{btntex}}</button>
 		</view>
 	</view>
 </template>
@@ -44,6 +44,7 @@
 		},
 		data() {
 			return {
+				btntex:"确认结束",
 				students: {},
 				line: {},
 				linelist: [],
@@ -51,6 +52,7 @@
 				carid: "",
 				linename: "",
 				show: false,
+				disabled: false,
 				background: {
 					backgroundColor: '#12c497',
 				},
@@ -69,6 +71,7 @@
 				})
 			},
 			inboard(item) {
+				console.log(item)
 				uni.showLoading({
 
 				})
@@ -103,23 +106,47 @@
 					},
 					success: (res) => {
 						if (res.data.code == -1) {
-							// uni.showToast({
-							// 	title:res.data.msg,
-							// 	icon:"none"
-							// })
-							// return false;
 							uni.showModal({
-								title: res.data.msg,
+								title: "尚未有人上车，是否结束",
 								icon: "none",
 								success: (res) => {
 									if (res.confirm) {
-										console.log('用户点击确定');
+										uni.request({
+											url: this.$store.state.apihost + "/xcx/auth/line-finish",
+											method: "POST",
+											header: {
+												'token': this.$store.state.token,
+											},
+											data: {
+												"line_id": this.$store.state.lineid,
+												"car_id": this.$store.state.carid,
+												"force": 1,
+											},
+											success: (res) => {
+												if(res.data.code == 200)
+												{
+													uni.showToast({
+														title:"线路已结束",
+														icon:"none"
+													})
+													this.btntex = "已结束"
+													this.disabled = true
+												}
+											},
+											fail: (err) => {
+												uni.showToast({
+													title:"请求失败，请重试",
+													icon:"none"
+												})
+												return false
+											}
+										})
 									} else if (res.cancel) {
-										console.log('用户点击取消');
+										return false;
 									}
 								}
 							})
-							return false;
+							
 						}
 						if (res.data.code == 200) {
 							uni.showToast({

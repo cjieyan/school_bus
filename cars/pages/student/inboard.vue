@@ -28,7 +28,6 @@
 						<view class="isPickUp" v-if="studentinfo.isPickUp == '0'">是否接送:否</view>
 						<view class="isPickUp" v-else>是否接送:是</view>
 					</view>
-
 				</view>
 				<view style="clear:both;height:0"></view>
 			</view>
@@ -40,7 +39,6 @@
 </template>
 
 <script>
-	// import faIcon from "@/components/kilvn-fa-icon/fa-icon.vue"
 	export default {
 		components: {
 			// faIcon
@@ -50,6 +48,9 @@
 				studentinfo: {},
 				lineinfo: {},
 				carinfo:{},
+				carid: "",
+				lineid: "",
+				userid: "",
 				swipeStatus: "",
 				disabled: true,
 				loading: true,
@@ -70,6 +71,35 @@
 			},
 			swipe(){
 				//手动打卡
+				uni.showLoading({
+					
+				})
+				uni.request({
+					url: this.$store.state.apihost + "/xcx/auth/swipe",
+					header: {
+						'token': this.$store.state.token,
+					},
+					data:{
+						"car_id": this.carid,
+						"line_id": this.lineid,
+						"user_id": this.userid,
+					},
+					method:"POST",
+					success: (res) => {
+						if(res.data.code == 200)
+						{
+							this.studentinfo.swipeStatus == '0'
+							this.inboard = res.data.msg
+							this.disabled = true
+						}
+					},
+					fail: (err) => {
+						uni.showToast({
+							title:"请求失败"
+						})
+					}
+				})
+				uni.hideLoading()
 			}
 		},
 		onLoad(options) {
@@ -83,17 +113,23 @@
 					'token': this.$store.state.token,
 				},
 				data:{
-					id: options.id
+					"user_id": options.id
 				},
 				success: (res) => {
 					console.log(res)
+					this.carid = res.data.data.carId,
+					this.lineid = res.data.data.lineId
+					this.userid = res.data.data.id
 					this.studentinfo = res.data.data
 					if(this.studentinfo.swipeStatus == '-1'){
 						this.inboard = "未上车"
+						this.disabled = false
 					} else if(this.studentinfo.swipeStatus == '0'){
 						this.inboard = "已上车"
+						this.disabled = false
 					} else if(this.studentinfo.swipeStatus == '1'){
 						this.inboard = "已下车"
+						this.disabled = false
 					}
 					this.loading = false
 				},
