@@ -37,6 +37,7 @@ type LineFinishReq struct {
 }
 type LineFinishRsp struct {
 	IsFinished int `json:"is_finished"`
+	GetOn int `json:"get_on"`
 }
 type LineInfoReq struct {
 	LineId int `json:"line_id"`
@@ -73,12 +74,12 @@ type FaceSwipeRsp struct {
 	IsFinished    bool                        `json:"isFinished"`
 }
 type FaceSwipeRspStudentStatus struct {
-	StudentId int `json:"studentId"`
+	StudentId int `json:"student_id"`
 	Status    int `json:"status"` //-1 未上车 0 上车 1 下车
 }
 type StudentInfoReq struct {
 	LineId    int `json:"line_id"`
-	StudentId int `json:"studentId"`
+	StudentId int `json:"student_id"`
 }
 type StudentInfoRsp struct {
 	Student ScbStudents `json:"student"`

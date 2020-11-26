@@ -214,43 +214,43 @@ func (a Api) LineInfo(c *gin.Context) {
 	rsp["isFinished"] = isFinished           // -1行程尚未开始 0未结束 1 已结束
 	app.OK(c, rsp, "")
 }
-
-func (a Api) LineStart(c *gin.Context) {
-
-	objParams := models.LineStartReq{}
-	err := c.ShouldBindJSON(&objParams)
-	if nil != err {
-		tools.HasError(err, "", -1)
-	}
-
-	userId := c.GetInt(models.UserId)
-
-	//获取跟车员信息
-	teacher, car, _, err := a.teacherCarLine(userId, objParams.CarId, objParams.LineId)
-	tools.HasError(err, "", -1)
-
-	followRecordModel := models.ScbFollowRecord{}
-	followRecordModel.CarId = car.Id
-	followRecordModel.LineId = objParams.LineId
-	followRecordModel.AttendantId = teacher.Id
-	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
-
-	followRecordData, err := followRecordModel.Get()
-	ret := models.LineFinishRsp{}
-	msg := "行程已经开始"
-	if gorm.IsRecordNotFoundError(err) {
-		followRecordModel.IsFinished = 0
-		followRecordData, err := followRecordModel.Create()
-		fmt.Println("followRecordData, err...", followRecordData, err)
-		ret.IsFinished = 1
-		msg = "操作成功"
-	}else if nil != err {
-		tools.HasError(err, "", -1)
-	} else if 1 == followRecordData.IsFinished {
-		msg = "行程已结束"
-	}
-	app.OK(c, nil, msg)
-}
+//
+//func (a Api) LineStart(c *gin.Context) {
+//
+//	objParams := models.LineStartReq{}
+//	err := c.ShouldBindJSON(&objParams)
+//	if nil != err {
+//		tools.HasError(err, "", -1)
+//	}
+//
+//	userId := c.GetInt(models.UserId)
+//
+//	//获取跟车员信息
+//	teacher, car, _, err := a.teacherCarLine(userId, objParams.CarId, objParams.LineId)
+//	tools.HasError(err, "", -1)
+//
+//	followRecordModel := models.ScbFollowRecord{}
+//	followRecordModel.CarId = car.Id
+//	followRecordModel.LineId = objParams.LineId
+//	followRecordModel.AttendantId = teacher.Id
+//	followRecordModel.Ymd, _ = strconv.Atoi(tools.Ymd())
+//
+//	followRecordData, err := followRecordModel.Get()
+//	ret := models.LineFinishRsp{}
+//	msg := "行程已经开始"
+//	if gorm.IsRecordNotFoundError(err) {
+//		followRecordModel.IsFinished = 0
+//		followRecordData, err := followRecordModel.Create()
+//		fmt.Println("followRecordData, err...", followRecordData, err)
+//		ret.IsFinished = 1
+//		msg = "操作成功"
+//	}else if nil != err {
+//		tools.HasError(err, "", -1)
+//	} else if 1 == followRecordData.IsFinished {
+//		msg = "行程已结束"
+//	}
+//	app.OK(c, nil, msg)
+//}
 
 func (a Api) LineCheck(c *gin.Context) {
 
@@ -306,9 +306,16 @@ func (a Api) LineFinish(c *gin.Context) {
 		}
 	}
 
-	if getOn <= 0 {
+	if getOn <= 0 && objParams.Force == 0 {
 		//app.Error(c, 200, errors.New("线路结束失败"), "线路结束失败, 尚未有人上车")
 		tools.HasError(err, "线路结束失败, 尚未有人上车", -1)
+		data := models.LineFinishRsp{}
+		data.GetOn = getOn
+		app.Custum(c, gin.H{
+			"code":        -1,
+			"data":		   data,
+		})
+		return
 	}
 
 	studentModel := models.ScbStudents{}
@@ -344,6 +351,7 @@ func (a Api) LineFinish(c *gin.Context) {
 		ret.IsFinished = 1
 		msg = "行程已结束"
 	}
+	ret.GetOn = getOn
 	app.OK(c, nil, msg)
 }
 
@@ -533,6 +541,7 @@ func (a Api) FaceSwipe(c *gin.Context) {
 			exist = false
 		} else {
 			var swipeAtInfo models.SwipeAt
+			fmt.Println("swipeData....", swipeData, err)
 			err = json.Unmarshal([]byte(swipeData), &swipeAtInfo)
 			fmt.Println("swipeAtInfo SwipeAt err....", err)
 			if nil == err {
@@ -551,7 +560,7 @@ func (a Api) FaceSwipe(c *gin.Context) {
 					//记录学生刷脸时间
 					tools.RdbHSet(swipeAtKey, studentIdStr, string(jsonBytes))
 					tools.RdbSetKeyExp(swipeAtKey, 86400)
-					sStatus.Status = 1
+					sStatus.Status = 1 //标记为已下车
 
 					//记录下车日志
 					carRecordModel := models.ScbCarRecord{}
@@ -563,9 +572,9 @@ func (a Api) FaceSwipe(c *gin.Context) {
 					_, err = carRecordModel.Create()
 					fmt.Println("carRecordModel.Create err........", err)
 				} else if 1 == swipeAtInfo.Status {
-					sStatus.Status = 1
+					sStatus.Status = 1 //标记为已下车
 				} else {
-					sStatus.Status = 0
+					sStatus.Status = 0 //标记为已上车
 				}
 			}
 		}
@@ -667,7 +676,6 @@ func (a Api) Swipe(c *gin.Context) {
 
 	//记录学生刷脸时间  用于标记上/下车状态 以及上/下车时间
 	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
-	swipeData, err := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
 
 	fmt.Println("carData.Id.......", car.Id, car.LineId, teacher.Id)
 	followRecordModel := models.ScbFollowRecord{}
@@ -683,6 +691,8 @@ func (a Api) Swipe(c *gin.Context) {
 		fmt.Println("followRecordData, err...", followRecordData, err)
 	}
 
+	swipeData, err := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
+	fmt.Println("err...", err,  redis.ErrNil )
 	exist := true
 	if redis.ErrNil == err { //redis无数据
 		exist = false
@@ -716,13 +726,13 @@ func (a Api) Swipe(c *gin.Context) {
 				carRecordModel.Prop = 2
 				carRecordModel.Create()
 
-				app.OK(c, ret, "下车刷脸成功..")
+				app.OK(c, ret, "下车打卡成功..")
 			} else if 1 == swipeAtInfo.Status {
 				ret.Status = 1
 				app.OK(c, ret, "您已下车了..")
 			} else {
 				ret.Status = 0
-				app.OK(c, ret, "您已刷脸上车了..")
+				app.OK(c, ret, "您已打卡上车了..")
 			}
 		}
 	}
@@ -754,7 +764,7 @@ func (a Api) Swipe(c *gin.Context) {
 		tools.RdbHSet(swipeAtKey, studentIdStr, string(jsonBytes))
 		tools.RdbSetKeyExp(swipeAtKey, 86400)
 		ret.Status = 0
-		app.OK(c, ret, "上车刷脸成功")
+		app.OK(c, ret, "上车打卡成功")
 	}
 }
 
@@ -791,9 +801,29 @@ func (a Api) StudentInfo(c *gin.Context) {
 	studentData, err := studentModel.Get()
 	studentData.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(studentData.HeadImg, ".", "_small.", 1)
 	studentData.HeadImg = config.ApplicationConfig.ImageUrl + studentData.HeadImg
-
 	studentData.TimeString = studentData.CreatedAt.Format("2006-01-02 15:04:05")
 
+	studentIdStr := strconv.Itoa( studentData.Id )
+	//记录学生刷脸时间  用于标记上/下车状态 以及上/下车时间
+	ymd := tools.Ymd()
+	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
+	swipeData, rErr := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
+
+	var swipeAtInfo models.SwipeAt
+	err = json.Unmarshal([]byte(swipeData), &swipeAtInfo)
+	fmt.Println("swipeAtInfo SwipeAt err....", err)
+	status := -1//未上车
+	if redis.ErrNil == rErr{
+	}else if rErr == nil {
+		if nil == err {
+			if 1 == swipeAtInfo.Status {
+				status = 1 //已下车
+			} else {
+				status = 0 //已上车
+			}
+		}
+	}
+	studentData.SwipeStatus = status
 	app.OK(c, studentData, "")
 
 }
