@@ -63,22 +63,21 @@
 				uni.switchTab({
 					url: "../index/index",
 					success: (res) => {
-						console.log(res)
+						
 					},
 					fail: (err) => {
-						console.log(err)
+						
 					}
 				})
 			},
 			inboard(item) {
-				console.log(item)
 				uni.showLoading({
 
 				})
 				uni.redirectTo({
 					url: "./inboard?id=" + item.id,
 					fail: (err) => {
-						console.log(err)
+						
 					}
 				})
 				uni.hideLoading()
@@ -214,7 +213,7 @@
 			lineInfo() {
 				var token = uni.getStorageSync('token')
 				uni.request({
-					url: this.$store.state.apihost + "/xcx/auth/lines",
+					url: this.$store.state.apihost + "/xcx/auth/cars",
 					method: "post",
 					header: {
 						'token': token,

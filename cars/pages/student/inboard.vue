@@ -82,7 +82,7 @@
 					data:{
 						"car_id": this.carid,
 						"line_id": this.lineid,
-						"user_id": this.userid,
+						"student_id": this.userid,
 					},
 					method:"POST",
 					success: (res) => {
@@ -113,10 +113,9 @@
 					'token': this.$store.state.token,
 				},
 				data:{
-					"user_id": options.id
+					"student_id": parseInt(options.id)
 				},
 				success: (res) => {
-					console.log(res)
 					this.carid = res.data.data.carId,
 					this.lineid = res.data.data.lineId
 					this.userid = res.data.data.id
