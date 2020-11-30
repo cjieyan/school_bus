@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	orm "go-admin/global"
 	"go-admin/tools"
 )
@@ -259,14 +260,14 @@ func (e *ScbStudents) GetAllByCarId() ([]ScbStudents, error) {
 }
 
 // 获取ScbStudents
-func (e *ScbStudents) GetByFaceTokens(carId int, faceTokens []string) ([]ScbStudents, error) {
+func (e *ScbStudents) GetByFaceTokens(lineId int, carId int, faceTokens []string) ([]ScbStudents, error) {
 	var doc []ScbStudents
 	table := orm.Eloquent.Table(e.TableName())
-
+	fmt.Println("faceTokens...", faceTokens)
 	if len(faceTokens) > 0 {
-
-		table = table.Where("site_id in ( ? )", faceTokens)
+		table = table.Where("line_id = ? ", lineId)
 		table = table.Where("car_id = ? ", carId)
+		table = table.Where("face_token in ( ? )", faceTokens)
 		if err := table.Find(&doc).Error; err != nil {
 			return doc, err
 		}
