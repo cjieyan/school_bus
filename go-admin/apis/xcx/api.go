@@ -318,6 +318,8 @@ func (a Api) LineFinish(c *gin.Context) {
 		return
 	}
 
+	tools.RdbDel(swipeAtKey)
+
 	studentModel := models.ScbStudents{}
 	studentModel.CarId = car.Id
 	allCount, err := studentModel.GetCount()
@@ -331,6 +333,7 @@ func (a Api) LineFinish(c *gin.Context) {
 	followRecord, err := followRecordModel.Get()
 	ret := models.LineFinishRsp{}
 	msg := "操作失败"
+
 	if gorm.IsRecordNotFoundError(err) {
 
 		followRecordModel.GetOn = getOn
@@ -508,7 +511,7 @@ func (a Api) FaceSwipe(c *gin.Context) {
 
 	studentModel := models.ScbStudents{}
 	//获取到识别的学生列表
-	studentsData, err := studentModel.GetByFaceTokens(car.Id, faceTokens)
+	studentsData, err := studentModel.GetByFaceTokens(objParams.LineId, car.Id, faceTokens)
 	tools.HasError(err, "扫码失败.您上错车了", 500)
 
 	//创建跟车记录
