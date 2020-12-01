@@ -107,7 +107,7 @@
 			lineInfo() {
 				var token = uni.getStorageSync('token')
 				uni.request({
-					url: this.$store.state.apihost + "/xcx/auth/lines",
+					url: this.$store.state.apihost + "/xcx/auth/cars",
 					method: "post",
 					header: {
 						'token': token,
@@ -151,8 +151,6 @@
 				})
 				var token = uni.getStorageSync('token')
 				new Promise(resolve => {
-					console.log("this.linelist[index]")
-					console.log(this.linelist[index])
 					uni.request({
 						url: this.$store.state.apihost + "/xcx/auth/line-info",
 						method: "POST",

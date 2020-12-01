@@ -181,7 +181,8 @@
 							'token': token,
 						},
 						data: {
-							"line_id": this.$store.state.lineid
+							"line_id": this.$store.state.lineid,
+							"car_id": this.$store.state.carid,
 						},
 						success: (res) => {
 							if (res.data.code == 401) {
