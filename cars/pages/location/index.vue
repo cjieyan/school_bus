@@ -98,7 +98,7 @@
 					url: "/pages/face/index",
 					success: res => {},
 					fail: (e) => {
-						console.log(e)
+						//console.log(e)
 					},
 					complete: () => {}
 				})
@@ -127,8 +127,6 @@
 						var data = []
 						// this.linelist = res.data.data
 						for (var i = 0; i < res.data.data.length; i++) {
-							console.log("res.data.data[i]")
-							console.log(res.data.data[i])
 							var obj = {
 								text: res.data.data[i].name,
 								color: 'blue',
@@ -189,8 +187,6 @@
 								"studentCount": res.data.data.studentCount,
 								"studentGetOnCount": res.data.data.studentGetOnCount
 							}
-							console.log("this.students")
-							console.log(this.students)
 							resolve(this.line)
 						},
 						fail: (err) => {
@@ -339,7 +335,7 @@
 			}
 			this.timer = setInterval(() => {
 				this.getLocation()
-			}, 1000)
+			}, 3000)
 			uni.hideLoading()
 		},
 		onLoad() {
