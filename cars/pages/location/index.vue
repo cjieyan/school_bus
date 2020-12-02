@@ -235,6 +235,11 @@
 							this.latitude = res.latitude
 							this.longitude = res.longitude
 							resolve(res);
+						},
+						fail: (err) => {
+							uni.showToast({
+								title:"定位失败，请重试"
+							})
 						}
 					})
 				}).then((res) => {
@@ -242,7 +247,7 @@
 					const lng = res.longitude
 					new Promise(resolve => {
 						uni.request({
-							url: "http://api.map.baidu.com/geoconv/v1/?coords=" + lng + "," + lat +
+							url: "https://api.map.baidu.com/geoconv/v1/?coords=" + lng + "," + lat +
 								"&from=1&to=5&ak=" + this.$store.state.ak,
 							method: "GET",
 							data: {},
@@ -257,14 +262,16 @@
 								resolve(data)
 							},
 							fail: (err) => {
-								console.log(err)
+								uni.showToast({
+									title:JSON.stringify(err)
+								})
 							}
 						})
 					}).then((res) => {
 						new Promise(resolve => {
 							var token = uni.getStorageSync('token')
 							uni.request({
-								url: "http://api.map.baidu.com/reverse_geocoding/v3/?ak=" + this.$store.state.ak +
+								url: "https://api.map.baidu.com/reverse_geocoding/v3/?ak=" + this.$store.state.ak +
 									"&output=json&coordtype=wgs84ll&location=" +
 									this.latitude + "," + this.longitude,
 								data: {
@@ -274,7 +281,9 @@
 									resolve(res)
 								},
 								fail: (err) => {
-									console.log(err)
+									uni.showToast({
+										title:"请求失败2，请重试"
+									})
 								}
 							})
 						}).then((res) => {
