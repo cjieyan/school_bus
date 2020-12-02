@@ -1,10 +1,11 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
-	_ "github.com/gin-gonic/gin"
 	"go-admin/pkg/jwtauth"
 	jwt "go-admin/pkg/jwtauth"
+
+	"github.com/gin-gonic/gin"
+	_ "github.com/gin-gonic/gin"
 )
 
 // 路由示例
@@ -27,8 +28,8 @@ func examplesNoCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMidd
 	// 空接口防止v1定义无使用报错
 	v1.GET("/nilcheckrole", nil)
 
-	// {{无需认证路由自动补充在此处请勿删除}} 
-    registerScbCarRecordRouter(v1)
+	// {{无需认证路由自动补充在此处请勿删除}}
+	registerScbCarRecordRouter(v1)
 	//registerOrdersRouter(v1)
 	//registerUserAccountRouter(v1)
 	// registerCarsRecordRouter(v1, authMiddleware)
@@ -42,8 +43,8 @@ func examplesCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMiddle
 	// 空接口防止v1定义无使用报错
 	v1.GET("/checkrole", nil)
 
-	// {{认证路由自动补充在此处请勿删除}} 
-    registerScbFollowRecordRouter(v1,authMiddleware)
+	// {{认证路由自动补充在此处请勿删除}}
+	registerScbFollowRecordRouter(v1, authMiddleware)
 	registerScbPostRouter(v1, authMiddleware)
 	registerScbDeptRouter(v1, authMiddleware)
 	registerSchSitesRouter(v1, authMiddleware)
@@ -53,7 +54,7 @@ func examplesCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMiddle
 	registerScbCarsRouter(v1, authMiddleware)
 }
 
-func xcxCheckRouter(r *gin.Engine){
-	v1 := r.Group("/xcx")
+func xcxCheckRouter(r *gin.Engine) {
+	v1 := r.Group("/")
 	registerXcxRouter(v1)
 }
