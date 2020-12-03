@@ -55,6 +55,6 @@ func examplesCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMiddle
 }
 
 func xcxCheckRouter(r *gin.Engine) {
-	v1 := r.Group("/")
+	v1 := r.Group("/xcx")
 	registerXcxRouter(v1)
 }
