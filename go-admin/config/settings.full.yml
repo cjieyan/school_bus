@@ -12,7 +12,7 @@ settings:
     writertimeout: 2
     # 数据权限功能开关
     enabledp: false
-    imageUrl: http://sc.kenashua.com/images/
+    imageUrl: http://img.sc.kenashua.com/
   ssl:
     # https对应的域名
     domain: localhost:8000
