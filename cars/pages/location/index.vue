@@ -290,7 +290,7 @@
 							var siteList = []
 							if (this.$store.state.siteinfo.length > 0) {
 								for (var i = 0; i < this.$store.state.siteinfo.length; i++) {
-									var distict = utils.getGreatCircleDistance(this.blat, this.blng, this.$store.state.siteinfo[i].latitude,
+									var distict = utils.getFlatternDistance(this.blat, this.blng, this.$store.state.siteinfo[i].latitude,
 										this.$store.state.siteinfo[i].longitude)
 									if (distict <= 100) {
 										this.current = i
