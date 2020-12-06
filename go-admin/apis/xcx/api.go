@@ -815,7 +815,7 @@ func (a Api) StudentInfo(c *gin.Context) {
 
 	var swipeAtInfo models.SwipeAt
 	err = json.Unmarshal([]byte(swipeData), &swipeAtInfo)
-	fmt.Println("swipeAtInfo SwipeAt err =>.", err, "swipeAtInfo SwipeAt rErr. => ", rErr, "swipeAtInfo => ", swipeAtInfo)
+	fmt.Println("swipeAtInfo SwipeAt err =>.", err, "swipeAtInfo SwipeAt rErr. => ", rErr, "swipeAtInfo => ", swipeAtInfo, "swipeData => ", swipeData)
 	status := -1 //未上车
 	if redis.ErrNil == rErr {
 	} else if rErr == nil {
