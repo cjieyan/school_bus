@@ -14,7 +14,7 @@
 			</view>
 			<view class="student-data">
 				<view class="student-img">
-					<image :src="studentinfo.headImg" style="width: 30px; height: 30px;" class="headImg"></image>
+					<image :src="studentinfo.headImg" style="width: 150rpx; height: 150rpx;" class="headImg"></image>
 				</view>
 				<view class="student-info">
 					<view class="info-top">
@@ -121,7 +121,7 @@
 					this.userid = res.data.data.id
 					this.studentinfo = res.data.data
 					if(this.studentinfo.swipeStatus == '-1'){
-						this.inboard = "未上车"
+						this.inboard = "手动打卡上车"
 						this.disabled = false
 					} else if(this.studentinfo.swipeStatus == '0'){
 						this.inboard = "已上车"
@@ -164,7 +164,7 @@
 
 	.student-info {
 		float: left;
-		margin-left: 40rpx;
+		margin-left: 100rpx;
 		line-height: 50rpx;
 		font-size: 24rpx;
 	}

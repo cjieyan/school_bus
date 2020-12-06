@@ -130,9 +130,8 @@
 									if (res.data.isFinished == true) {
 										this.$store.commit("isfinish", true)
 									}
-									uni.redirectTo({
-										url: "complete"
-									})
+									this.tipclass = "tips green"
+									this.tip = res.data.msg
 								} else {
 									this.icon = "warn"
 									this.tip = res.data.msg
