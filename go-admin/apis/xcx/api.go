@@ -67,7 +67,7 @@ func (a Api) Sites(c *gin.Context) {
 }
 
 //车辆列表
-func (a Api) Cars(c *gin.Context){
+func (a Api) Cars(c *gin.Context) {
 
 	userId := c.GetInt(models.UserId)
 
@@ -87,12 +87,12 @@ func (a Api) Cars(c *gin.Context){
 	tools.HasError(err, "车辆信息不存在", -1)
 
 	var linesRetData []models.ScbLines
-	for _, car := range carsData{
+	for _, car := range carsData {
 
 		lineModel := models.ScbLines{}
 		lineModel.CarId = car.Id
 		line, err := lineModel.Get()
-		if nil != err{
+		if nil != err {
 			continue
 		}
 
@@ -112,6 +112,7 @@ func (a Api) Cars(c *gin.Context){
 	}
 	app.OK(c, linesRetData, "")
 }
+
 //多线路信息
 //
 func (a Api) Lines(c *gin.Context) {
@@ -206,14 +207,15 @@ func (a Api) LineInfo(c *gin.Context) {
 
 	rsp := make(map[string]interface{})
 	rsp["teacher"] = teacher                 //跟车员信息
-	rsp["car"] = car                     //车辆信息
-	rsp["line"] = line                   //线路信息
+	rsp["car"] = car                         //车辆信息
+	rsp["line"] = line                       //线路信息
 	rsp["sites"] = sitesData                 //站点信息
 	rsp["studentCount"] = studentCount       //所有學生
 	rsp["studentGetOnCount"] = len(students) //已上車的學生
 	rsp["isFinished"] = isFinished           // -1行程尚未开始 0未结束 1 已结束
 	app.OK(c, rsp, "")
 }
+
 //
 //func (a Api) LineStart(c *gin.Context) {
 //
@@ -312,8 +314,8 @@ func (a Api) LineFinish(c *gin.Context) {
 		data := models.LineFinishRsp{}
 		data.GetOn = getOn
 		app.Custum(c, gin.H{
-			"code":        -1,
-			"data":		   data,
+			"code": -1,
+			"data": data,
 		})
 		return
 	}
@@ -345,7 +347,7 @@ func (a Api) LineFinish(c *gin.Context) {
 		fmt.Println("followRecordData, err...", followRecordData, err)
 		ret.IsFinished = 1
 		msg = "行程结束成功"
-	}else if nil != err {
+	} else if nil != err {
 		tools.HasError(err, "", -1)
 	} else {
 		followRecordModel.IsFinished = 1
@@ -477,7 +479,7 @@ func (a Api) FollowRecord(c *gin.Context) {
 
 	ret := make(map[string]interface{})
 	ret["count"] = count                                                       //未上车数量
-	ret["result"] = followRecordsData                                                     //已上车数量
+	ret["result"] = followRecordsData                                          //已上车数量
 	ret["page_index"] = objParams.PageIndex                                    //已下车数量
 	ret["page_size"] = objParams.PageSize                                      //每页数量
 	ret["totalpage"] = math.Ceil(float64(count) / float64(objParams.PageSize)) //总页数
@@ -495,7 +497,6 @@ func (a Api) FaceSwipe(c *gin.Context) {
 
 	userId := c.GetInt(models.UserId)
 
-
 	teacher, car, _, err := a.teacherCarLine(userId, objParams.CarId, objParams.LineId)
 	tools.HasError(err, "", -1)
 
@@ -504,14 +505,14 @@ func (a Api) FaceSwipe(c *gin.Context) {
 
 	// 获取百度接口识别到的人脸
 	api := tools2.BdApi{}
-	faceTokens := api.MutilSearch(objParams.Image)
-	if len(faceTokens) <= 0 {
+	userIds := api.MutilSearch(objParams.Image)
+	if len(userIds) <= 0 {
 		tools.HasError(err, "扫码失败,未发识别到人脸", 500)
 	}
 
 	studentModel := models.ScbStudents{}
 	//获取到识别的学生列表
-	studentsData, err := studentModel.GetByFaceTokens(objParams.LineId, car.Id, faceTokens)
+	studentsData, err := studentModel.GetByFaceTokens(objParams.LineId, car.Id, userIds)
 	tools.HasError(err, "扫码失败.您上错车了", 500)
 
 	//创建跟车记录
@@ -695,7 +696,7 @@ func (a Api) Swipe(c *gin.Context) {
 	}
 
 	swipeData, err := redis.String(tools.RdbHGet(swipeAtKey, studentIdStr))
-	fmt.Println("err...", err,  redis.ErrNil )
+	fmt.Println("err...", err, redis.ErrNil)
 	exist := true
 	if redis.ErrNil == err { //redis无数据
 		exist = false
@@ -806,7 +807,7 @@ func (a Api) StudentInfo(c *gin.Context) {
 	studentData.HeadImg = config.ApplicationConfig.ImageUrl + studentData.HeadImg
 	studentData.TimeString = studentData.CreatedAt.Format("2006-01-02 15:04:05")
 
-	studentIdStr := strconv.Itoa( studentData.Id )
+	studentIdStr := strconv.Itoa(studentData.Id)
 	//记录学生刷脸时间  用于标记上/下车状态 以及上/下车时间
 	ymd := tools.Ymd()
 	swipeAtKey := tools.Keys{}.SwipeAt(ymd, objParams.LineId)
@@ -815,9 +816,9 @@ func (a Api) StudentInfo(c *gin.Context) {
 	var swipeAtInfo models.SwipeAt
 	err = json.Unmarshal([]byte(swipeData), &swipeAtInfo)
 	fmt.Println("swipeAtInfo SwipeAt err....", err)
-	status := -1//未上车
-	if redis.ErrNil == rErr{
-	}else if rErr == nil {
+	status := -1 //未上车
+	if redis.ErrNil == rErr {
+	} else if rErr == nil {
 		if nil == err {
 			if 1 == swipeAtInfo.Status {
 				status = 1 //已下车
@@ -830,8 +831,9 @@ func (a Api) StudentInfo(c *gin.Context) {
 	app.OK(c, studentData, "")
 
 }
+
 //教师车辆线路
-func (a Api) teacherCarLine(userId, carId, lineId int)(teacher models.ScbTeachers, car models.ScbCars, line models.ScbLines, err error ){
+func (a Api) teacherCarLine(userId, carId, lineId int) (teacher models.ScbTeachers, car models.ScbCars, line models.ScbLines, err error) {
 	lineModel := models.ScbLines{}
 	teacherModel := models.ScbTeachers{}
 
@@ -859,7 +861,7 @@ func (a Api) teacherCarLine(userId, carId, lineId int)(teacher models.ScbTeacher
 	lineModel.Id = lineId
 	lineModel.CarId = carId
 	line, err = lineModel.Get()
-	if nil != err{
+	if nil != err {
 		err = errors.New("尚未个给您分配路线")
 		return
 	}

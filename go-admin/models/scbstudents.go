@@ -260,14 +260,14 @@ func (e *ScbStudents) GetAllByCarId() ([]ScbStudents, error) {
 }
 
 // 获取ScbStudents
-func (e *ScbStudents) GetByFaceTokens(lineId int, carId int, faceTokens []string) ([]ScbStudents, error) {
+func (e *ScbStudents) GetByFaceTokens(lineId int, carId int, userIds []int) ([]ScbStudents, error) {
 	var doc []ScbStudents
 	table := orm.Eloquent.Table(e.TableName())
-	fmt.Println("faceTokens...", faceTokens)
-	if len(faceTokens) > 0 {
-		table = table.Where("line_id = ? ", lineId)
-		table = table.Where("car_id = ? ", carId)
-		table = table.Where("face_token in ( ? )", faceTokens)
+	fmt.Println("userIds...", userIds)
+	if len(userIds) > 0 {
+		// table = table.Where("line_id = ? ", lineId)
+		// table = table.Where("car_id = ? ", carId)
+		table = table.Where("id in ( ? )", userIds)
 		if err := table.Find(&doc).Error; err != nil {
 			return doc, err
 		}

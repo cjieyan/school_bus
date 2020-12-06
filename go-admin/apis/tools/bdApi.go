@@ -9,6 +9,7 @@ import (
 	"go-admin/tools"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -62,19 +63,20 @@ func (b *BdApi) getToken() (token string) {
 
 	return rsp.AccessToken
 }
+
 type RequestBody struct {
 	Id int `json:"id"`
 
 	Name string `json:"name"`
 }
 
-	//人脸注册
+//人脸注册
 func (b *BdApi) FacesetAdd(userId, image string) (faceToken string) {
-	if "" == image{
+	if "" == image {
 		return ""
 	}
 	imageArr := strings.Split(image, ";base64,")
-	if len(imageArr) > 1{
+	if len(imageArr) > 1 {
 		image = imageArr[1]
 	}
 
@@ -94,7 +96,7 @@ func (b *BdApi) FacesetAdd(userId, image string) (faceToken string) {
 
 	json.NewEncoder(requestBody).Encode(reqModel)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 
 	defer cancel()
 	req, err := http.NewRequest("POST", urlStr, requestBody)
@@ -123,12 +125,12 @@ func (b *BdApi) FacesetAdd(userId, image string) (faceToken string) {
 	if 0 == rsp.ErrorCode {
 		return rsp.Result.FaceToken
 	}
-	fmt.Println("FacesetAdd    rsp....", rsp )
+	fmt.Println("FacesetAdd    rsp....", rsp)
 	return ""
 }
 
 // 多个人脸识别
-func (b *BdApi)MutilSearch(image string) (ret []string){
+func (b *BdApi) MutilSearch(image string) (ret []int) {
 	token := b.getToken()
 	urlStr := "https://aip.baidubce.com/rest/2.0/face/v3/multi-search" +
 		"?access_token=" + token
@@ -146,7 +148,7 @@ func (b *BdApi)MutilSearch(image string) (ret []string){
 
 	json.NewEncoder(requestBody).Encode(reqModel)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 
 	defer cancel()
 	fmt.Println("requestBody", requestBody)
@@ -173,10 +175,19 @@ func (b *BdApi)MutilSearch(image string) (ret []string){
 	err = json.Unmarshal(content, &rsp)
 	fmt.Println("MutilSearch content: ----> ", string(content), rsp.ErrorCode)
 
-	faceTokenArray := []string{}
+	faceTokenArray := []int{}
 	if 0 == rsp.ErrorCode && rsp.Result.FaceNum > 0 {
-		for _, face := range rsp.Result.FaceList{
-			faceTokenArray = append(faceTokenArray, face.FaceToken)
+		for _, faceList := range rsp.Result.FaceList {
+
+			for _, faceUser := range faceList.UserList {
+				if faceUser.Score > 80 {
+					userId, _ := strconv.Atoi(faceUser.UserID)
+					faceTokenArray = append(faceTokenArray, userId)
+				}
+			}
+			// for _, user := face.UserList.UserList{
+			// 	faceTokenArray = append(faceTokenArray, user.U
+			// }
 		}
 		ret = faceTokenArray
 	}
