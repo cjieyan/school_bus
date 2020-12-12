@@ -14,13 +14,19 @@
 			<view class="student-list">
 				<view class="student-list-info" v-for="(item, index) in students" :key="index">
 					<view class="student-img" @tap="inboard(item)" :value="item.id">
-						<image :src="item.headImg" style="width: 30px; height: 30px;" class="headImg"></image>
-						<view class="inboard">
-							<span v-if="item.swipeStatus == '-1'">未上车</span>
-							<span v-else-if="item.swipeStatus == '0'">已上车</span>
-							<span v-else-if="item.swipeStatus == '1'">已下车</span>
-							<span v-else>未上车</span>
+						<image :src="item.headImg" style="width: 100rpx; height: 100rpx;" class="headImg"></image>
+						<view v-if="item.swipeStatus == '-1'" class="inboard">
+							<span>未上车</span>
+						</view>
+						<view  v-else-if="item.swipeStatus == '0'" class="">
+							<span></span>
 							<icon v-if="item.swipeStatus == '1'" type="success" size="13" />
+						</view>
+						<view  v-else-if="item.swipeStatus == '1'" class="inboard">
+							<span >已下车</span>
+						</view>
+						<view  v-else class="inboard">
+							<span>未上车</span>
 						</view>
 					</view>
 					<view class="student-name">
@@ -394,22 +400,22 @@
 	.outboard,
 	.inboard {
 		background-color: #808080;
-		width: 84rpx;
-		height: 84rpx;
+		width: 100rpx;
+		height: 100rpx;
 		position: absolute;
 		top: 0;
 		left: 0;
-		border-radius: 40rpx;
+		border-radius: 50rpx;
 		opacity: 0.9;
 	}
 
 	.outboard span,
 	.inboard span {
-		font-size: 16rpx;
+		font-size: 20rpx;
 		color: #fff;
 		position: absolute;
-		top: 32rpx;
-		left: 18rpx;
+		top: 38rpx;
+		left: 24rpx;
 	}
 
 	.inboard-check {
