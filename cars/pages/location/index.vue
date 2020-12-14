@@ -299,7 +299,7 @@
 										this.$store.state.sitename = this.$store.state.siteinfo[i].name
 									}
 									var resdata = {
-										"name": this.$store.state.siteinfo[i].name + "(" + Math.round(distict) + "米)",
+										"name": this.$store.state.siteinfo[i].name + "(" + Math.round(distict/1000) + "公里)",
 										"distict": Math.round(distict)
 									}
 									siteList.push(resdata)
