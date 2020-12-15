@@ -330,6 +330,20 @@
 			this.numList = []
 			this.lineInfo()
 			this.line = this.$store.state.liniInfo
+			var siteList = []
+			if (this.$store.state.siteinfo.length > 0) {
+				for (var i = 0; i < this.$store.state.siteinfo.length; i++) {
+					
+					var resdata = {
+						"name": this.$store.state.siteinfo[i].name,
+						"distict": 0
+					}
+					siteList.push(resdata)
+					this.numList = siteList
+					this.disabled = false
+					this.loading = false
+				}
+			}
 			if (this.line.hasOwnProperty("name")) {
 				// this.line = this.$store.state.liniInfo
 				this.carinfo = this.$store.state.carInfo
@@ -352,6 +366,20 @@
 
 			})
 			this.numList = []
+			var siteList = []
+			if (this.$store.state.siteinfo.length > 0) {
+				for (var i = 0; i < this.$store.state.siteinfo.length; i++) {
+					
+					var resdata = {
+						"name": this.$store.state.siteinfo[i].name,
+						"distict": 0
+					}
+					siteList.push(resdata)
+					this.numList = siteList
+					this.disabled = false
+					this.loading = false
+				}
+			}
 			this.getLocation()
 			this.line = this.$store.state.liniInfo
 			this.carinfo = this.$store.state.carInfo
