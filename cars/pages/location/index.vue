@@ -465,7 +465,6 @@
 	.comfirm {
 		padding: 20rpx 80rpx;
 	}
-
 	.comfirm-bottom {
 		background: linear-gradient(to right, rgba(8, 189, 175), rgb(247, 218, 99));
 		color: #fff;
