@@ -298,8 +298,10 @@
 										this.$store.state.lng = this.$store.state.siteinfo[i].longitude
 										this.$store.state.sitename = this.$store.state.siteinfo[i].name
 									}
+									// var distictstr = parseFloat(distict/1000) + "公里"
+									var distictstr = Math.round(distict/1000*100)/100 + "公里"
 									var resdata = {
-										"name": this.$store.state.siteinfo[i].name + "(" + Math.round(distict/1000) + "公里)",
+										"name": this.$store.state.siteinfo[i].name + "(" + distictstr +")",
 										"distict": Math.round(distict)
 									}
 									siteList.push(resdata)
