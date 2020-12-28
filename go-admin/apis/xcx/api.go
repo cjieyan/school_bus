@@ -660,7 +660,7 @@ func (a Api) FaceSwipe(c *gin.Context) {
 	rsp.Num = len(studentsStatus)
 	rsp.IsFinished = isFinished
 	if len(studentsStatus) > 0 {
-		app.OK(c, rsp, "")
+		app.OK(c, rsp, msg)
 	} else {
 		tools.HasError(errors.New("未识别到人脸"), "未识别到人脸", -1)
 	}
