@@ -81,7 +81,7 @@
 
 				})
 				uni.redirectTo({
-					url: "./inboard?id=" + item.id,
+					url: "./inboard?id=" + item.id + "&lineid=" + item.id,
 					fail: (err) => {
 						
 					}

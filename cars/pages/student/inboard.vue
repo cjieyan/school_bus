@@ -113,7 +113,8 @@
 					'token': this.$store.state.token,
 				},
 				data:{
-					"student_id": parseInt(options.id)
+					"student_id": parseInt(options.id),
+					"line_id": parseInt(options.lineid)
 				},
 				success: (res) => {
 					this.carid = res.data.data.carId,

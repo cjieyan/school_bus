@@ -159,6 +159,10 @@
 							})
 						}else{
 							this.lines = res.data.data
+							if (res.data.data.length > 0){
+								// this.$store.commit('setLineinfo', res.data.data[0].line)
+								this.selectline(res.data.data[0])
+							}
 						}
 					},
 					fail: (err) => {

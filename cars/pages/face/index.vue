@@ -147,7 +147,7 @@
 					},
 					fail: (err) => {
 						uni.showModal({
-							title: "无法打开摄像头，请重试"
+							title: "无法启用摄像头，请重试"
 						})
 					}
 				})
