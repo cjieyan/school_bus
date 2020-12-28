@@ -10,7 +10,7 @@ import (
 // 无需认证的路由代码
 func registerXcxRouter(v1 *gin.RouterGroup) {
 	v1.POST("/login", xcx.Api{}.Login) //登录信息
-
+	v1.POST("/test", xcx.Api{}.Test)
 	//需要校验header的token
 	authGroup := v1.Group("/auth")
 	authGroup.Use(handler.XcxCheckToken)
