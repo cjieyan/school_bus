@@ -578,21 +578,21 @@ func (a Api) FaceSwipe(c *gin.Context) {
 					fmt.Println("carRecordModel.Create err........", err)
 
 					if len(msg) > 0{
-						msg = msg + "；" + studentData.Name + "下车成功"
+						msg = studentData.Name + "下车成功"
 					}
 					msg = msg + studentData.Name + "下车成功"
 				} else if 1 == swipeAtInfo.Status {
 					sStatus.Status = 1 //标记为已下车
 					if len(msg) > 0{
-						msg = msg + "；" + studentData.Name + "已下车"
+						msg = studentData.Name + "已下车"
 					}
-					msg = msg + studentData.Name + "已下车"
+					msg = studentData.Name + "已下车"
 				} else {
 					sStatus.Status = 0 //标记为已上车
 					if len(msg) > 0{
-						msg = msg + "；" + studentData.Name + "已上车"
+						msg = studentData.Name + "已上车"
 					}
-					msg = msg + studentData.Name + "已上车"
+					msg = studentData.Name + "已上车"
 				}
 			}
 		}
@@ -627,9 +627,9 @@ func (a Api) FaceSwipe(c *gin.Context) {
 
 			sStatus.Status = 0 //标记为已上车
 			if len(msg) > 0{
-				msg = msg + "；" + studentData.Name + "上车成功"
+				msg = studentData.Name + "上车成功"
 			}
-			msg = msg + studentData.Name + "上车成功"
+			msg = studentData.Name + "上车成功"
 		}
 		studentsStatus = append(studentsStatus, sStatus)
 	}
