@@ -3,9 +3,7 @@ package router
 import (
 	"go-admin/pkg/jwtauth"
 	jwt "go-admin/pkg/jwtauth"
-
 	"github.com/gin-gonic/gin"
-	_ "github.com/gin-gonic/gin"
 )
 
 // 路由示例
@@ -17,6 +15,8 @@ func InitExamplesRouter(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) *gi
 	examplesCheckRoleRouter(r, authMiddleware)
 	// 小程序接口
 	xcxCheckRouter(r)
+	//公众号接口
+	wxCheckRouter(r)
 
 	return r
 }
@@ -57,4 +57,9 @@ func examplesCheckRoleRouter(r *gin.Engine, authMiddleware *jwtauth.GinJWTMiddle
 func xcxCheckRouter(r *gin.Engine) {
 	v1 := r.Group("/xcx")
 	registerXcxRouter(v1)
+}
+
+func wxCheckRouter(c *gin.Engine){
+    v1 := c.Group("/wx")
+    registerWxRouter(v1)
 }

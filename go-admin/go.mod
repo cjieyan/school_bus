@@ -8,6 +8,8 @@ require (
 	github.com/apache/thrift v0.12.0 // indirect
 	github.com/casbin/casbin/v2 v2.13.1
 	github.com/casbin/gorm-adapter/v2 v2.1.0
+	github.com/chanxuehong/rand v0.0.0-20201110082127-2f19a1bdd973
+	github.com/chanxuehong/wechat v0.0.0-20201110083048-0180211b69fd
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/garyburd/redigo v1.6.2
