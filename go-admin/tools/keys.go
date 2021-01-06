@@ -31,3 +31,10 @@ func (k Keys)SwipeNowRecord(teacherId int) string{
 func (k Keys)GetOff(ymd string, teacherId int) string{
 	return "getOff:" + ymd + ":" + strconv.Itoa(teacherId)
 }
+//ticket
+func (k Keys)Ticket(ticket string) string{
+	return "ticket:" + ticket
+}
+func (k Keys)WxToken(token string ) string{
+	return "wxToken:" + token
+}

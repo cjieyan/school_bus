@@ -182,14 +182,35 @@ func XcxCheckToken(c *gin.Context){
 	key := tools.Keys{}.ApiToken(token)
 	userIdStr, err := tools.RdbGet(key)
 	if nil != err || "" == userIdStr {
-		//Unauthorized(c, 401, "Unauthorized.")
-		//c.Abort()
-		//return
+		Unauthorized(c, 401, "Unauthorized.")
+		c.Abort()
+		return
 	}
 	//刷新token有效期
 	tools.RdbSetKeyExp(key, 3600*2)
 	userId, _ := strconv.Atoi(userIdStr)
-	userId = 1
+	c.Set(models.UserId, userId)
+	c.Next()
+}
+
+func WxCheckToken(c *gin.Context){
+	token := c.GetHeader("token")
+	if "" == token{
+		Unauthorized(c, 401, "Unauthorized")
+		c.Abort()
+		return
+	}
+
+	key := tools.Keys{}.WxToken(token)
+	userIdStr, err := tools.RdbGet(key)
+	if nil != err || "" == userIdStr {
+		Unauthorized(c, 401, "Unauthorized.")
+		c.Abort()
+		return
+	}
+	//刷新token有效期
+	tools.RdbSetKeyExp(key, 3600*2)
+	userId, _ := strconv.Atoi(userIdStr)
 	c.Set(models.UserId, userId)
 	c.Next()
 }

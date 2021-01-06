@@ -3,6 +3,7 @@ package tools
 import (
 	"bytes"
 	"crypto/rand"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"math/big"
 	"strconv"
@@ -84,4 +85,9 @@ func Ymd() string {
 	day := time.Now().Day()
 	ymd := strconv.Itoa(year) + month + strconv.Itoa(day)
 	return ymd
+}
+
+func Uniqid() string {
+	now := time.Now()
+	return fmt.Sprintf("%08x%08x", now.Unix(), now.UnixNano()%0x100000)
 }
