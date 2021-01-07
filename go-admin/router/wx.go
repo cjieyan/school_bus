@@ -15,6 +15,7 @@ func registerWxRouter(v1 *gin.RouterGroup) {
 	authGroup := v1.Group("/auth")
 	authGroup.Use(handler.WxCheckToken)
 	{
-		v1.GET("/ticket-token", wx.Api{}.Bind)
+		v1.POST("/bind", wx.Api{}.Bind)
+		v1.POST("/student-detail", wx.Api{}.StudentDetail)
 	}
 }

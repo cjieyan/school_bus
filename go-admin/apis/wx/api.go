@@ -144,5 +144,27 @@ func (_ Api)Bind(c *gin.Context){
 	}
 	app.OK(c, nil, "手机号绑定成功")
 }
+// 学生明细
+func (_ Api)StudentDetail(c *gin.Context){
+	objParams := models.StudentDetailReq{}
+	err := c.ShouldBindJSON(&objParams)
+	if nil != err{
+		tools.HasError(err, "参数错误", -1)
+	}
 
-func (_ Api)20
+
+	userId := c.GetInt(models.UserId)
+	userModel := models.SchUser{}
+	userModel.Id = userId
+	user, err := userModel.Get()
+	if err != nil {
+		tools.HasError(err, "用户异常", -1)
+	}
+	if user.Phone == ""{
+		tools.HasError(err, "手机号", -1)
+	}
+
+	studentModel := models.ScbStudents{}
+	studentModel.ParentPhone = ""
+
+}

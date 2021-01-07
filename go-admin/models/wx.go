@@ -10,3 +10,7 @@ type TicketTokenRsp struct {
 type BindReq struct {
 	Mobile string `json:"mobile"`
 }
+
+type StudentDetailReq struct {
+	// Mobile string `json:"mobile"`
+}
