@@ -1,14 +1,14 @@
 body{background: #fff;}
 .clearfix:after{
-    content: "020"; 
-    display: block; 
-    height: 0; 
-    clear: both; 
-    visibility: hidden;  
+    content: "020";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
 }
 .clearfix {
-/* 触发 hasLayout */ 
-    zoom: 1; 
+/* 触发 hasLayout */
+    zoom: 1;
 }
 /*导航部分*/
 .logo-content{
@@ -35,13 +35,14 @@ body{background: #fff;}
     margin-bottom: 10px;
 }
 .tel p{
-    font-size: 18px;
+    font-size: 26px;
     font-weight: bold;
     color: #646464;
     margin-left: 20px;
 }
 .tel img, .tel p{
     display: inline;
+    vertical-align: bottom;
 }
 .nav{
     box-shadow: -17px -6px 20px 0px #ccc !important;
@@ -64,7 +65,8 @@ body{background: #fff;}
 .nav .layui-nav-bar,
 .nav .layui-nav .layui-this:after{height: 2px; background-color: #2db5a3;}
 .nav .layui-nav .layui-this a
-,.nav .layui-nav .layui-nav-item a:hover{color: #2db5a3;}
+,.nav .layui-nav .layui-nav-item a:hover{color: #FF8A00;}
+.nav .layui-nav .nav-main a{ color: #FF8A00;}
 .left{
     float: left;
 }
