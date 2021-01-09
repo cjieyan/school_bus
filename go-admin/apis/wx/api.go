@@ -1,18 +1,22 @@
 package wx
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/chanxuehong/rand"
 	mpoauth2 "github.com/chanxuehong/wechat/mp/oauth2"
 	"github.com/chanxuehong/wechat/oauth2"
+	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"go-admin/models"
 	"go-admin/tools"
 	"go-admin/tools/app"
+	"go-admin/tools/config"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type Api struct {
@@ -165,6 +169,36 @@ func (_ Api)StudentDetail(c *gin.Context){
 	}
 
 	studentModel := models.ScbStudents{}
-	studentModel.ParentPhone = ""
+	studentModel.ParentPhone = userModel.Phone
+	studentData, err := studentModel.Get()
+	if err != nil{
+		tools.HasError(err, "无法查询单相关学生信息", -1)
+	}
+	studentData.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(studentData.HeadImg, ".", "_small.", 1)
+	studentData.HeadImg = config.ApplicationConfig.ImageUrl + studentData.HeadImg
+	studentData.TimeString = studentData.CreatedAt.Format("2006-01-02 15:04:05")
 
+	studentIdStr := strconv.Itoa(studentData.Id)
+	//记录学生刷脸时间  用于标记上/下车状态 以及上/下车时间
+	ymd := tools.Ymd()
+	swipeAtKey := tools.Keys{}.SwipeAt(ymd, studentData.LineId)
+	rStudentInfo, rsErr := tools.RdbHGet(swipeAtKey, studentIdStr)
+	swipeData, rErr := redis.String(rStudentInfo, rsErr)
+
+	var swipeAtInfo models.SwipeAt
+	err = json.Unmarshal([]byte(swipeData), &swipeAtInfo)
+	fmt.Println("swipeAtInfo SwipeAt err =>.", err, "swipeAtInfo SwipeAt rErr. => ", rErr, "swipeAtInfo => ", swipeAtInfo, "swipeData => ", swipeData)
+	status := -1 //未上车
+	if redis.ErrNil == rErr {
+	} else if rErr == nil {
+		if nil == err {
+			if 1 == swipeAtInfo.Status {
+				status = 1 //已下车
+			} else {
+				status = 0 //已上车
+			}
+		}
+	}
+	studentData.SwipeStatus = status
+	app.OK(c, studentData, "")
 }

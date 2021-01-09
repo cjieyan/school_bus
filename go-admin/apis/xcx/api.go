@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/garyburd/redigo/redis"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	tools2 "go-admin/apis/tools"
 	"go-admin/models"
 	"go-admin/tools"
@@ -13,10 +16,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/garyburd/redigo/redis"
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 type Api struct {
@@ -824,6 +823,9 @@ func (a Api) StudentInfo(c *gin.Context) {
 	var studentModel models.ScbStudents
 	studentModel.Id = objParams.StudentId
 	studentData, err := studentModel.Get()
+	if err != nil{
+		tools.HasError(err, "无法查询单相关学生信息", -1)
+	}
 	studentData.HeadImgSmall = config.ApplicationConfig.ImageUrl + strings.Replace(studentData.HeadImg, ".", "_small.", 1)
 	studentData.HeadImg = config.ApplicationConfig.ImageUrl + studentData.HeadImg
 	studentData.TimeString = studentData.CreatedAt.Format("2006-01-02 15:04:05")
