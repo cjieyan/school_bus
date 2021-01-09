@@ -12,6 +12,15 @@
 	// },
 	"pages": [
 		{
+		    "path" : "pages/index/bind",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		},
+		{
 		    "path" : "pages/index/index",
 		    "style" :                                                                                    
 		    {
