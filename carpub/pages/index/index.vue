@@ -1,7 +1,7 @@
 <template>
 	<view class="u-demo">
 		<view class="top">
-			<u-navbar :is-back="isback" title="智慧校车" @click="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
+			<u-navbar :is-back="isback" title="智慧校车" @tap="back" class="top" :background="background" back-icon-color="#fff" title-color="#fff"></u-navbar>
 		</view>
 		<view class="u-demo-wrap">
 			<view class="u-demo-area">
