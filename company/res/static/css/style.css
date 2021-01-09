@@ -169,7 +169,7 @@ body{background: #fff;}
     text-align: center;
 }
 .wrap1-content p{
-    margin-top: 20px;
+    margin-top: 60px;
     color: #555555;
     font-size: 18px;
     text-align: left;
@@ -185,6 +185,9 @@ p.introduce{
     font-size: 18px;
     padding: 10px 20px;
 }
+.advantage-main{
+    margin-top: 60px;
+}
 .advantage p.title{
     margin-top: 20px;
     font-size: 50px;
@@ -192,12 +195,14 @@ p.introduce{
     text-align: center;
 }
 .advantage-content{
-    margin: 20px auto;
+    /*margin: 20px auto;*/
     text-align: center;
     display: flex;
     display: -ms-flex; /* 兼容IE */
     justify-self: center;
     align-items: center;
+    margin-top:20px;
+    margin-bottom: 60px;
 }
 .advantage-1{
     padding: 0 30px;
@@ -207,6 +212,9 @@ p.introduce{
 }
 .advantage-img{
     height: 131px;
+}
+.vat-center{
+    margin-top: 20px;
 }
 .advantage-1 p.content{
     margin-top: 10px;
