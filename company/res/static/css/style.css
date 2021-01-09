@@ -78,7 +78,7 @@ body{background: #fff;}
     background-color: #d8af46;
 }
 .banner .banner-content{
-    width: 980px;
+    /*width: 980px;*/
     margin: 0 auto;
 }
 .banner img{
