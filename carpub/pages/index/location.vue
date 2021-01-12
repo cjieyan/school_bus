@@ -1,7 +1,7 @@
 <template>
 	<view>
-		<view class="top">
-			<u-navbar :is-back="isback" title="智慧校车" @tap="back" class="top" :background="background" back-icon-color="#fff"
+		<view class="top" @click="gotoindex">
+			<u-navbar is-back="true" backurl="./index" title="智慧校车" class="top" @click="gotoindex" :background="background" back-icon-color="#fff"
 			 title-color="#fff"></u-navbar>
 		</view>
 		<view class="page-body">
@@ -41,7 +41,7 @@
 	export default {
 		data() {
 			return {
-				isback: false,
+				isback: true,
 				background: {
 					backgroundColor: '#12c497',
 				},
@@ -61,7 +61,17 @@
 			}
 		},
 		methods: {
-
+			gotoindex() {
+				uni.redirectTo({
+					url: "../index/index",
+					success: (res) => {
+						console.log(res)
+					},
+					fail: (err) => {
+						console.log(err)
+					}
+				})
+			}
 		}
 	}
 </script>
