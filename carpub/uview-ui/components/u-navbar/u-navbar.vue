@@ -1,6 +1,6 @@
 <template>
 	<view class="">
-		<view class="u-navbar" :style="[navbarStyle]" :class="{ 'u-navbar-fixed': isFixed, 'u-border-bottom': borderBottom }">
+		<view class="u-navbar" :style="[navbarStyle]" :class="{ 'u-navbar-fixed': isFixed, 'u-border-bottom': borderBottom }" :backurl="backurl">
 			<view class="u-status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
 			<view class="u-navbar-inner" :style="[navbarInnerStyle]">
 				<view class="u-back-wrap" v-if="isBack" @tap="goBack">
@@ -106,6 +106,10 @@
 				type: String,
 				default: ''
 			},
+			backurl: {
+				type: String,
+				default: ''
+			},
 			// 标题的宽度，如果需要自定义右侧内容，且右侧内容很多时，可能需要减少这个宽度，单位rpx
 			titleWidth: {
 				type: [String, Number],
@@ -167,7 +171,7 @@
 		data() {
 			return {
 				menuButtonInfo: menuButtonInfo,
-				statusBarHeight: systemInfo.statusBarHeight
+				statusBarHeight: systemInfo.statusBarHeight,
 			};
 		},
 		computed: {
@@ -231,7 +235,13 @@
 					// 通过bind()方法，绑定父组件的this，让this.customBack()的this为父组件的上下文
 					this.customBack.bind(this.$u.$parent.call(this))();
 				} else {
-					uni.navigateBack();
+					// uni.navigateBack();
+					uni.redirectTo({
+						url:this.backurl,
+						fail: (err) => {
+							console.log(err)
+						}
+					})
 				}
 			}
 		}
