@@ -1,25 +1,25 @@
 <template>
 	<view class="u-demo">
 		<view class="top">
-			<u-navbar :is-back="isback" title="智慧校车" @click="back" class="top" :background="background" back-icon-color="#fff"
+			<u-navbar :is-back="isback" backurl="./index" title="智慧校车" class="top" :background="background" back-icon-color="#fff"
 			 title-color="#fff"></u-navbar>
 		</view>
 		<view class="u-demo-wrap">
 			<u-form :model="model" :rules="rules" ref="uForm" :errorType="errorType">
-				<u-form-item :leftIconStyle="{color: '#888', fontSize: '32rpx'}" label-width="240"
-				 :label-position="labelPosition" label="姓名" prop="name">
+				<u-form-item :leftIconStyle="{color: '#888', fontSize: '32rpx'}" label-width="240" :label-position="labelPosition"
+				 label="姓名" prop="name">
 					<text>李明</text>
 				</u-form-item>
-				<u-form-item :leftIconStyle="{color: '#888', fontSize: '32rpx'}" label-width="240"
-				 :label-position="labelPosition" label="现乘车路线" prop="name">
+				<u-form-item :leftIconStyle="{color: '#888', fontSize: '32rpx'}" label-width="240" :label-position="labelPosition"
+				 label="现乘车路线" prop="name">
 					<text>1号线（粤B1234）</text>
 				</u-form-item>
-				<u-form-item :leftIconStyle="{color: '#888', fontSize: '32rpx'}" label-width="240"
-				 :label-position="labelPosition" label="现上车站点" prop="name">
+				<u-form-item :leftIconStyle="{color: '#888', fontSize: '32rpx'}" label-width="240" :label-position="labelPosition"
+				 label="现上车站点" prop="name">
 					<text>硅谷人才公寓</text>
 				</u-form-item>
-				<u-form-item :leftIconStyle="{color: '#888', fontSize: '32rpx'}" label-width="240"
-				 :label-position="labelPosition" label="现下车站点" prop="name">
+				<u-form-item :leftIconStyle="{color: '#888', fontSize: '32rpx'}" label-width="240" :label-position="labelPosition"
+				 label="现下车站点" prop="name">
 					<text>西丽湖地铁站</text>
 				</u-form-item>
 				<u-form-item :label-position="labelPosition" label="更换路线" label-width="240" prop="sex">
@@ -48,7 +48,6 @@
 		<u-action-sheet :list="actionSheetList" v-model="actionSheetShow" @click="actionSheetCallback"></u-action-sheet>
 		<u-select mode="single-column" :list="selectList" v-model="selectShow" @confirm="selectConfirm"></u-select>
 		<u-picker mode="region" v-model="pickerShow" @confirm="regionConfirm"></u-picker>
-		<u-verification-code seconds="60" ref="uCode" @change="codeChange"></u-verification-code>
 	</view>
 </template>
 
@@ -57,7 +56,7 @@
 		data() {
 			let that = this;
 			return {
-				isback: false,
+				isback: true,
 				background: {
 					backgroundColor: '#12c497',
 				},
@@ -227,27 +226,7 @@
 				border: false,
 				check: false,
 				selectStatus: 'close',
-				checkboxList: [{
-						name: '荔枝',
-						checked: false,
-						disabled: false
-					},
-					{
-						name: '香蕉',
-						checked: false,
-						disabled: false
-					},
-					{
-						name: '橙子',
-						checked: false,
-						disabled: false
-					},
-					{
-						name: '草莓',
-						checked: false,
-						disabled: false
-					}
-				],
+				checkboxList: [],
 				radioList: [{
 						name: '临时更换',
 						checked: true,
@@ -289,90 +268,13 @@
 			this.$refs.uForm.setRules(this.rules);
 		},
 		methods: {
-			submit() {
-				this.$refs.uForm.validate(valid => {
-					if (valid) {
-						if (!this.model.agreement) return this.$u.toast('请勾选协议');
-						console.log('验证通过');
-					} else {
-						console.log('验证失败');
-					}
-				});
-			},
-			// 点击actionSheet回调
 			actionSheetCallback(index) {
 				uni.hideKeyboard();
 				this.model.sex = this.actionSheetList[index].text;
 			},
-			// checkbox选择发生变化
-			checkboxGroupChange(e) {
-				this.model.likeFruit = e;
-			},
-			// radio选择发生变化
 			radioGroupChange(e) {
 				this.model.payType = e;
 			},
-			// 勾选版权协议
-			checkboxChange(e) {
-				this.model.agreement = e.value;
-			},
-			// 选择地区回调
-			regionConfirm(e) {
-				this.model.region = e.province.label + '-' + e.city.label + '-' + e.area.label;
-			},
-			// 选择商品类型回调
-			selectConfirm(e) {
-				this.model.goodsType = '';
-				e.map((val, index) => {
-					this.model.goodsType += this.model.goodsType == '' ? val.label : '-' + val.label;
-				})
-			},
-			borderChange(index) {
-				this.border = !index;
-			},
-			radioCheckboxChange(index) {
-				if (index == 0) {
-					this.radioCheckWrap = false;
-					this.radioCheckWidth = 'auto';
-				} else if (index == 1) {
-					this.radioCheckWrap = true;
-					this.radioCheckWidth = 'auto';
-				} else if (index == 2) {
-					this.radioCheckWrap = false;
-					this.radioCheckWidth = '50%';
-				}
-			},
-			labelPositionChange(index) {
-				this.labelPosition = index == 0 ? 'left' : 'top';
-			},
-			codeChange(text) {
-				this.codeTips = text;
-			},
-			// 获取验证码
-			getCode() {
-				if (this.$refs.uCode.canGetCode) {
-					// 模拟向后端请求验证码
-					uni.showLoading({
-						title: '正在获取验证码',
-						mask: true
-					})
-					setTimeout(() => {
-						uni.hideLoading();
-						// 这里此提示会被this.start()方法中的提示覆盖
-						this.$u.toast('验证码已发送');
-						// 通知验证码组件内部开始倒计时
-						this.$refs.uCode.start();
-					}, 2000);
-				} else {
-					this.$u.toast('倒计时结束后再发送');
-				}
-			},
-			errorChange(index) {
-				if (index == 0) this.errorType = ['message'];
-				if (index == 1) this.errorType = ['toast'];
-				if (index == 2) this.errorType = ['border-bottom'];
-				if (index == 3) this.errorType = ['border'];
-			}
 		}
 	};
 </script>
