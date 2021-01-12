@@ -1,14 +1,14 @@
 body{background: #fff;}
 .clearfix:after{
-    content: "020"; 
-    display: block; 
-    height: 0; 
-    clear: both; 
-    visibility: hidden;  
+    content: "020";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
 }
 .clearfix {
-/* 触发 hasLayout */ 
-    zoom: 1; 
+/* 触发 hasLayout */
+    zoom: 1;
 }
 /*导航部分*/
 .logo-content{
@@ -17,14 +17,22 @@ body{background: #fff;}
     margin-left: 15px;
 }
 .logo-content .p1{
-    color: #F7B52C;
-    font-size: 20px;
+    /*color: #F7B52C;*/
+    /*font-size: 20px;*/
     font-weight: bold;
     margin-top: 20px;
+    width: 158px;
+    height: 30px;
+    font-size: 28px;
+    font-weight: 800;
+    color: #F7B52C;
+
 }
 .logo-content .p2{
     font-size: 14px;
-    margin-top: 10px;
+    width: 205px;
+    height: 20px;
+    font-weight: 400;
     color: #333333;
 }
 .tel{
@@ -35,13 +43,14 @@ body{background: #fff;}
     margin-bottom: 10px;
 }
 .tel p{
-    font-size: 18px;
+    font-size: 26px;
     font-weight: bold;
     color: #646464;
     margin-left: 20px;
 }
 .tel img, .tel p{
     display: inline;
+    vertical-align: bottom;
 }
 .nav{
     box-shadow: -17px -6px 20px 0px #ccc !important;
@@ -64,25 +73,81 @@ body{background: #fff;}
 .nav .layui-nav-bar,
 .nav .layui-nav .layui-this:after{height: 2px; background-color: #2db5a3;}
 .nav .layui-nav .layui-this a
-,.nav .layui-nav .layui-nav-item a:hover{color: #2db5a3;}
+,.nav .layui-nav .layui-nav-item a:hover{color: #FF8A00;}
+.nav .layui-nav .nav-main a{ color: #FF8A00;}
 .left{
     float: left;
 }
 .right{
     float: right;
 }
+
 .banner{
     width: 100%;
     background-color: #d8af46;
 }
 .banner .banner-content{
-    width: 980px;
+    /*width: 980px;*/
     margin: 0 auto;
+}
+.banner p, .banner button{
+    position: absolute;
+
+}
+.banner p.p1 {
+    top: 259px;
+    left: 961px;
+    width: 430px;
+    height: 56px;
+    font-size: 58px;
+    font-family: PingFang SC;
+    font-weight: 800;
+    color: #FFFFFF;
+    text-shadow: 0px 2px 16px #191F27;
+}
+.banner p.p2{
+    top: 380px;
+    left: 1075px;
+    width: 180px;
+    height: 27px;
+    font-size: 28px;
+    font-family: PingFang SC;
+    font-weight: 800;
+    color: #FFFFFF;
+    text-shadow: 0px 2px 16px #191F27;
+}
+.banner p.p3{
+    top: 422px;
+    left: 997px;
+    width: 321px;
+    height: 18px;
+    font-size: 18px;
+    font-family: PingFang SC;
+    font-weight: 500;
+    color: #FFFFFF;
+    text-shadow: 0px 2px 16px #191F27;
+}
+.banner button.apply{
+    top: 482px;
+    left: 1053px;
+    width: 251px;
+    height: 67px;
+    background: #3F89E0;
+    border:0px;
+}
+.banner button.apply span{
+    width: 137px;
+    height: 28px;
+    font-size: 28px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    color: #FFFFFF;
 }
 .banner img{
     display: block;
-    max-width: 100%;
-    max-height: 100%;
+    height: 614px;
+    /*max-width: 100%;*/
+    /*max-height: 100%;*/
 }
 .wrap1{
     padding-top: 30px;
@@ -104,7 +169,7 @@ body{background: #fff;}
     text-align: center;
 }
 .wrap1-content p{
-    margin-top: 20px;
+    margin-top: 60px;
     color: #555555;
     font-size: 18px;
     text-align: left;
@@ -120,6 +185,9 @@ p.introduce{
     font-size: 18px;
     padding: 10px 20px;
 }
+.advantage-main{
+    margin-top: 60px;
+}
 .advantage p.title{
     margin-top: 20px;
     font-size: 50px;
@@ -127,12 +195,14 @@ p.introduce{
     text-align: center;
 }
 .advantage-content{
-    margin: 20px auto;
+    /*margin: 20px auto;*/
     text-align: center;
     display: flex;
     display: -ms-flex; /* 兼容IE */
     justify-self: center;
     align-items: center;
+    margin-top:20px;
+    margin-bottom: 60px;
 }
 .advantage-1{
     padding: 0 30px;
@@ -143,12 +213,16 @@ p.introduce{
 .advantage-img{
     height: 131px;
 }
-.advantage-1 p.content{
-    font-size: 18px;
-    text-align: left;
-    color: #333333;
-    line-height: 30px;
+.vat-center{
     margin-top: 20px;
+}
+.advantage-1 p.content{
+    margin-top: 10px;
+    width: 251px;
+    height: 39px;
+    font-size: 16px;
+    font-weight: 400;
+    color: #888;
 }
 .wrap2{
     width: 100%;
@@ -179,6 +253,24 @@ p.introduce{
 }
 .wrap3 p.content{
     font-size: 28px;
+    color: #727272;
+}
+.wrap3 .intro{
+    height: 50px;
+    position: relative;
+}
+.wrap3 .intro .left{
+    width: 359px;
+    height: 40px;
+    font-size: 16px;
+    font-weight: 400;
+    color: #727272;
+}
+.wrap3 .intro .right{
+    width: 305px;
+    height: 39px;
+    font-size: 16px;
+    font-weight: 400;
     color: #727272;
 }
 .wrap4{
