@@ -472,6 +472,50 @@ ul.sitemap-links li{
     width: 169px;
     height: 169px;
 }
+.pop-main{
+    position: relative;
+}
+.pop-main .pop-left{
+    float:left;
+    width: 300px;
+    height: 420px;
+    background-color: #FFCF68;
+}
+.pop-main .pop-left img{
+    margin: 132px 0 0 103px;
+}
+.pop-main .pop-right{
+    float: left;
+}
+.pop-main .pop-right .pop-title{
+    width: 200px;
+    height: 29px;
+    font-size: 32px;
+    font-weight: 800;
+    color: #555555;
+    margin: 31px 40px 0 145px;
+}
+.pop-main .layui-form{
+    margin-top: 40px;
+}
+.pop-main .layui-form .layui-input{
+    width: 333px;
+    height: 39px;
+    background: #F6F6F6;
+    border: 1px solid rgba(211, 211, 211, 0.73);
+}
+.pop-main .layui-form .layui-input-block{
+     margin-left:40px;
+ }
+.pop-main .layui-form .layui-textarea{
+    width: 333px;
+    height: 96px;
+    background: #F6F6F6;
+    border: 1px solid rgba(211, 211, 211, 0.73);
+}
+.pop-main .layui-form .layui-btn{
+    background: #3E3A39;
+}
 @media screen and (min-width: 768px){
     .nav{max-height: 120px;}
     .nav.index{background: rgba(255, 255, 255 ,0.3);}
@@ -486,5 +530,5 @@ ul.sitemap-links li{
     .main-newsdate .pushtime{line-height: 142px;}
     .main-case .content{width: 45%;}
     .main-case .content.even{margin-left: 9%;}
-    .main-about ul.aboutab li{padding: 0 32px; font-size: 24px; margin-left: 30px; line-height: 50px;
+    .main-about ul.aboutab li{padding: 0 32px; font-size: 24px; margin-left: 30px; line-height: 50px;}
 }

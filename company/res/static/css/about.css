@@ -226,19 +226,70 @@ ul.sitemap-links li{
     width: 169px;
     height: 169px;
 }
-@media screen and (min-width: 768px){
-    .nav{max-height: 120px;}
-    .nav.index{background: rgba(255, 255, 255 ,0.3);}
-    .nav .nav-list button{display: none;}
-    .nav .layui-nav{width: auto; position: absolute; top: 60px; padding: 0 5px; border-radius: 0; margin: 0; }
-    .nav .layui-nav .layui-nav-item{display: inline-block; margin:0 53px; line-height: 40px;}
-    .main-product p.title
-    ,.main-service p.title{font-size: 36px; line-height: 216px;}
-    .main.product .content .content-img{text-align: left;}
-    .main-news .content .news-panel strong a{font-size: 20px; line-height: 30px;}
-    .main-news .content .news-panel p.read-push{padding-top: 0; position: absolute; bottom: 40px;}
-    .main-newsdate .pushtime{line-height: 142px;}
-    .main-case .content{width: 45%;}
-    .main-case .content.even{margin-left: 9%;}
-    .main-about ul.aboutab li{padding: 0 32px; font-size: 24px; margin-left: 30px; line-height: 50px;
+@media screen and (min-width: 768px) {
+    .nav {
+        max-height: 120px;
+    }
+
+    .nav.index {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .nav .nav-list button {
+        display: none;
+    }
+
+    .nav .layui-nav {
+        width: auto;
+        position: absolute;
+        top: 60px;
+        padding: 0 5px;
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .nav .layui-nav .layui-nav-item {
+        display: inline-block;
+        margin: 0 53px;
+        line-height: 40px;
+    }
+
+    .main-product p.title, .main-service p.title {
+        font-size: 36px;
+        line-height: 216px;
+    }
+
+    .main.product .content .content-img {
+        text-align: left;
+    }
+
+    .main-news .content .news-panel strong a {
+        font-size: 20px;
+        line-height: 30px;
+    }
+
+    .main-news .content .news-panel p.read-push {
+        padding-top: 0;
+        position: absolute;
+        bottom: 40px;
+    }
+
+    .main-newsdate .pushtime {
+        line-height: 142px;
+    }
+
+    .main-case .content {
+        width: 45%;
+    }
+
+    .main-case .content.even {
+        margin-left: 9%;
+    }
+
+    .main-about ul.aboutab li {
+        padding: 0 32px;
+        font-size: 24px;
+        margin-left: 30px;
+        line-height: 50px;
+    }
 }
