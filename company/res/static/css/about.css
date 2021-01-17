@@ -96,12 +96,16 @@ body{background: #F8FAFB;}
     text-align: left;
     width: 780px;
     margin: 0 auto;
+    position: relative;
 }
 .wrap-content2 ul {
     padding: 0 60px 0 0;
 }
 .wrap-content2 ul li{
-    margin-top: 20px;
+    width: 900px;
+    clear: both;
+    margin:10px 0px 20px 0px;
+    float: left;
 }
 .wrap-content2 ul li span{
     display: inline-block;
@@ -110,11 +114,20 @@ body{background: #F8FAFB;}
     background-color: #F7B52C;
     border-radius: 50%;
 }
+.wrap-content2 .circle{
+    float: left;
+    margin: 10px 10px 20px 0;
+}
 .wrap-content2 ul li p{
     display: inline;
     margin-left: 20px;
     padding-right: 40px;
     line-height: 25px;
+    font-size: 16px;
+    font-weight: 400;
+    color: #555555;
+    float: left;
+    width: 750px;
 }
 .wrap-content2 ul{
     margin-left: 40px;
