@@ -17,14 +17,19 @@ body{background: #fff;}
     margin-left: 15px;
 }
 .logo-content .p1{
-    color: #F7B52C;
-    font-size: 20px;
     font-weight: bold;
     margin-top: 20px;
+    width: 158px;
+    height: 30px;
+    font-size: 28px;
+    font-weight: 800;
+    color: #F7B52C;
 }
 .logo-content .p2{
     font-size: 14px;
-    margin-top: 10px;
+    width: 205px;
+    height: 20px;
+    font-weight: 400;
     color: #333333;
 }
 .tel{
@@ -35,13 +40,14 @@ body{background: #fff;}
     margin-bottom: 10px;
 }
 .tel p{
-    font-size: 18px;
+    font-size: 26px;
     font-weight: bold;
     color: #646464;
     margin-left: 20px;
 }
 .tel img, .tel p{
     display: inline;
+    vertical-align: bottom;
 }
 .nav{
     box-shadow: -17px -6px 20px 0px #ccc !important;

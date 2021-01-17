@@ -17,8 +17,6 @@ body{background: #fff;}
     margin-left: 15px;
 }
 .logo-content .p1{
-    /*color: #F7B52C;*/
-    /*font-size: 20px;*/
     font-weight: bold;
     margin-top: 20px;
     width: 158px;
@@ -26,7 +24,6 @@ body{background: #fff;}
     font-size: 28px;
     font-weight: 800;
     color: #F7B52C;
-
 }
 .logo-content .p2{
     font-size: 14px;
