@@ -86,6 +86,9 @@ body{background: #fff;}
 .banner .banner-content{
     /*width: 980px;*/
     margin: 0 auto;
+    background: url(../images/banner.png) no-repeat  center top;
+    background-size: 1918px 614px;
+    height: 614px;
 }
 .banner p, .banner button{
     position: absolute;
