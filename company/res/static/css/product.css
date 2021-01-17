@@ -227,7 +227,36 @@ body{background: #fff;}
     font-size: 48px;
     color: #fff;
 }
-
+.wrap2 .img9{
+    width: 980px;
+    height: 535px;
+    position: relative;
+    margin-top: 60px;
+}
+.wrap2 .img9 .p1{
+    float: left;
+    width: 600px;
+    height: 535px;
+    font-size: 58px;
+    font-weight: 800;
+    color: #555555;
+}
+.wrap .img9 img{
+    float: left;
+    vertical-align: sub;
+    margin-top: 19px;
+}
+.wrap .img9 .p1 .s1{
+    margin-left: 30px;;
+}
+.wrap .img9 .p1 .s2{
+    font-size: 38px;
+    font-weight: 300;
+    color: #666666;
+    width: 980px;
+    float: left;
+    margin-left: 50px;
+}
 .wrap2-1{
     background-color: #F2E6D5;
 }
