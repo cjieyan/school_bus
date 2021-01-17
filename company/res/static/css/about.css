@@ -92,10 +92,9 @@ body{background: #F8FAFB;}
     line-height: 22px;
 }
 .wrap-content2{
-    padding: 60px 0;
     text-align: left;
     width: 780px;
-    margin: 0 auto;
+    margin: 65px auto;
     position: relative;
 }
 .wrap-content2 ul {
@@ -131,6 +130,7 @@ body{background: #F8FAFB;}
 }
 .wrap-content2 ul{
     margin-left: 40px;
+    height: 350px;
 }
 .wrap-content3{
     margin: 30px 0;
@@ -160,6 +160,7 @@ body{background: #F8FAFB;}
 .info{
     padding: 20px;
     background-color: #F7B52C;
+    color: #333333;
 }
 .hr{
     height: 18px;
