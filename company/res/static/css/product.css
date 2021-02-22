@@ -419,7 +419,40 @@ button.apply{
 .pop-main .layui-form .layui-btn{
     background: #3E3A39;
 }
+.pop-msg{
+    position: relative;
+    width: 439px;
+    height: 40px;
+    background: #fff;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    line-height: 40px;
+    padding-left: 10px;
+}
 
+.pop-msg:before{
+    position: absolute;
+    content: "";
+    width: 0;
+    height: 0;
+    right: 180px;
+    top: 40px;
+    border-top: 15px solid #fff;
+    border-right: 7px solid transparent;
+    border-left: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+}
+.entry-trangle-bottom{  
+    position:absolute;  
+    bottom:-10px;  
+    left:20px;  
+    width:0;  
+    height:0;  
+    border-left:15px solid transparent;  
+    border-right:15px solid transparent;  
+    border-top:15px solid #fff;  
+}
 @media screen and (min-width: 768px) {
     .nav {
         max-height: 120px;
